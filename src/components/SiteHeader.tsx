@@ -97,19 +97,35 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
           ref={listRef}
           className="relative hidden items-center gap-1 rounded-full border border-zinc-200 bg-zinc-50/80 p-1 md:flex"
         >
-          {/* Pill escuro estilo Apple liquid */}
+          {/* Pill escuro semi-transparente, estilo Apple Liquid Glass */}
           <span
             aria-hidden="true"
-            className="pointer-events-none absolute top-1 bottom-1 rounded-full bg-zinc-950 shadow-[0_10px_28px_rgba(24,24,27,0.28)]"
+            className="pointer-events-none absolute top-1 bottom-1 overflow-hidden rounded-full"
             style={{
               left: indicator.left,
               width: indicator.width,
               opacity: indicator.ready ? 1 : 0,
               transform: 'translateZ(0)',
               transition:
-                'left 620ms cubic-bezier(0.32, 0.72, 0, 1), width 620ms cubic-bezier(0.32, 0.72, 0, 1), opacity 260ms ease',
+                'left 780ms cubic-bezier(0.34, 1.15, 0.32, 1), width 780ms cubic-bezier(0.34, 1.15, 0.32, 1), opacity 300ms ease',
+              background:
+                'linear-gradient(140deg, rgba(24,24,27,0.78) 0%, rgba(39,39,42,0.62) 50%, rgba(24,24,27,0.78) 100%)',
+              backdropFilter: 'blur(14px) saturate(140%)',
+              WebkitBackdropFilter: 'blur(14px) saturate(140%)',
+              boxShadow:
+                '0 12px 30px rgba(24,24,27,0.28), inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(255,255,255,0.06)',
             }}
-          />
+          >
+            {/* brilho superior tipo vidro liquido */}
+            <span
+              aria-hidden="true"
+              className="absolute inset-x-2 top-0 h-1/2 rounded-full"
+              style={{
+                background:
+                  'radial-gradient(120% 100% at 50% 0%, rgba(255,255,255,0.35), rgba(255,255,255,0) 70%)',
+              }}
+            />
+          </span>
           {links.map((link) => {
             const isActive = active === link.id
             return (
