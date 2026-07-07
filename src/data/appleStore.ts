@@ -192,7 +192,7 @@ export const allProducts: FeaturedProduct[] = [
     description: 'Fones leves para chamadas, musica e uso continuo no ecossistema Apple.',
     specs: ['USB-C', 'Som espacial', 'Estojo compacto'],
     colors: ['Branco', 'Estojo branco'],
-    image: 'https://www.apple.com/v/airpods/ae/images/chapternav/airpods_4__fqax1brwh46e_large.svg',
+    image: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/airpods-4-select-202409?wid=976&hei=916&fmt=jpeg&qlt=90&.v=1724144219189',
   },
 ]
 
