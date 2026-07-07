@@ -128,7 +128,7 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
           <a
             href="/shop"
             aria-current={variant === 'shop' ? 'page' : undefined}
-            className="relative z-10 ml-1 inline-flex items-center gap-2 rounded-full bg-zinc-950 px-4 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-zinc-800"
+            className="relative z-10 ml-1 inline-flex items-center gap-2 rounded-full bg-sky-600 px-4 py-2 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(2,132,199,0.28)] transition hover:-translate-y-0.5 hover:bg-sky-500"
           >
             <ShoppingBag className="size-4" aria-hidden="true" />
             Shopping
