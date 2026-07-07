@@ -1,57 +1,69 @@
-# React + TypeScript + Vite
+# Apple Pacces
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A vitrine digital e catálogo premium para venda consultiva do ecossistema Apple. Focado em uma experiência de usuário de alto nível (UI/UX), curadoria inteligente e design minimalista.
 
-Currently, two official plugins are available:
+## Tecnologias e Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Este projeto foi construído utilizando as melhores práticas do ecossistema front-end moderno:
 
-## Expanding the ESLint configuration
+- **React 18** - Biblioteca de UI
+- **Vite** - Bundler ultrarrápido
+- **TypeScript** - Tipagem estática para maior segurança do código
+- **Tailwind CSS** - Estilização utility-first (com suporte a animações e efeitos de glassmorphism)
+- **React Router DOM** - Navegação fluida entre páginas (SPA)
+- **Lucide React** - Ícones minimalistas
+- **Zustand** - Gerenciamento de estado (preparado para futuras integrações)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 📁 Estrutura de Diretórios
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+O projeto segue uma arquitetura baseada em features e componentes:
+
+```text
+src/
+├── assets/         # Imagens estáticas e recursos visuais
+├── components/     # Componentes reutilizáveis de UI
+│   ├── CatalogSections.tsx   # Vitrine de produtos e categorias
+│   ├── ConversionSections.tsx # Passos de venda, diferenciais e formulário
+│   ├── HeroSection.tsx       # Dobra principal da landing page
+│   └── SiteHeader.tsx        # Navegação principal global
+├── data/           # Mock data para o catálogo de produtos
+│   └── appleStore.ts         # Produtos, categorias e textos do site
+├── hooks/          # React hooks customizados
+├── lib/            # Utilitários gerais (ex: junção de classes tailwind)
+└── pages/          # Páginas roteáveis da aplicação
+    ├── Home.tsx              # Landing page principal
+    └── Shop.tsx              # Catálogo expandido com todos os produtos
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Instalação e Execução
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Para rodar o projeto localmente, certifique-se de ter o Node.js instalado (versão 18+ recomendada).
 
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+1. **Clone o repositório:**
+   ```bash
+   git clone https://github.com/ExQues/Apple-Pacces.git
+   cd Apple-Pacces
+   ```
+
+2. **Instale as dependências:**
+   ```bash
+   npm install
+   ```
+
+3. **Inicie o servidor de desenvolvimento:**
+   ```bash
+   npm run dev
+   ```
+
+4. Acesse no navegador em `http://localhost:5173`.
+
+## Próximos Passos (Roadmap Backend)
+
+Atualmente o site funciona de forma estática no front-end. O próximo passo lógico da evolução da plataforma inclui:
+
+1. **Integração com Supabase:** Mover os dados locais (`src/data/appleStore.ts`) para um banco de dados PostgreSQL real.
+2. **Captação de Leads:** Conectar o formulário de "Solicitar atendimento" a uma tabela de contatos ou a um webhook (ex: envio direto para WhatsApp ou e-mail comercial).
+3. **Gerenciamento do Catálogo:** Criação de um painel administrativo (ou integração direta pelo painel do Supabase) para adicionar, remover e alterar o preço dos dispositivos dinamicamente.
+
+---
+*Desenvolvido com padrão de curadoria premium.*

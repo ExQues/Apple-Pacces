@@ -8,7 +8,6 @@ type SiteHeaderProps = {
 
 const SECTIONS = ['produtos', 'diferenciais', 'consultoria', 'contato'] as const
 type SectionId = (typeof SECTIONS)[number]
-type ActiveKey = SectionId | 'shop'
 
 export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
   const sectionPrefix = variant === 'home' ? '' : '/'
@@ -19,8 +18,7 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
     { label: 'Contato', id: 'contato', href: `${sectionPrefix}#contato` },
   ]
 
-  // Na Shop, o item ativo eh o proprio Shop. Na home, comeca em "produtos".
-  const [active, setActive] = useState<ActiveKey>(variant === 'shop' ? 'shop' : 'produtos')
+  const [active, setActive] = useState<SectionId>('produtos')
   const [indicator, setIndicator] = useState<{ left: number; width: number; ready: boolean }>({
     left: 0,
     width: 0,
@@ -104,13 +102,13 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
             style={{
               left: indicator.left,
               width: indicator.width,
-              opacity: indicator.ready ? 1 : 0,
+              opacity: indicator.ready && variant === 'home' ? 1 : 0,
               transition:
                 'left 500ms cubic-bezier(0.4, 0, 0.2, 1), width 500ms cubic-bezier(0.4, 0, 0.2, 1), opacity 220ms ease',
             }}
           />
           {links.map((link) => {
-            const isActive = active === link.id
+            const isActive = variant === 'home' && active === link.id
             return (
               <a
                 key={link.href}
@@ -128,16 +126,9 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
             )
           })}
           <a
-            ref={(el) => {
-              itemRefs.current['shop'] = el
-            }}
             href="/shop"
-            aria-current={active === 'shop' ? 'page' : undefined}
-            className={`relative z-10 ml-1 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold shadow-sm transition ${
-              active === 'shop'
-                ? 'bg-transparent text-white'
-                : 'bg-sky-600 text-white hover:-translate-y-0.5 hover:bg-sky-500'
-            }`}
+            aria-current={variant === 'shop' ? 'page' : undefined}
+            className="relative z-10 ml-1 inline-flex items-center gap-2 rounded-full bg-zinc-950 px-4 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-zinc-800"
           >
             <ShoppingBag className="size-4" aria-hidden="true" />
             Shopping
