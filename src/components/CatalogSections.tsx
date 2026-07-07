@@ -1,7 +1,4 @@
-import { Laptop, MonitorSmartphone, Tablet, Watch } from 'lucide-react'
 import { categories, featuredProducts } from '@/data/appleStore'
-
-const icons = [MonitorSmartphone, Laptop, Tablet, Watch]
 
 export function CatalogSections() {
   return (
@@ -20,19 +17,14 @@ export function CatalogSections() {
         </div>
 
         <div className="mt-12 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {categories.map((category, index) => {
-            const Icon = icons[index]
-            return (
-              <article key={category.name} className="group rounded-[2rem] border border-zinc-200 bg-white p-6 transition duration-300 hover:-translate-y-1 hover:border-zinc-300 hover:shadow-2xl">
-                <div className="mb-8 flex size-12 items-center justify-center rounded-2xl bg-zinc-950 text-white transition group-hover:scale-105">
-                  <Icon className="size-5" aria-hidden="true" />
-                </div>
-                <h3 className="text-2xl font-semibold tracking-tight text-zinc-950">{category.name}</h3>
-                <p className="mt-4 min-h-20 text-sm leading-6 text-zinc-600">{category.description}</p>
-                <p className="mt-6 border-t border-zinc-100 pt-5 text-sm font-semibold text-zinc-950">{category.highlight}</p>
-              </article>
-            )
-          })}
+          {categories.map((category) => (
+            <article key={category.name} className="group rounded-[2rem] border border-zinc-200 bg-white p-6 transition duration-300 hover:-translate-y-1 hover:border-zinc-300 hover:shadow-2xl">
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-zinc-400">Linha</p>
+              <h3 className="mt-3 text-2xl font-semibold tracking-tight text-zinc-950">{category.name}</h3>
+              <p className="mt-4 min-h-20 text-sm leading-6 text-zinc-600">{category.description}</p>
+              <p className="mt-6 border-t border-zinc-100 pt-5 text-sm font-semibold text-zinc-950">{category.highlight}</p>
+            </article>
+          ))}
         </div>
 
         <div className="mt-16 grid gap-5 lg:grid-cols-3">

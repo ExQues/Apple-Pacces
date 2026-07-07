@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { Search, ShoppingBag } from 'lucide-react'
-import { allProducts } from '@/data/appleStore'
+import { ShoppingBag } from 'lucide-react'
+import { ImportContactModal } from '@/components/ImportContactModal'
 
 type SiteHeaderProps = {
   variant?: 'home' | 'shop'
@@ -19,6 +19,7 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
   ]
 
   const [active, setActive] = useState<SectionId>('produtos')
+  const [modalOpen, setModalOpen] = useState(false)
   const [indicator, setIndicator] = useState<{ left: number; width: number; ready: boolean }>({
     left: 0,
     width: 0,
@@ -136,22 +137,16 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
         </div>
 
         <div className="flex items-center gap-2">
-          <a
-            href="/shop"
-            className="hidden items-center gap-2 rounded-full border border-zinc-200 bg-white px-4 py-2.5 text-sm font-semibold text-zinc-700 transition hover:border-zinc-300 hover:text-zinc-950 sm:inline-flex"
-            aria-label={`Ver catalogo com ${allProducts.length} produtos`}
-          >
-            <Search className="size-4" aria-hidden="true" />
-            {allProducts.length} produtos
-          </a>
-          <a
-            href={`${sectionPrefix}#contato`}
+          <button
+            type="button"
+            onClick={() => setModalOpen(true)}
             className="rounded-full bg-zinc-950 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(24,24,27,0.18)] transition hover:-translate-y-0.5 hover:bg-zinc-800"
           >
             Falar agora
-          </a>
+          </button>
         </div>
       </nav>
+      <ImportContactModal open={modalOpen} onClose={() => setModalOpen(false)} />
     </header>
   )
 }
