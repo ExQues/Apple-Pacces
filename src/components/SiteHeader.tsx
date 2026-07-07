@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Search, ShoppingBag } from 'lucide-react'
 import { allProducts } from '@/data/appleStore'
 
@@ -8,6 +8,7 @@ type SiteHeaderProps = {
 
 const SECTIONS = ['produtos', 'diferenciais', 'consultoria', 'contato'] as const
 type SectionId = (typeof SECTIONS)[number]
+type ActiveKey = SectionId | 'shop'
 
 export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
   const sectionPrefix = variant === 'home' ? '' : '/'
@@ -18,7 +19,8 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
     { label: 'Contato', id: 'contato', href: `${sectionPrefix}#contato` },
   ]
 
-  const [active, setActive] = useState<SectionId>('produtos')
+  // Na Shop, o item ativo eh o proprio Shop. Na home, comeca em "produtos".
+  const [active, setActive] = useState<ActiveKey>(variant === 'shop' ? 'shop' : 'produtos')
   const [indicator, setIndicator] = useState<{ left: number; width: number; ready: boolean }>({
     left: 0,
     width: 0,
@@ -27,41 +29,39 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
   const listRef = useRef<HTMLDivElement | null>(null)
   const itemRefs = useRef<Record<string, HTMLAnchorElement | null>>({})
 
-  // Observa qual secao esta visivel na home
+  // Detecta a secao ativa com base em scrollY (mais confiavel que IntersectionObserver
+  // quando as secoes tem alturas muito diferentes).
   useEffect(() => {
     if (variant !== 'home') return
     if (typeof window === 'undefined') return
 
-    const sections = SECTIONS.map((id) => document.getElementById(id)).filter(
-      (el): el is HTMLElement => Boolean(el),
-    )
-    if (sections.length === 0) return
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0]
-        if (visible) {
-          setActive(visible.target.id as SectionId)
+    const computeActive = () => {
+      const trigger = window.innerHeight * 0.35 // ponto de leitura acima do meio
+      let current: SectionId = 'produtos'
+      for (const id of SECTIONS) {
+        const el = document.getElementById(id)
+        if (!el) continue
+        const rect = el.getBoundingClientRect()
+        if (rect.top - trigger <= 0) {
+          current = id
         }
-      },
-      {
-        rootMargin: '-45% 0px -45% 0px',
-        threshold: [0, 0.25, 0.5, 0.75, 1],
-      },
-    )
+      }
+      setActive(current)
+    }
 
-    sections.forEach((el) => observer.observe(el))
-    return () => observer.disconnect()
+    computeActive()
+    window.addEventListener('scroll', computeActive, { passive: true })
+    window.addEventListener('resize', computeActive)
+    return () => {
+      window.removeEventListener('scroll', computeActive)
+      window.removeEventListener('resize', computeActive)
+    }
   }, [variant])
 
-  // Recalcula posicao/tamanho do indicador liquid
-  useLayoutEffect(() => {
+  const recalcIndicator = useCallback(() => {
     const container = listRef.current
     const target = itemRefs.current[active]
     if (!container || !target) return
-
     const containerRect = container.getBoundingClientRect()
     const targetRect = target.getBoundingClientRect()
     setIndicator({
@@ -71,22 +71,14 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
     })
   }, [active])
 
+  useLayoutEffect(() => {
+    recalcIndicator()
+  }, [recalcIndicator])
+
   useEffect(() => {
-    const handleResize = () => {
-      const container = listRef.current
-      const target = itemRefs.current[active]
-      if (!container || !target) return
-      const containerRect = container.getBoundingClientRect()
-      const targetRect = target.getBoundingClientRect()
-      setIndicator({
-        left: targetRect.left - containerRect.left,
-        width: targetRect.width,
-        ready: true,
-      })
-    }
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [active])
+    window.addEventListener('resize', recalcIndicator)
+    return () => window.removeEventListener('resize', recalcIndicator)
+  }, [recalcIndicator])
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 px-3 pt-3">
@@ -105,10 +97,10 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
           ref={listRef}
           className="relative hidden items-center gap-1 rounded-full border border-zinc-200 bg-zinc-50/80 p-1 md:flex"
         >
-          {/* Indicador liquid */}
+          {/* Pill escuro estilo Apple liquid */}
           <span
             aria-hidden="true"
-            className="pointer-events-none absolute top-1 bottom-1 rounded-full bg-white shadow-[0_6px_18px_rgba(24,24,27,0.12)] ring-1 ring-zinc-200/70"
+            className="pointer-events-none absolute top-1 bottom-1 rounded-full bg-zinc-950 shadow-[0_10px_28px_rgba(24,24,27,0.28)]"
             style={{
               left: indicator.left,
               width: indicator.width,
@@ -119,7 +111,7 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
             }}
           />
           {links.map((link) => {
-            const isActive = variant === 'home' && active === link.id
+            const isActive = active === link.id
             return (
               <a
                 key={link.href}
@@ -129,7 +121,7 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
                 href={link.href}
                 aria-current={isActive ? 'page' : undefined}
                 className={`relative z-10 rounded-full px-4 py-2 text-sm font-medium transition-colors duration-300 ${
-                  isActive ? 'text-zinc-950' : 'text-zinc-500 hover:text-zinc-950'
+                  isActive ? 'text-white' : 'text-zinc-500 hover:text-zinc-950'
                 }`}
               >
                 {link.label}
@@ -137,11 +129,19 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
             )
           })}
           <a
+            ref={(el) => {
+              itemRefs.current['shop'] = el
+            }}
             href="/shop"
-            className="relative z-10 ml-1 inline-flex items-center gap-2 rounded-full bg-zinc-950 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-zinc-800"
+            aria-current={active === 'shop' ? 'page' : undefined}
+            className={`relative z-10 ml-1 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold shadow-sm transition ${
+              active === 'shop'
+                ? 'bg-transparent text-white'
+                : 'bg-sky-600 text-white hover:-translate-y-0.5 hover:bg-sky-500'
+            }`}
           >
             <ShoppingBag className="size-4" aria-hidden="true" />
-            Shop
+            Shopping
           </a>
         </div>
 
