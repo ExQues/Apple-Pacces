@@ -194,16 +194,6 @@ export const allProducts: FeaturedProduct[] = [
     colors: ['Branco', 'Estojo branco'],
     image: 'https://www.apple.com/v/airpods/ae/images/chapternav/airpods_4__fqax1brwh46e_large.svg',
   },
-  {
-    name: 'Magic Keyboard para iPad',
-    category: 'Acessorios',
-    line: 'Produtividade movel',
-    priceFrom: 'A partir de R$ 2.499',
-    description: 'Transforma o iPad em uma estacao de trabalho leve, precisa e elegante.',
-    specs: ['Trackpad integrado', 'Teclas retroiluminadas', 'Design flutuante'],
-    colors: ['Branco', 'Preto'],
-    image: 'https://www.apple.com/assets-www/en_WW/ipad/03_chapternav/small/keyboards_c8202d7ef.png',
-  },
 ]
 
 export const featuredProducts: FeaturedProduct[] = [allProducts[0], allProducts[4], allProducts[7]]
