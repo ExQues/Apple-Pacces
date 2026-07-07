@@ -3,7 +3,7 @@ import { ArrowUpRight, BadgeCheck, Clock3, PackageCheck, Search, SlidersHorizont
 import { SiteHeader } from '@/components/SiteHeader'
 import { allProducts, categories } from '@/data/appleStore'
 
-const CATEGORY_FILTERS = ['Todos', 'iPhone', 'Mac', 'iPad', 'Apple Watch', 'Acessorios'] as const
+const CATEGORY_FILTERS = ['Todos', 'iPhone', 'Mac', 'iPad', 'Apple Watch', 'Android', 'Acessorios'] as const
 
 function slugify(value: string) {
   return value.toLowerCase().replace(/\s+/g, '-')
@@ -55,7 +55,7 @@ export default function Shop() {
                 Shopping Apple completo.
               </h1>
               <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-600">
-                Uma prateleira digital limpa para comparar iPhone, Mac, iPad, Apple Watch e acessorios. Filtre por linha, busque pelo nome e fale direto com um consultor.
+                Uma prateleira digital limpa para comparar iPhone, Mac, iPad, Apple Watch, Android e acessorios. Filtre por linha, busque pelo nome e fale direto com um consultor.
               </p>
             </div>
 
