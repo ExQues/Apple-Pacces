@@ -1,3 +1,4 @@
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Search, ShoppingBag } from 'lucide-react'
 import { allProducts } from '@/data/appleStore'
 
@@ -5,14 +6,87 @@ type SiteHeaderProps = {
   variant?: 'home' | 'shop'
 }
 
+const SECTIONS = ['produtos', 'diferenciais', 'consultoria', 'contato'] as const
+type SectionId = (typeof SECTIONS)[number]
+
 export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
   const sectionPrefix = variant === 'home' ? '' : '/'
-  const links = [
-    { label: 'Produtos', href: `${sectionPrefix}#produtos` },
-    { label: 'Diferenciais', href: `${sectionPrefix}#diferenciais` },
-    { label: 'Consultoria', href: `${sectionPrefix}#consultoria` },
-    { label: 'Contato', href: `${sectionPrefix}#contato` },
+  const links: { label: string; id: SectionId; href: string }[] = [
+    { label: 'Produtos', id: 'produtos', href: `${sectionPrefix}#produtos` },
+    { label: 'Diferenciais', id: 'diferenciais', href: `${sectionPrefix}#diferenciais` },
+    { label: 'Consultoria', id: 'consultoria', href: `${sectionPrefix}#consultoria` },
+    { label: 'Contato', id: 'contato', href: `${sectionPrefix}#contato` },
   ]
+
+  const [active, setActive] = useState<SectionId>('produtos')
+  const [indicator, setIndicator] = useState<{ left: number; width: number; ready: boolean }>({
+    left: 0,
+    width: 0,
+    ready: false,
+  })
+  const listRef = useRef<HTMLDivElement | null>(null)
+  const itemRefs = useRef<Record<string, HTMLAnchorElement | null>>({})
+
+  // Observa qual secao esta visivel na home
+  useEffect(() => {
+    if (variant !== 'home') return
+    if (typeof window === 'undefined') return
+
+    const sections = SECTIONS.map((id) => document.getElementById(id)).filter(
+      (el): el is HTMLElement => Boolean(el),
+    )
+    if (sections.length === 0) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0]
+        if (visible) {
+          setActive(visible.target.id as SectionId)
+        }
+      },
+      {
+        rootMargin: '-45% 0px -45% 0px',
+        threshold: [0, 0.25, 0.5, 0.75, 1],
+      },
+    )
+
+    sections.forEach((el) => observer.observe(el))
+    return () => observer.disconnect()
+  }, [variant])
+
+  // Recalcula posicao/tamanho do indicador liquid
+  useLayoutEffect(() => {
+    const container = listRef.current
+    const target = itemRefs.current[active]
+    if (!container || !target) return
+
+    const containerRect = container.getBoundingClientRect()
+    const targetRect = target.getBoundingClientRect()
+    setIndicator({
+      left: targetRect.left - containerRect.left,
+      width: targetRect.width,
+      ready: true,
+    })
+  }, [active])
+
+  useEffect(() => {
+    const handleResize = () => {
+      const container = listRef.current
+      const target = itemRefs.current[active]
+      if (!container || !target) return
+      const containerRect = container.getBoundingClientRect()
+      const targetRect = target.getBoundingClientRect()
+      setIndicator({
+        left: targetRect.left - containerRect.left,
+        width: targetRect.width,
+        ready: true,
+      })
+    }
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [active])
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 px-3 pt-3">
@@ -27,15 +101,44 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
           <span className="hidden text-sm font-semibold tracking-[0.28em] text-zinc-950 sm:inline">PACCES</span>
         </a>
 
-        <div className="hidden items-center gap-1 rounded-full border border-zinc-200 bg-zinc-50/80 p-1 md:flex">
-          {links.map((link) => (
-            <a key={link.href} href={link.href} className="rounded-full px-4 py-2 text-sm font-medium text-zinc-500 transition hover:bg-white hover:text-zinc-950 hover:shadow-sm">
-              {link.label}
-            </a>
-          ))}
+        <div
+          ref={listRef}
+          className="relative hidden items-center gap-1 rounded-full border border-zinc-200 bg-zinc-50/80 p-1 md:flex"
+        >
+          {/* Indicador liquid */}
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute top-1 bottom-1 rounded-full bg-white shadow-[0_6px_18px_rgba(24,24,27,0.12)] ring-1 ring-zinc-200/70"
+            style={{
+              left: indicator.left,
+              width: indicator.width,
+              opacity: indicator.ready ? 1 : 0,
+              transform: 'translateZ(0)',
+              transition:
+                'left 620ms cubic-bezier(0.32, 0.72, 0, 1), width 620ms cubic-bezier(0.32, 0.72, 0, 1), opacity 260ms ease',
+            }}
+          />
+          {links.map((link) => {
+            const isActive = variant === 'home' && active === link.id
+            return (
+              <a
+                key={link.href}
+                ref={(el) => {
+                  itemRefs.current[link.id] = el
+                }}
+                href={link.href}
+                aria-current={isActive ? 'page' : undefined}
+                className={`relative z-10 rounded-full px-4 py-2 text-sm font-medium transition-colors duration-300 ${
+                  isActive ? 'text-zinc-950' : 'text-zinc-500 hover:text-zinc-950'
+                }`}
+              >
+                {link.label}
+              </a>
+            )
+          })}
           <a
             href="/shop"
-            className="inline-flex items-center gap-2 rounded-full bg-zinc-950 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-zinc-800"
+            className="relative z-10 ml-1 inline-flex items-center gap-2 rounded-full bg-zinc-950 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-zinc-800"
           >
             <ShoppingBag className="size-4" aria-hidden="true" />
             Shop
