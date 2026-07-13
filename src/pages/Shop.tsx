@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { ArrowUpRight, BadgeCheck, Clock3, PackageCheck, Search, SlidersHorizontal, X } from 'lucide-react'
 import { SiteHeader } from '@/components/SiteHeader'
 import { allProducts, categories } from '@/data/appleStore'
+import { useCartStore } from '@/store/useCartStore'
 
 const CATEGORY_FILTERS = ['Todos', 'iPhone', 'Mac', 'iPad', 'Apple Watch', 'Android', 'Acessorios'] as const
 
@@ -222,15 +223,12 @@ export default function Shop() {
                     </div>
                     <div className="mt-7 flex items-center justify-between border-t border-zinc-100 pt-5">
                       <p className="font-semibold text-zinc-950">{product.priceFrom}</p>
-                      <a
-                        href={whatsappLink(product.name)}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                      <button
+                        onClick={() => useCartStore.getState().addItem(product, product.colors[0])}
                         className="inline-flex items-center gap-1 rounded-full bg-zinc-950 px-4 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-zinc-800"
                       >
-                        Falar sobre
-                        <ArrowUpRight className="size-4" aria-hidden="true" />
-                      </a>
+                        Adicionar
+                      </button>
                     </div>
                   </div>
                 </article>

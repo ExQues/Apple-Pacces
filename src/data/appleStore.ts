@@ -21,12 +21,64 @@ export type TrustItem = {
   description: string
 }
 
-// Placeholder SVG "foto em breve" — substituir por foto real depois.
+// Placeholder SVG (fallback caso alguma URL oficial fique fora do ar).
 const placeholder = (label: string) =>
   'data:image/svg+xml;utf8,' +
   encodeURIComponent(
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 360"><rect width="480" height="360" fill="#f5f5f7"/><text x="50%" y="46%" dominant-baseline="middle" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="22" font-weight="700" fill="#18181b">${label}</text><text x="50%" y="60%" dominant-baseline="middle" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="13" fill="#71717a">foto em breve</text></svg>`,
   )
+
+// URLs oficiais das CDNs Apple/Xiaomi. Mesmo modelo em armazenamentos diferentes
+// reaproveita a mesma foto.
+const img = {
+  // iPhone
+  iphone14: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-14-finish-select-202209-6-1inch-midnight?wid=1200&hei=1200&fmt=jpeg&qlt=90&.v=1707768406014',
+  iphone15: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-15-finish-select-202309-6-1inch-black?wid=1200&hei=1200&fmt=jpeg&qlt=90&.v=1725065422695',
+  iphone16e: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-16e-finish-select-202502-6-1inch-black?wid=1200&hei=1200&fmt=jpeg&qlt=90&.v=1738779923428',
+  iphone16: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-16-finish-select-202409-6-1inch-ultramarine?wid=1200&hei=1200&fmt=jpeg&qlt=90&.v=1723923878172',
+  iphone17: 'https://www.apple.com/v/iphone/home/cj/images/overview/select/iphone_17__fb1277oq3eaa_large.jpg',
+  iphone17Air: 'https://www.apple.com/v/iphone/home/cj/images/overview/select/iphone_air__b5qmgl05ojyq_large.jpg',
+  iphone17Pro: 'https://www.apple.com/v/iphone/home/cj/images/overview/select/iphone_17pro__t1j902iw6kya_large.jpg',
+  iphone17ProMax: 'https://www.apple.com/v/iphone/home/cj/images/overview/select/iphone_17pro_max__ftrqjcue4d02_large.jpg',
+  iphone17e: 'https://www.apple.com/v/iphone/home/cj/images/overview/select/iphone_17__fb1277oq3eaa_large.jpg',
+
+  // Apple Watch
+  watchSE2: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/MRE53_VW_34FR+watch-40-alum-midnight-nc-s10_VW_34FR_WF_CO?wid=750&hei=712&trim=1%2C0&fmt=p-jpg&qlt=95&.v=1724165231160',
+  watchSE3: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/MYAF3_VW_34FR+watch-40-alum-midnight-cell-11_VW_34FR_WF_CO?wid=750&hei=712&trim=1%2C0&fmt=p-jpg&qlt=95&.v=1756853120411',
+  watchSeries11: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/MYA43_VW_34FR+watch-46-alum-jetblack-cell-11_VW_34FR_WF_CO?wid=750&hei=712&trim=1%2C0&fmt=p-jpg&qlt=95&.v=1756852999999',
+  watchUltra2: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/MX4E3_VW_34FR+watch-49-titanium-natural-cell-ultra2_VW_34FR_WF_CO?wid=750&hei=712&trim=1%2C0&fmt=p-jpg&qlt=95&.v=1724264460446',
+  watchUltra3: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/MYFY3_VW_34FR+watch-49-titanium-natural-cell-ultra3_VW_34FR_WF_CO?wid=750&hei=712&trim=1%2C0&fmt=p-jpg&qlt=95&.v=1756881744810',
+
+  // iPad
+  ipadMini7: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-finish-select-gallery-202410-space-gray-wifi?wid=1200&hei=1200&fmt=jpeg&qlt=90&.v=1727119715762',
+  ipad11: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-11-finish-select-gallery-202503-silver-wifi?wid=1200&hei=1200&fmt=jpeg&qlt=90&.v=1740518291816',
+  ipadAirM3: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-air-11-finish-select-gallery-202503-blue-wifi?wid=1200&hei=1200&fmt=jpeg&qlt=90&.v=1740518291816',
+  ipadAirM4: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-air-11-finish-select-gallery-202503-blue-wifi?wid=1200&hei=1200&fmt=jpeg&qlt=90&.v=1740518291816',
+  ipadProM5: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-pro-13-finish-select-gallery-202405-space-black-wifi?wid=1200&hei=1200&fmt=jpeg&qlt=90&.v=1713310656931',
+
+  // Mac
+  macMini: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-mini-hero-202410?wid=1200&hei=1200&fmt=jpeg&qlt=90&.v=1729009989552',
+  macbookNeo: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/macbook-air-13-mid-select-202503-midnight?wid=1200&hei=1200&fmt=jpeg&qlt=90&.v=1740504665253',
+  macbookAirM4: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/macbook-air-13-mid-select-202503-sky-blue?wid=1200&hei=1200&fmt=jpeg&qlt=90&.v=1740504665253',
+  macbookAirM5: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/macbook-air-13-mid-select-202503-silver?wid=1200&hei=1200&fmt=jpeg&qlt=90&.v=1740504665253',
+  macbookProM5: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/macbook-pro-14-hero-202410-spaceblack?wid=1200&hei=1200&fmt=jpeg&qlt=90&.v=1729264981617',
+
+  // AirPods
+  airpods4: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/airpods-4-select-202409?wid=976&hei=916&fmt=jpeg&qlt=90&.v=1724144219189',
+  airpods4Anc: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/airpods-4-anc-select-202409?wid=976&hei=916&fmt=jpeg&qlt=90&.v=1724144219189',
+  airpodsPro2: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/MTJV3?wid=1200&hei=1200&fmt=jpeg&qlt=90&.v=1693598943842',
+  airpodsPro3: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/airpods-pro-3-select-202509?wid=976&hei=916&fmt=jpeg&qlt=90&.v=1756923453999',
+  airpodsMax: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/airpods-max-select-202409-starlight?wid=976&hei=916&fmt=jpeg&qlt=90&.v=1724144219189',
+
+  // AirTag
+  airtag: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/airtag-single-select-202104?wid=1200&hei=1200&fmt=jpeg&qlt=90&.v=1617761672000',
+  airtagPack: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/airtag-4pack-select-202104?wid=1200&hei=1200&fmt=jpeg&qlt=90&.v=1617761672000',
+
+  // Apple Pencil
+  pencilUsbc: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/apple-pencil-usbc-select-202310?wid=1200&hei=1200&fmt=jpeg&qlt=90&.v=1696950027192',
+  pencil2: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/MU8F2?wid=1200&hei=1200&fmt=jpeg&qlt=90&.v=1657224900101',
+  pencilPro: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/apple-pencil-pro-select-202405?wid=1200&hei=1200&fmt=jpeg&qlt=90&.v=1713812029973',
+} as const
 
 export const categories: ProductCategory[] = [
   {
@@ -72,7 +124,7 @@ export const allProducts: FeaturedProduct[] = [
     description: 'Modelo consolidado, com desempenho solido e Otima camera para o dia a dia.',
     specs: ['128 GB', 'Face ID', 'Garantia Apple 1 ano'],
     colors: ['Meia-noite', 'Estelar', 'Roxo'],
-    image: placeholder('iPhone 14 128GB'),
+    image: img.iphone14,
   },
   {
     name: 'iPhone 15 128GB',
@@ -82,7 +134,7 @@ export const allProducts: FeaturedProduct[] = [
     description: 'USB-C, camera principal de 48 MP e Dynamic Island.',
     specs: ['128 GB', 'USB-C', 'Garantia Apple 1 ano'],
     colors: ['Preto', 'Azul', 'Rosa', 'Amarelo'],
-    image: placeholder('iPhone 15 128GB'),
+    image: img.iphone15,
   },
   {
     name: 'iPhone 15 256GB',
@@ -92,7 +144,7 @@ export const allProducts: FeaturedProduct[] = [
     description: 'Mais espaco para fotos, videos e apps sem se preocupar.',
     specs: ['256 GB', 'USB-C', 'Garantia Apple 1 ano'],
     colors: ['Preto', 'Azul', 'Rosa', 'Amarelo'],
-    image: placeholder('iPhone 15 256GB'),
+    image: img.iphone15,
   },
   {
     name: 'iPhone 16e 128GB',
@@ -102,7 +154,7 @@ export const allProducts: FeaturedProduct[] = [
     description: 'Porta de entrada da linha 16 com bateria longa e desempenho equilibrado.',
     specs: ['128 GB', 'Apple Intelligence', 'Garantia Apple 1 ano'],
     colors: ['Preto', 'Branco'],
-    image: placeholder('iPhone 16e 128GB'),
+    image: img.iphone16e,
   },
   {
     name: 'iPhone 16 128GB',
@@ -112,7 +164,7 @@ export const allProducts: FeaturedProduct[] = [
     description: 'Camera dupla Fusion, chip A18 e Apple Intelligence.',
     specs: ['128 GB', 'Chip A18', 'Garantia Apple 1 ano'],
     colors: ['Ultramarino', 'Rosa', 'Preto', 'Verde'],
-    image: placeholder('iPhone 16 128GB'),
+    image: img.iphone16,
   },
   {
     name: 'iPhone 16 256GB',
@@ -132,7 +184,7 @@ export const allProducts: FeaturedProduct[] = [
     description: 'Versao acessivel da linha 17 com bom custo-beneficio.',
     specs: ['256 GB', 'Apple Intelligence', 'Garantia Apple 1 ano'],
     colors: ['Preto', 'Branco'],
-    image: placeholder('iPhone 17e 256GB'),
+    image: img.iphone17e,
   },
   {
     name: 'iPhone 17 256GB',
@@ -152,7 +204,7 @@ export const allProducts: FeaturedProduct[] = [
     description: 'Perfil extremamente fino, acabamento leve e camera Fusion.',
     specs: ['256 GB', 'Design ultrafino', 'Garantia Apple 1 ano'],
     colors: ['Azul ceu', 'Dourado claro', 'Preto espacial'],
-    image: placeholder('iPhone 17 Air 256GB'),
+    image: img.iphone17Air,
   },
   {
     name: 'iPhone 17 Air 512GB',
@@ -162,7 +214,7 @@ export const allProducts: FeaturedProduct[] = [
     description: 'iPhone Air com armazenamento maior para uso profissional.',
     specs: ['512 GB', 'Design ultrafino', 'Garantia Apple 1 ano'],
     colors: ['Azul ceu', 'Dourado claro', 'Preto espacial'],
-    image: placeholder('iPhone 17 Air 512GB'),
+    image: img.iphone17Air,
   },
   {
     name: 'iPhone 17 Pro 256GB',
@@ -182,7 +234,7 @@ export const allProducts: FeaturedProduct[] = [
     description: '17 Pro com armazenamento amplo para criacao e trabalho profissional.',
     specs: ['512 GB', 'Tela Pro', 'Garantia Apple 1 ano'],
     colors: ['Laranja cosmico', 'Prata', 'Azul profundo'],
-    image: placeholder('iPhone 17 Pro 512GB'),
+    image: img.iphone17Pro,
   },
   {
     name: 'iPhone 17 Pro Max 256GB',
@@ -202,7 +254,7 @@ export const allProducts: FeaturedProduct[] = [
     description: '17 Pro Max com espaco para quem edita e produz no telefone.',
     specs: ['512 GB', 'Tela Pro Max', 'Garantia Apple 1 ano'],
     colors: ['Laranja cosmico', 'Prata', 'Azul profundo'],
-    image: placeholder('iPhone 17 Pro Max 512GB'),
+    image: img.iphone17ProMax,
   },
   {
     name: 'iPhone 17 Pro Max 1TB',
@@ -212,7 +264,7 @@ export const allProducts: FeaturedProduct[] = [
     description: 'A configuracao maxima do iPhone: 1 TB para nao ter limites.',
     specs: ['1 TB', 'Tela Pro Max', 'Garantia Apple 1 ano'],
     colors: ['Laranja cosmico', 'Prata', 'Azul profundo'],
-    image: placeholder('iPhone 17 Pro Max 1TB'),
+    image: img.iphone17ProMax,
   },
 
   // Apple Watch
@@ -224,7 +276,7 @@ export const allProducts: FeaturedProduct[] = [
     description: 'Entrada no Watch com recursos essenciais de saude e treino.',
     specs: ['40 mm', 'GPS', 'Garantia Apple 1 ano'],
     colors: ['Meia-noite', 'Estelar'],
-    image: placeholder('Apple Watch SE 2 40mm'),
+    image: img.watchSE2,
   },
   {
     name: 'Apple Watch SE 2 44mm',
@@ -234,7 +286,7 @@ export const allProducts: FeaturedProduct[] = [
     description: 'Versao maior do SE 2 com melhor visualizacao das notificacoes.',
     specs: ['44 mm', 'GPS', 'Garantia Apple 1 ano'],
     colors: ['Meia-noite', 'Estelar'],
-    image: placeholder('Apple Watch SE 2 44mm'),
+    image: img.watchSE2,
   },
   {
     name: 'Apple Watch SE 3 40mm',
@@ -244,7 +296,7 @@ export const allProducts: FeaturedProduct[] = [
     description: 'Nova geracao do SE com desempenho aprimorado.',
     specs: ['40 mm', 'GPS', 'Garantia Apple 1 ano'],
     colors: ['Meia-noite', 'Estelar'],
-    image: placeholder('Apple Watch SE 3 40mm'),
+    image: img.watchSE3,
   },
   {
     name: 'Apple Watch SE 3 44mm',
@@ -254,7 +306,7 @@ export const allProducts: FeaturedProduct[] = [
     description: 'SE 3 em tamanho maior, ideal para pulsos maiores e leitura confortavel.',
     specs: ['44 mm', 'GPS', 'Garantia Apple 1 ano'],
     colors: ['Meia-noite', 'Estelar'],
-    image: placeholder('Apple Watch SE 3 44mm'),
+    image: img.watchSE3,
   },
   {
     name: 'Apple Watch Series 11 42mm',
@@ -264,7 +316,7 @@ export const allProducts: FeaturedProduct[] = [
     description: 'Tela ampla, monitoramento avancado e acabamento refinado.',
     specs: ['42 mm', 'GPS', 'Garantia Apple 1 ano'],
     colors: ['Rose Gold', 'Prateado', 'Jet Black'],
-    image: placeholder('Apple Watch Series 11 42mm'),
+    image: img.watchSeries11,
   },
   {
     name: 'Apple Watch Series 11 46mm',
@@ -274,7 +326,7 @@ export const allProducts: FeaturedProduct[] = [
     description: 'Series 11 em versao maior para maxima visualizacao.',
     specs: ['46 mm', 'GPS', 'Garantia Apple 1 ano'],
     colors: ['Rose Gold', 'Prateado', 'Jet Black'],
-    image: placeholder('Apple Watch Series 11 46mm'),
+    image: img.watchSeries11,
   },
   {
     name: 'Apple Watch Ultra 2 49mm',
@@ -294,7 +346,7 @@ export const allProducts: FeaturedProduct[] = [
     description: 'A geracao mais robusta do Watch, para trilha, mergulho e treino pesado.',
     specs: ['49 mm', 'GPS + Cellular', 'Titanio'],
     colors: ['Titanio natural', 'Titanio preto'],
-    image: placeholder('Apple Watch Ultra 3 49mm'),
+    image: img.watchUltra3,
   },
 
   // iPad
@@ -306,7 +358,7 @@ export const allProducts: FeaturedProduct[] = [
     description: 'Pequeno, leve e poderoso para leitura, anotacoes e mobilidade total.',
     specs: ['128 GB', '8.3 polegadas', 'Wi-Fi'],
     colors: ['Roxo', 'Azul', 'Cinza espacial'],
-    image: placeholder('iPad mini 7 128GB'),
+    image: img.ipadMini7,
   },
   {
     name: 'iPad 11 128GB',
@@ -316,7 +368,7 @@ export const allProducts: FeaturedProduct[] = [
     description: 'Tablet moderno para estudo, streaming e uso diario.',
     specs: ['128 GB', 'Wi-Fi', 'USB-C'],
     colors: ['Prateado', 'Amarelo', 'Rosa', 'Azul'],
-    image: placeholder('iPad 11 128GB'),
+    image: img.ipad11,
   },
   {
     name: 'iPad Air M3 128GB',
@@ -326,7 +378,7 @@ export const allProducts: FeaturedProduct[] = [
     description: 'Equilibrio entre potencia, portabilidade e custo, com chip M3.',
     specs: ['128 GB', 'Chip M3', 'Wi-Fi'],
     colors: ['Azul', 'Roxo', 'Estelar', 'Cinza espacial'],
-    image: placeholder('iPad Air M3 128GB'),
+    image: img.ipadAirM3,
   },
   {
     name: 'iPad Air M4 128GB',
@@ -336,7 +388,7 @@ export const allProducts: FeaturedProduct[] = [
     description: 'Nova geracao do Air com chip M4 e desempenho ainda maior.',
     specs: ['128 GB', 'Chip M4', 'Wi-Fi'],
     colors: ['Azul', 'Roxo', 'Estelar', 'Cinza espacial'],
-    image: placeholder('iPad Air M4 128GB'),
+    image: img.ipadAirM4,
   },
   {
     name: 'iPad Pro M5 256GB',
@@ -346,7 +398,7 @@ export const allProducts: FeaturedProduct[] = [
     description: 'Tela incrivel, chip M5 e versatilidade para criar em movimento.',
     specs: ['256 GB', 'Chip M5', 'Compativel com Pencil Pro'],
     colors: ['Preto espacial', 'Prateado'],
-    image: placeholder('iPad Pro M5 256GB'),
+    image: img.ipadProM5,
   },
 
   // Mac
@@ -358,7 +410,7 @@ export const allProducts: FeaturedProduct[] = [
     description: 'Setup minimalista para mesa fixa, estudio e produtividade intensa.',
     specs: ['256 GB', 'Chip M4', 'Compacto'],
     colors: ['Prateado'],
-    image: placeholder('Mac mini M4 256GB'),
+    image: img.macMini,
   },
   {
     name: 'MacBook Neo 256GB',
@@ -368,7 +420,7 @@ export const allProducts: FeaturedProduct[] = [
     description: 'Notebook Apple com custo acessivel para estudo e trabalho leve.',
     specs: ['256 GB', 'Tela Retina', 'Bateria longa'],
     colors: ['Prateado', 'Estelar'],
-    image: placeholder('MacBook Neo 256GB'),
+    image: img.macbookNeo,
   },
   {
     name: 'MacBook Air M4 13" 256GB',

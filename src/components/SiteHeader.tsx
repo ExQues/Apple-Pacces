@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { ShoppingBag } from 'lucide-react'
-import { ImportContactModal } from '@/components/ImportContactModal'
+import { ShoppingBag, User as UserIcon, LogOut } from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuthStore } from '@/store/useAuthStore'
+import { useCartStore } from '@/store/useCartStore'
 
 type SiteHeaderProps = {
   variant?: 'home' | 'shop'
@@ -18,8 +20,11 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
     { label: 'Contato', id: 'contato', href: `${sectionPrefix}#contato` },
   ]
 
+  const { user, signOut } = useAuthStore()
+  const { toggleDrawer, totalItems } = useCartStore()
+  const navigate = useNavigate()
+
   const [active, setActive] = useState<SectionId>('produtos')
-  const [modalOpen, setModalOpen] = useState(false)
   const [indicator, setIndicator] = useState<{ left: number; width: number; ready: boolean }>({
     left: 0,
     width: 0,
@@ -28,14 +33,12 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
   const listRef = useRef<HTMLDivElement | null>(null)
   const itemRefs = useRef<Record<string, HTMLAnchorElement | null>>({})
 
-  // Detecta a secao ativa com base em scrollY (mais confiavel que IntersectionObserver
-  // quando as secoes tem alturas muito diferentes).
   useEffect(() => {
     if (variant !== 'home') return
     if (typeof window === 'undefined') return
 
     const computeActive = () => {
-      const trigger = window.innerHeight * 0.35 // ponto de leitura acima do meio
+      const trigger = window.innerHeight * 0.35
       let current: SectionId = 'produtos'
       for (const id of SECTIONS) {
         const el = document.getElementById(id)
@@ -79,27 +82,31 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
     return () => window.removeEventListener('resize', recalcIndicator)
   }, [recalcIndicator])
 
+  const handleSignOut = async () => {
+    await signOut()
+    navigate('/')
+  }
+
   return (
     <header className="fixed inset-x-0 top-0 z-50 px-3 pt-3">
       <nav
         className="mx-auto flex max-w-7xl items-center justify-between rounded-full border border-white/70 bg-white/85 px-4 py-3 shadow-[0_18px_60px_rgba(24,24,27,0.10)] backdrop-blur-2xl lg:px-5"
         aria-label="Navegacao principal"
       >
-        <a href="/" className="group flex items-center gap-3" aria-label="Apple Pacces">
+        <Link to="/" className="group flex items-center gap-3" aria-label="Apple Pacces">
           <span className="grid size-10 place-items-center rounded-full border border-zinc-200 bg-zinc-950 text-sm font-semibold text-white shadow-sm transition group-hover:scale-105">
             AP
           </span>
           <span className="hidden text-sm font-semibold tracking-[0.28em] text-zinc-950 sm:inline">PACCES</span>
-        </a>
+        </Link>
 
         <div
           ref={listRef}
           className="relative hidden items-center gap-1 rounded-full border border-zinc-200 bg-zinc-50/80 p-1 md:flex"
         >
-          {/* Pill minimalista: preto solido, movimento suave */}
           <span
             aria-hidden="true"
-            className="pointer-events-none absolute top-1 bottom-1 rounded-full bg-zinc-950"
+            className="pointer-events-none absolute bottom-1 top-1 rounded-full bg-zinc-950"
             style={{
               left: indicator.left,
               width: indicator.width,
@@ -126,27 +133,57 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
               </a>
             )
           })}
-          <a
-            href="/shop"
+          <Link
+            to="/shop"
             aria-current={variant === 'shop' ? 'page' : undefined}
             className="relative z-10 ml-1 inline-flex items-center gap-2 rounded-full bg-sky-600 px-4 py-2 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(2,132,199,0.28)] transition hover:-translate-y-0.5 hover:bg-sky-500"
           >
             <ShoppingBag className="size-4" aria-hidden="true" />
             Shopping
-          </a>
+          </Link>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={() => setModalOpen(true)}
-            className="rounded-full bg-zinc-950 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(24,24,27,0.18)] transition hover:-translate-y-0.5 hover:bg-zinc-800"
+            onClick={toggleDrawer}
+            className="relative rounded-full p-2 text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-950"
           >
-            Falar agora
+            <ShoppingBag className="size-5" />
+            {totalItems() > 0 && (
+              <span className="absolute right-0 top-0 flex h-4 w-4 items-center justify-center rounded-full bg-sky-600 text-[10px] font-bold text-white">
+                {totalItems()}
+              </span>
+            )}
           </button>
+          
+          {user ? (
+            <div className="group relative">
+              <button className="flex items-center gap-2 rounded-full border border-zinc-200 bg-white px-4 py-2.5 text-sm font-semibold text-zinc-950 transition hover:bg-zinc-50">
+                <UserIcon className="size-4" />
+                <span className="hidden sm:inline">Minha Conta</span>
+              </button>
+              <div className="absolute right-0 mt-2 hidden w-56 flex-col rounded-2xl border border-zinc-200 bg-white p-2 shadow-xl group-hover:flex">
+                <p className="px-3 py-3 text-xs font-medium text-zinc-500 truncate border-b border-zinc-100 mb-2">{user.email}</p>
+                <button 
+                  onClick={handleSignOut} 
+                  className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-50"
+                >
+                  <LogOut className="size-4" />
+                  Sair
+                </button>
+              </div>
+            </div>
+          ) : (
+            <Link
+              to="/login"
+              className="rounded-full bg-zinc-950 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(24,24,27,0.18)] transition hover:-translate-y-0.5 hover:bg-zinc-800"
+            >
+              Entrar
+            </Link>
+          )}
         </div>
       </nav>
-      <ImportContactModal open={modalOpen} onClose={() => setModalOpen(false)} />
     </header>
   )
 }

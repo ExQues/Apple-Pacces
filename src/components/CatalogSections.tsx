@@ -1,4 +1,5 @@
 import { categories, featuredProducts } from '@/data/appleStore'
+import { useCartStore } from '@/store/useCartStore'
 
 export function CatalogSections() {
   return (
@@ -56,9 +57,9 @@ export function CatalogSections() {
                 </div>
                 <div className="mt-7 flex items-center justify-between border-t border-zinc-100 pt-5">
                   <p className="font-semibold text-zinc-950">{product.priceFrom}</p>
-                  <a href="#contato" className="text-sm font-semibold text-sky-700 transition hover:text-sky-900">
-                    Consultar
-                  </a>
+                  <button onClick={() => useCartStore.getState().addItem(product, product.colors[0])} className="text-sm font-semibold text-sky-700 transition hover:text-sky-900">
+                    Adicionar
+                  </button>
                 </div>
               </div>
             </article>
