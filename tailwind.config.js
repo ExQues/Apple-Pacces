@@ -7,7 +7,20 @@ export default {
     container: {
       center: true,
     },
-    extend: {},
+    extend: {
+      animation: {
+        'cart-bounce': 'cartBounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
+      },
+      keyframes: {
+        cartBounce: {
+          '0%': { transform: 'scale(1)' },
+          '30%': { transform: 'scale(1.35)' },
+          '50%': { transform: 'scale(0.9)' },
+          '70%': { transform: 'scale(1.1)' },
+          '100%': { transform: 'scale(1)' },
+        },
+      },
+    },
   },
   plugins: [],
 };

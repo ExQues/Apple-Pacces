@@ -3,6 +3,7 @@ import { ShoppingBag, User as UserIcon, LogOut } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/useAuthStore'
 import { useCartStore } from '@/store/useCartStore'
+import { useFlyingAnimationStore } from '@/store/useFlyingAnimationStore'
 
 type SiteHeaderProps = {
   variant?: 'home' | 'shop'
@@ -22,7 +23,15 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
 
   const { user, signOut } = useAuthStore()
   const { toggleDrawer, totalItems } = useCartStore()
+  const { setCartIconRef, isBouncing } = useFlyingAnimationStore()
   const navigate = useNavigate()
+  const cartButtonRef = useRef<HTMLButtonElement | null>(null)
+
+  // Registrar o ref do ícone da sacola na store global para a animação de voo
+  useEffect(() => {
+    setCartIconRef(cartButtonRef.current)
+    return () => setCartIconRef(null)
+  }, [setCartIconRef])
 
   const [active, setActive] = useState<SectionId>('produtos')
   const [indicator, setIndicator] = useState<{ left: number; width: number; ready: boolean }>({
@@ -144,10 +153,14 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
         </div>
 
         <div className="flex items-center gap-3">
+          {/* Ícone da Sacola com ref para animação + bounce */}
           <button
+            ref={cartButtonRef}
             type="button"
             onClick={toggleDrawer}
-            className="relative rounded-full p-2 text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-950"
+            className={`relative rounded-full p-2 text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-950 ${
+              isBouncing ? 'animate-cart-bounce' : ''
+            }`}
           >
             <ShoppingBag className="size-5" />
             {totalItems() > 0 && (
@@ -164,7 +177,7 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
                 <span className="hidden sm:inline">Minha Conta</span>
               </button>
               <div className="absolute right-0 mt-2 hidden w-56 flex-col rounded-2xl border border-zinc-200 bg-white p-2 shadow-xl group-hover:flex">
-                <p className="px-3 py-3 text-xs font-medium text-zinc-500 truncate border-b border-zinc-100 mb-2">{user.email}</p>
+                <p className="truncate border-b border-zinc-100 px-3 py-3 mb-2 text-xs font-medium text-zinc-500">{user.email}</p>
                 <button 
                   onClick={handleSignOut} 
                   className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-50"

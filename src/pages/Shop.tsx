@@ -1,8 +1,11 @@
-import { useMemo, useState } from 'react'
-import { ArrowUpRight, BadgeCheck, Clock3, PackageCheck, Search, SlidersHorizontal, X } from 'lucide-react'
+import { useMemo, useRef, useState } from 'react'
+import { BadgeCheck, Clock3, PackageCheck, Search, ShoppingBag, SlidersHorizontal, X } from 'lucide-react'
 import { SiteHeader } from '@/components/SiteHeader'
 import { allProducts, categories } from '@/data/appleStore'
 import { useCartStore } from '@/store/useCartStore'
+import { useProductModalStore } from '@/store/useProductModalStore'
+import { useFlyingAnimationStore } from '@/store/useFlyingAnimationStore'
+import type { FeaturedProduct } from '@/data/appleStore'
 
 const CATEGORY_FILTERS = ['Todos', 'iPhone', 'Mac', 'iPad', 'Apple Watch', 'Android', 'Acessorios'] as const
 
@@ -10,11 +13,90 @@ function slugify(value: string) {
   return value.toLowerCase().replace(/\s+/g, '-')
 }
 
-// Numero comercial pode ser trocado facilmente aqui
-const WHATSAPP_NUMBER = '5511999999999'
-function whatsappLink(product: string) {
-  const text = encodeURIComponent(`Olá! Tenho interesse no ${product}. Pode me ajudar com informacoes e condicoes?`)
-  return `https://wa.me/${WHATSAPP_NUMBER}?text=${text}`
+function ProductCard({ product }: { product: FeaturedProduct }) {
+  const imgRef = useRef<HTMLImageElement | null>(null)
+  const { addItemSilently } = useCartStore()
+  const { open: openModal } = useProductModalStore()
+  const { triggerFly } = useFlyingAnimationStore()
+
+  const handleAddToCart = () => {
+    if (imgRef.current) {
+      const rect = imgRef.current.getBoundingClientRect()
+      triggerFly(product.image, rect)
+    }
+    addItemSilently(product, product.colors[0])
+  }
+
+  return (
+    <article
+      id={slugify(product.category)}
+      className="group overflow-hidden rounded-[2rem] border border-zinc-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-2xl"
+    >
+      <div className="relative overflow-hidden bg-zinc-100">
+        <div className="flex h-72 items-center justify-center bg-[#f5f5f7] p-8">
+          <img
+            ref={imgRef}
+            src={product.image}
+            alt={`Imagem oficial do ${product.name}`}
+            loading="lazy"
+            onError={(e) => {
+              const target = e.currentTarget
+              target.onerror = null
+              target.src =
+                'data:image/svg+xml;utf8,' +
+                encodeURIComponent(
+                  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect width="400" height="300" fill="%23f5f5f7"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="system-ui" font-size="20" fill="%239ca3af">${product.name}</text></svg>`,
+                )
+            }}
+            className="h-full w-full object-contain transition duration-500 group-hover:scale-105"
+          />
+        </div>
+        <span className="absolute left-5 top-5 rounded-full bg-white/85 px-3 py-1.5 text-xs font-semibold text-zinc-700 shadow-sm backdrop-blur">
+          {product.category}
+        </span>
+      </div>
+      <div className="p-6">
+        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-zinc-400">{product.line}</p>
+        <h2 className="mt-3 text-2xl font-semibold tracking-tight text-zinc-950">{product.name}</h2>
+        <p className="mt-3 text-sm leading-6 text-zinc-600">{product.description}</p>
+        <div className="mt-6 flex flex-wrap gap-2">
+          {product.specs.map((spec) => (
+            <span key={spec} className="rounded-full bg-zinc-100 px-3 py-1.5 text-xs font-medium text-zinc-600">
+              {spec}
+            </span>
+          ))}
+        </div>
+        <div className="mt-5">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400">Acabamentos</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {product.colors.map((color) => (
+              <span key={color} className="rounded-full border border-zinc-200 bg-white px-3 py-1 text-xs font-medium text-zinc-600">
+                {color}
+              </span>
+            ))}
+          </div>
+        </div>
+        <div className="mt-7 flex items-center justify-between border-t border-zinc-100 pt-5">
+          <p className="font-semibold text-zinc-950">{product.priceFrom}</p>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => openModal(product)}
+              className="rounded-full bg-zinc-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-zinc-800"
+            >
+              Comprar
+            </button>
+            <button
+              onClick={handleAddToCart}
+              className="grid size-10 place-items-center rounded-full border border-zinc-200 text-zinc-500 transition hover:border-zinc-400 hover:bg-zinc-50 hover:text-zinc-950"
+              aria-label={`Adicionar ${product.name} à sacola`}
+            >
+              <ShoppingBag className="size-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </article>
+  )
 }
 
 export default function Shop() {
@@ -173,65 +255,7 @@ export default function Shop() {
           ) : (
             <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
               {filtered.map((product) => (
-                <article
-                  key={product.name}
-                  id={slugify(product.category)}
-                  className="group overflow-hidden rounded-[2rem] border border-zinc-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-2xl"
-                >
-                  <div className="relative overflow-hidden bg-zinc-100">
-                    <div className="flex h-72 items-center justify-center bg-[#f5f5f7] p-8">
-                      <img
-                        src={product.image}
-                        alt={`Imagem oficial do ${product.name}`}
-                        loading="lazy"
-                        onError={(e) => {
-                          const target = e.currentTarget
-                          target.onerror = null
-                          target.src =
-                            'data:image/svg+xml;utf8,' +
-                            encodeURIComponent(
-                              `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect width="400" height="300" fill="%23f5f5f7"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="system-ui" font-size="20" fill="%239ca3af">${product.name}</text></svg>`,
-                            )
-                        }}
-                        className="h-full w-full object-contain transition duration-500 group-hover:scale-105"
-                      />
-                    </div>
-                    <span className="absolute left-5 top-5 rounded-full bg-white/85 px-3 py-1.5 text-xs font-semibold text-zinc-700 shadow-sm backdrop-blur">
-                      {product.category}
-                    </span>
-                  </div>
-                  <div className="p-6">
-                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-zinc-400">{product.line}</p>
-                    <h2 className="mt-3 text-2xl font-semibold tracking-tight text-zinc-950">{product.name}</h2>
-                    <p className="mt-3 text-sm leading-6 text-zinc-600">{product.description}</p>
-                    <div className="mt-6 flex flex-wrap gap-2">
-                      {product.specs.map((spec) => (
-                        <span key={spec} className="rounded-full bg-zinc-100 px-3 py-1.5 text-xs font-medium text-zinc-600">
-                          {spec}
-                        </span>
-                      ))}
-                    </div>
-                    <div className="mt-5">
-                      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400">Acabamentos</p>
-                      <div className="mt-2 flex flex-wrap gap-2">
-                        {product.colors.map((color) => (
-                          <span key={color} className="rounded-full border border-zinc-200 bg-white px-3 py-1 text-xs font-medium text-zinc-600">
-                            {color}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="mt-7 flex items-center justify-between border-t border-zinc-100 pt-5">
-                      <p className="font-semibold text-zinc-950">{product.priceFrom}</p>
-                      <button
-                        onClick={() => useCartStore.getState().addItem(product, product.colors[0])}
-                        className="inline-flex items-center gap-1 rounded-full bg-zinc-950 px-4 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-zinc-800"
-                      >
-                        Adicionar
-                      </button>
-                    </div>
-                  </div>
-                </article>
+                <ProductCard key={product.name} product={product} />
               ))}
             </div>
           )}

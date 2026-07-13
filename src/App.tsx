@@ -6,6 +6,8 @@ import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import Checkout from "@/pages/Checkout";
 import { CartDrawer } from "@/components/CartDrawer";
+import { ProductModal } from "@/components/ProductModal";
+import { FlyingImage } from "@/components/FlyingImage";
 import { useAuthStore } from "@/store/useAuthStore";
 
 export default function App() {
@@ -18,6 +20,8 @@ export default function App() {
   return (
     <Router>
       <CartDrawer />
+      <ProductModal />
+      <FlyingImage />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/shop" element={<Shop />} />
