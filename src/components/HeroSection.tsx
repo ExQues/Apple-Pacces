@@ -11,10 +11,7 @@ export function HeroSection() {
       <div className="absolute right-0 top-28 -z-10 h-56 w-56 rounded-full bg-zinc-200/50 blur-3xl" />
       <div className="mx-auto grid max-w-7xl items-center gap-14 lg:grid-cols-[0.96fr_1.04fr]">
         <div className="max-w-3xl animate-rise">
-          <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white/80 px-4 py-2 text-sm font-medium text-zinc-600 shadow-sm">
-            <Sparkles className="size-4 text-sky-500" aria-hidden="true" />
-            Loja premium para escolher Apple sem erro
-          </div>
+
 
           <h1 className="max-w-4xl text-balance font-display text-5xl font-semibold leading-[0.94] tracking-[-0.055em] text-zinc-950 sm:text-6xl lg:text-7xl">
             Linha Apple para quem exige o melhor.

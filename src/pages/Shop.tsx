@@ -130,11 +130,7 @@ export default function Shop() {
         <section className="mx-auto max-w-7xl">
           <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
             <div>
-              <p className="inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold text-zinc-600 shadow-sm">
-                <SlidersHorizontal className="size-4 text-zinc-950" aria-hidden="true" />
-                Todos os produtos
-              </p>
-              <h1 className="mt-6 max-w-3xl font-display text-5xl font-semibold leading-[0.96] tracking-[-0.055em] text-zinc-950 sm:text-6xl">
+              <h1 className="max-w-3xl font-display text-5xl font-semibold leading-[0.96] tracking-[-0.055em] text-zinc-950 sm:text-6xl">
                 Shopping Apple completo.
               </h1>
               <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-600">
