@@ -8,6 +8,7 @@ import Checkout from "@/pages/Checkout";
 import { CartDrawer } from "@/components/CartDrawer";
 import { ProductModal } from "@/components/ProductModal";
 import { FlyingImage } from "@/components/FlyingImage";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { useAuthStore } from "@/store/useAuthStore";
 
 export default function App() {
@@ -27,7 +28,14 @@ export default function App() {
         <Route path="/shop" element={<Shop />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/checkout" element={<Checkout />} />
+        <Route
+          path="/checkout"
+          element={
+            <ProtectedRoute>
+              <Checkout />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </Router>
   );
