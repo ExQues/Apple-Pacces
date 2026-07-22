@@ -6,13 +6,14 @@ export interface CartItem extends FeaturedProduct {
   cartItemId: string
   quantity: number
   selectedColor: string
+  selectedStorage?: string
 }
 
 interface CartState {
   items: CartItem[]
   isDrawerOpen: boolean
-  addItem: (product: FeaturedProduct, selectedColor: string) => void
-  addItemSilently: (product: FeaturedProduct, selectedColor: string) => void
+  addItem: (product: FeaturedProduct, selectedColor: string, selectedStorage?: string, customPrice?: string, customImage?: string) => void
+  addItemSilently: (product: FeaturedProduct, selectedColor: string, selectedStorage?: string, customPrice?: string, customImage?: string) => void
   removeItem: (cartItemId: string) => void
   updateQuantity: (cartItemId: string, quantity: number) => void
   clearCart: () => void
@@ -22,10 +23,23 @@ interface CartState {
   totalItems: () => number
 }
 
-function addProductToItems(items: CartItem[], product: FeaturedProduct, selectedColor: string): CartItem[] {
+function addProductToItems(
+  items: CartItem[],
+  product: FeaturedProduct,
+  selectedColor: string,
+  selectedStorage?: string,
+  customPrice?: string,
+  customImage?: string
+): CartItem[] {
+  const itemPrice = customPrice || product.priceFrom
+  const itemImage = customImage || product.image
+  const storageLabel = selectedStorage ? ` (${selectedStorage})` : ''
+  const itemTitle = `${product.name}${storageLabel}`
+
   const existingItem = items.find(
-    (item) => item.name === product.name && item.selectedColor === selectedColor
+    (item) => item.name === itemTitle && item.selectedColor === selectedColor
   )
+
   if (existingItem) {
     return items.map((item) =>
       item.cartItemId === existingItem.cartItemId
@@ -33,9 +47,19 @@ function addProductToItems(items: CartItem[], product: FeaturedProduct, selected
         : item
     )
   }
+
   return [
     ...items,
-    { ...product, cartItemId: crypto.randomUUID(), quantity: 1, selectedColor },
+    {
+      ...product,
+      name: itemTitle,
+      priceFrom: itemPrice,
+      image: itemImage,
+      cartItemId: crypto.randomUUID(),
+      quantity: 1,
+      selectedColor,
+      selectedStorage,
+    },
   ]
 }
 
@@ -45,17 +69,16 @@ export const useCartStore = create<CartState>()(
       items: [],
       isDrawerOpen: false,
 
-      addItem: (product, selectedColor) => {
+      addItem: (product, selectedColor, selectedStorage, customPrice, customImage) => {
         set((state) => ({
-          items: addProductToItems(state.items, product, selectedColor),
+          items: addProductToItems(state.items, product, selectedColor, selectedStorage, customPrice, customImage),
           isDrawerOpen: true,
         }))
       },
 
-      // Adiciona sem abrir o drawer — usado pela flying animation
-      addItemSilently: (product, selectedColor) => {
+      addItemSilently: (product, selectedColor, selectedStorage, customPrice, customImage) => {
         set((state) => ({
-          items: addProductToItems(state.items, product, selectedColor),
+          items: addProductToItems(state.items, product, selectedColor, selectedStorage, customPrice, customImage),
         }))
       },
 
@@ -63,12 +86,14 @@ export const useCartStore = create<CartState>()(
         set((state) => ({
           items: state.items.filter((item) => item.cartItemId !== cartItemId),
         })),
+
       updateQuantity: (cartItemId, quantity) =>
         set((state) => ({
           items: state.items.map((item) =>
             item.cartItemId === cartItemId ? { ...item, quantity } : item
           ),
         })),
+
       clearCart: () => set({ items: [] }),
       openDrawer: () => set({ isDrawerOpen: true }),
       closeDrawer: () => set({ isDrawerOpen: false }),

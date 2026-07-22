@@ -20,12 +20,27 @@ function ProductCard({ product }: { product: FeaturedProduct }) {
   const { open: openModal } = useProductModalStore()
   const { triggerFly } = useFlyingAnimationStore()
 
+  // Estado da opcao de armazenamento selecionada
+  const defaultStorage = product.storageOptions?.[0]?.storage || ''
+  const [selectedStorage, setSelectedStorage] = useState(defaultStorage)
+
+  // Estado da cor selecionada
+  const defaultColor = product.colorOptions?.[0]?.name || product.colors[0] || ''
+  const [selectedColor, setSelectedColor] = useState(defaultColor)
+
+  // Calcular preco e imagem ativos dinamicamente
+  const activeStorageObj = product.storageOptions?.find((s) => s.storage === selectedStorage)
+  const activePrice = activeStorageObj?.priceFrom || product.priceFrom
+
+  const activeColorObj = product.colorOptions?.find((c) => c.name === selectedColor)
+  const activeImage = activeColorObj?.image || product.image
+
   const handleAddToCart = () => {
     if (imgRef.current) {
       const rect = imgRef.current.getBoundingClientRect()
-      triggerFly(product.image, rect)
+      triggerFly(activeImage, rect)
     }
-    addItemSilently(product, product.colors[0])
+    addItemSilently(product, selectedColor, selectedStorage, activePrice, activeImage)
   }
 
   return (
@@ -37,8 +52,8 @@ function ProductCard({ product }: { product: FeaturedProduct }) {
         <div className="flex h-72 items-center justify-center bg-[#f5f5f7] p-8">
           <img
             ref={imgRef}
-            src={product.image}
-            alt={`Imagem oficial do ${product.name}`}
+            src={activeImage}
+            alt={`Imagem do ${product.name} na cor ${selectedColor}`}
             loading="lazy"
             onError={(e) => {
               const target = e.currentTarget
@@ -66,26 +81,67 @@ function ProductCard({ product }: { product: FeaturedProduct }) {
       <div className="p-6">
         <p className="text-xs font-semibold uppercase tracking-[0.22em] text-zinc-400">{product.line}</p>
         <h2 className="mt-3 text-2xl font-semibold tracking-tight text-zinc-950">{product.name}</h2>
-        <p className="mt-3 text-sm leading-6 text-zinc-600">{product.description}</p>
-        <div className="mt-6 flex flex-wrap gap-2">
-          {product.specs.map((spec) => (
-            <span key={spec} className="rounded-full bg-zinc-100 px-3 py-1.5 text-xs font-medium text-zinc-600">
-              {spec}
-            </span>
-          ))}
-        </div>
-        <div className="mt-5">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400">Acabamentos</p>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {product.colors.map((color) => (
-              <span key={color} className="rounded-full border border-zinc-200 bg-white px-3 py-1 text-xs font-medium text-zinc-600">
-                {color}
-              </span>
-            ))}
+        <p className="mt-2 text-sm leading-6 text-zinc-600">{product.description}</p>
+
+        {/* Seletor Dinamico de Armazenamento/Capacidade */}
+        {product.storageOptions && product.storageOptions.length > 0 && (
+          <div className="mt-5">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400">Capacidade</p>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {product.storageOptions.map((opt) => (
+                <button
+                  key={opt.storage}
+                  onClick={() => setSelectedStorage(opt.storage)}
+                  className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
+                    selectedStorage === opt.storage
+                      ? 'bg-zinc-950 font-semibold text-white shadow-sm'
+                      : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
+                  }`}
+                >
+                  {opt.storage}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
-        <div className="mt-7 flex items-center justify-between border-t border-zinc-100 pt-5">
-          <p className="font-semibold text-zinc-950">{product.priceFrom}</p>
+        )}
+
+        {/* Seletor Dinamico de Cor com Bolinhas e Preview em Tempo Real */}
+        {product.colorOptions && product.colorOptions.length > 0 && (
+          <div className="mt-4">
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400">Cor</p>
+              <span className="text-xs font-semibold text-zinc-700">{selectedColor}</span>
+            </div>
+            <div className="mt-2 flex flex-wrap items-center gap-1.5">
+              {product.colorOptions.map((c) => (
+                <button
+                  key={c.name}
+                  onClick={() => setSelectedColor(c.name)}
+                  title={c.name}
+                  className={`relative flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition ${
+                    selectedColor === c.name
+                      ? 'border-zinc-950 bg-zinc-950 text-white shadow-sm'
+                      : 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-400 hover:bg-zinc-50'
+                  }`}
+                >
+                  {c.hex && (
+                    <span
+                      className="size-3 rounded-full border border-black/10 shadow-inner"
+                      style={{ backgroundColor: c.hex }}
+                    />
+                  )}
+                  {c.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="mt-6 flex items-center justify-between border-t border-zinc-100 pt-5">
+          <div>
+            <span className="text-xs text-zinc-400">A partir de</span>
+            <p className="text-xl font-bold text-zinc-950">{activePrice}</p>
+          </div>
           <div className="flex items-center gap-2">
             {product.status === 'em-falta' ? (
               <span className="rounded-full bg-zinc-100 px-4 py-2 text-xs font-semibold text-zinc-400">
@@ -94,7 +150,7 @@ function ProductCard({ product }: { product: FeaturedProduct }) {
             ) : (
               <>
                 <button
-                  onClick={() => openModal(product)}
+                  onClick={() => openModal({ ...product, priceFrom: activePrice, image: activeImage })}
                   className="rounded-full bg-zinc-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-zinc-800"
                 >
                   Comprar

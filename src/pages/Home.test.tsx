@@ -25,7 +25,7 @@ describe('Home', () => {
     expect(screen.getAllByText(/apple watch/i).length).toBeGreaterThan(0)
 
     expect(screen.getByText(/iPhone 17 Pro/i)).toBeInTheDocument()
-    expect(screen.getByText(/MacBook Air M4/i)).toBeInTheDocument()
+    expect(screen.getByText(/MacBook Air/i)).toBeInTheDocument()
     expect(screen.getByText(/Garantia e proced/i)).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: /escolha inteligente em 3 passos/i })).toBeInTheDocument()
     expect(screen.getByText(/compare perfil, orçamento e ciclo de troca/i)).toBeInTheDocument()
