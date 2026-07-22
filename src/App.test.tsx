@@ -10,7 +10,7 @@ describe('App', () => {
     render(<App />)
 
     expect(screen.getByRole('heading', { name: /shopping apple completo/i })).toBeInTheDocument()
-    expect(screen.getByText(/todos os produtos/i)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^todos/i })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: /curadoria que reduz arrependimento/i })).toBeInTheDocument()
     expect(screen.getByText(/estoque selecionado por uso real/i)).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /voltar para o inicio/i })).toHaveAttribute('href', '/')

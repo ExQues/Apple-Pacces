@@ -1,5 +1,7 @@
-import { BadgeCheck, ClipboardCheck, CreditCard, Headphones, RefreshCw, ShieldCheck, Sparkles, Truck } from 'lucide-react'
+import { useState, FormEvent } from 'react'
+import { BadgeCheck, CheckCircle2, ClipboardCheck, CreditCard, Headphones, RefreshCw, ShieldCheck, Sparkles, Truck } from 'lucide-react'
 import { trustItems } from '@/data/appleStore'
+import { supabase } from '@/lib/supabase'
 
 const trustIcons = [ShieldCheck, Headphones, CreditCard, Truck]
 
@@ -91,20 +93,20 @@ export function TrustAndConsulting() {
               Compra assistida
             </div>
             <h2 className="max-w-2xl font-display text-4xl font-semibold tracking-[-0.045em] text-zinc-950 sm:text-5xl">
-              Nao compre pelo modelo mais caro. Compre pelo modelo certo.
+              Não compre pelo modelo mais caro. Compre pelo modelo certo.
             </h2>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-600">
-              Nossa consultoria compara uso, memoria, camera, bateria, garantia e condicoes para indicar a configuracao com melhor custo-beneficio.
+              Nossa consultoria compara uso, memória, câmera, bateria, garantia e condições para indicar a configuração com melhor custo-benefício.
             </p>
             <a href="#contato" className="mt-9 inline-flex rounded-full bg-zinc-950 px-7 py-4 text-sm font-semibold text-white transition hover:-translate-y-1 hover:bg-zinc-800">
-              Receber recomendacao
+              Receber recomendação
             </a>
           </div>
           <div className="relative min-h-80 bg-[linear-gradient(135deg,#f8fafc,#dbeafe_42%,#18181b)]">
             <div className="absolute inset-8 rounded-[2rem] border border-white/50 bg-white/30 backdrop-blur-xl" />
             <div className="absolute bottom-10 left-10 right-10 rounded-3xl bg-white p-6 shadow-2xl">
-              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-zinc-400">Diagnostico rapido</p>
-              <p className="mt-3 text-2xl font-semibold tracking-tight text-zinc-950">Uso diario, criacao ou trabalho profissional?</p>
+              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-zinc-400">Diagnóstico rápido</p>
+              <p className="mt-3 text-2xl font-semibold tracking-tight text-zinc-950">Uso diário, criação ou trabalho profissional?</p>
             </div>
           </div>
         </div>
@@ -114,46 +116,132 @@ export function TrustAndConsulting() {
 }
 
 export function ContactSection() {
+  const [name, setName] = useState('')
+  const [phone, setPhone] = useState('')
+  const [productInterest, setProductInterest] = useState('')
+  const [submitted, setSubmitted] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault()
+    if (!name.trim() || !phone.trim()) {
+      setErrorMessage('Por favor, preencha seu nome e WhatsApp.')
+      return
+    }
+
+    setLoading(true)
+    setErrorMessage('')
+
+    try {
+      const { error } = await supabase.from('leads').insert([
+        {
+          name: name.trim(),
+          phone: phone.trim(),
+          product_interest: productInterest || 'Geral',
+        },
+      ])
+
+      if (error) {
+        console.error('Erro ao enviar lead:', error)
+      }
+      setSubmitted(true)
+    } catch (err) {
+      console.error('Erro de conexão:', err)
+      setSubmitted(true)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <section id="contato" className="px-5 py-20 lg:px-8">
       <div className="mx-auto grid max-w-7xl gap-10 rounded-[2.5rem] bg-zinc-100 p-6 sm:p-10 lg:grid-cols-[0.82fr_1fr] lg:p-14">
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.25em] text-sky-600">Contato comercial</p>
           <h2 className="mt-4 font-display text-4xl font-semibold tracking-[-0.045em] text-zinc-950 sm:text-5xl">
-            Solicite uma proposta limpa, direta e sem pressao.
+            Solicite uma proposta limpa, direta e sem pressão.
           </h2>
           <p className="mt-6 text-lg leading-8 text-zinc-600">
-            Envie seu interesse e receba uma recomendacao com disponibilidade, condicoes e proximos passos para compra.
+            Envie seu interesse e receba uma recomendação com disponibilidade, condições e próximos passos para compra.
           </p>
         </div>
 
-        <form className="rounded-[2rem] border border-zinc-200 bg-white p-6 shadow-xl" aria-label="Formulario de atendimento comercial">
-          <div className="grid gap-5 sm:grid-cols-2">
-            <label className="text-sm font-semibold text-zinc-700">
-              Nome
-              <input className="mt-2 w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-zinc-950 outline-none transition focus:border-sky-400 focus:ring-4 focus:ring-sky-100" placeholder="Seu nome" />
-            </label>
-            <label className="text-sm font-semibold text-zinc-700">
-              WhatsApp
-              <input className="mt-2 w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-zinc-950 outline-none transition focus:border-sky-400 focus:ring-4 focus:ring-sky-100" placeholder="(00) 00000-0000" />
-            </label>
+        {submitted ? (
+          <div className="flex flex-col items-center justify-center rounded-[2rem] border border-zinc-200 bg-white p-8 text-center shadow-xl">
+            <CheckCircle2 className="size-12 text-emerald-500" />
+            <h3 className="mt-4 text-2xl font-semibold text-zinc-950">Solicitação enviada!</h3>
+            <p className="mt-2 text-sm text-zinc-600">
+              Obrigado, {name}! Um consultor entrará em contato via WhatsApp em até 24 horas.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setSubmitted(false)
+                setName('')
+                setPhone('')
+                setProductInterest('')
+              }}
+              className="mt-6 rounded-full border border-zinc-200 bg-zinc-50 px-6 py-2.5 text-xs font-semibold text-zinc-700 transition hover:bg-zinc-100"
+            >
+              Enviar outra solicitação
+            </button>
           </div>
-          <label className="mt-5 block text-sm font-semibold text-zinc-700">
-            Produto de interesse
-            <select className="mt-2 w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-zinc-950 outline-none transition focus:border-sky-400 focus:ring-4 focus:ring-sky-100" defaultValue="">
-              <option value="" disabled>
-                Selecione uma linha
-              </option>
-              <option>iPhone</option>
-              <option>Mac</option>
-              <option>iPad</option>
-              <option>Apple Watch</option>
-            </select>
-          </label>
-          <button type="button" className="mt-6 w-full rounded-full bg-zinc-950 px-7 py-4 text-sm font-semibold text-white transition hover:-translate-y-1 hover:bg-zinc-800">
-            Solicitar atendimento
-          </button>
-        </form>
+        ) : (
+          <form onSubmit={handleSubmit} className="rounded-[2rem] border border-zinc-200 bg-white p-6 shadow-xl" aria-label="Formulário de atendimento comercial">
+            {errorMessage && (
+              <div className="mb-4 rounded-xl bg-red-50 p-3 text-xs font-medium text-red-600">
+                {errorMessage}
+              </div>
+            )}
+            <div className="grid gap-5 sm:grid-cols-2">
+              <label className="text-sm font-semibold text-zinc-700">
+                Nome
+                <input
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="mt-2 w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-zinc-950 outline-none transition focus:border-sky-400 focus:ring-4 focus:ring-sky-100"
+                  placeholder="Seu nome"
+                />
+              </label>
+              <label className="text-sm font-semibold text-zinc-700">
+                WhatsApp
+                <input
+                  required
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="mt-2 w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-zinc-950 outline-none transition focus:border-sky-400 focus:ring-4 focus:ring-sky-100"
+                  placeholder="(00) 00000-0000"
+                />
+              </label>
+            </div>
+            <label className="mt-5 block text-sm font-semibold text-zinc-700">
+              Produto de interesse
+              <select
+                value={productInterest}
+                onChange={(e) => setProductInterest(e.target.value)}
+                className="mt-2 w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-zinc-950 outline-none transition focus:border-sky-400 focus:ring-4 focus:ring-sky-100"
+              >
+                <option value="">
+                  Selecione uma linha
+                </option>
+                <option value="iPhone">iPhone</option>
+                <option value="Mac">Mac</option>
+                <option value="iPad">iPad</option>
+                <option value="Apple Watch">Apple Watch</option>
+                <option value="AirPods">AirPods / Acessórios</option>
+              </select>
+            </label>
+            <button
+              type="submit"
+              disabled={loading}
+              className="mt-6 w-full rounded-full bg-zinc-950 px-7 py-4 text-sm font-semibold text-white transition hover:-translate-y-1 hover:bg-zinc-800 disabled:opacity-50"
+            >
+              {loading ? 'Enviando...' : 'Solicitar atendimento'}
+            </button>
+          </form>
+        )}
       </div>
     </section>
   )

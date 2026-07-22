@@ -1,10 +1,11 @@
 import { useMemo, useRef, useState } from 'react'
 import { BadgeCheck, Clock3, PackageCheck, Search, ShoppingBag, SlidersHorizontal, X } from 'lucide-react'
 import { SiteHeader } from '@/components/SiteHeader'
-import { allProducts, categories } from '@/data/appleStore'
+import { categories } from '@/data/appleStore'
 import { useCartStore } from '@/store/useCartStore'
 import { useProductModalStore } from '@/store/useProductModalStore'
 import { useFlyingAnimationStore } from '@/store/useFlyingAnimationStore'
+import { useProducts } from '@/hooks/useProducts'
 import type { FeaturedProduct } from '@/data/appleStore'
 
 const CATEGORY_FILTERS = ['Todos', 'iPhone', 'Mac', 'iPad', 'Apple Watch', 'Android', 'Acessorios'] as const
@@ -51,9 +52,16 @@ function ProductCard({ product }: { product: FeaturedProduct }) {
             className="h-full w-full object-contain transition duration-500 group-hover:scale-105"
           />
         </div>
-        <span className="absolute left-5 top-5 rounded-full bg-white/85 px-3 py-1.5 text-xs font-semibold text-zinc-700 shadow-sm backdrop-blur">
-          {product.category}
-        </span>
+        <div className="absolute left-5 top-5 flex gap-2">
+          <span className="rounded-full bg-white/85 px-3 py-1.5 text-xs font-semibold text-zinc-700 shadow-sm backdrop-blur">
+            {product.category}
+          </span>
+          {product.status === 'em-falta' && (
+            <span className="rounded-full bg-red-500/90 px-3 py-1.5 text-xs font-semibold text-white shadow-sm backdrop-blur">
+              Em falta
+            </span>
+          )}
+        </div>
       </div>
       <div className="p-6">
         <p className="text-xs font-semibold uppercase tracking-[0.22em] text-zinc-400">{product.line}</p>
@@ -79,19 +87,27 @@ function ProductCard({ product }: { product: FeaturedProduct }) {
         <div className="mt-7 flex items-center justify-between border-t border-zinc-100 pt-5">
           <p className="font-semibold text-zinc-950">{product.priceFrom}</p>
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => openModal(product)}
-              className="rounded-full bg-zinc-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-zinc-800"
-            >
-              Comprar
-            </button>
-            <button
-              onClick={handleAddToCart}
-              className="grid size-10 place-items-center rounded-full border border-zinc-200 text-zinc-500 transition hover:border-zinc-400 hover:bg-zinc-50 hover:text-zinc-950"
-              aria-label={`Adicionar ${product.name} à sacola`}
-            >
-              <ShoppingBag className="size-4" />
-            </button>
+            {product.status === 'em-falta' ? (
+              <span className="rounded-full bg-zinc-100 px-4 py-2 text-xs font-semibold text-zinc-400">
+                Esgotado
+              </span>
+            ) : (
+              <>
+                <button
+                  onClick={() => openModal(product)}
+                  className="rounded-full bg-zinc-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-zinc-800"
+                >
+                  Comprar
+                </button>
+                <button
+                  onClick={handleAddToCart}
+                  className="grid size-10 place-items-center rounded-full border border-zinc-200 text-zinc-500 transition hover:border-zinc-400 hover:bg-zinc-50 hover:text-zinc-950"
+                  aria-label={`Adicionar ${product.name} à sacola`}
+                >
+                  <ShoppingBag className="size-4" />
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -100,12 +116,13 @@ function ProductCard({ product }: { product: FeaturedProduct }) {
 }
 
 export default function Shop() {
+  const { products } = useProducts()
   const [query, setQuery] = useState('')
   const [selected, setSelected] = useState<(typeof CATEGORY_FILTERS)[number]>('Todos')
 
   const filtered = useMemo(() => {
     const term = query.trim().toLowerCase()
-    return allProducts.filter((p) => {
+    return products.filter((p) => {
       const inCategory = selected === 'Todos' || p.category === selected
       if (!inCategory) return false
       if (!term) return true
@@ -115,13 +132,13 @@ export default function Shop() {
         p.description.toLowerCase().includes(term)
       )
     })
-  }, [query, selected])
+  }, [query, selected, products])
 
   const totalByCategory = useMemo(() => {
     const map = new Map<string, number>()
-    for (const p of allProducts) map.set(p.category, (map.get(p.category) ?? 0) + 1)
+    for (const p of products) map.set(p.category, (map.get(p.category) ?? 0) + 1)
     return map
-  }, [])
+  }, [products])
 
   return (
     <div className="min-h-screen bg-[#f8f8f6] text-zinc-950">
@@ -163,7 +180,7 @@ export default function Shop() {
               <div className="mt-4 flex flex-wrap gap-2">
                 {CATEGORY_FILTERS.map((cat) => {
                   const isActive = selected === cat
-                  const count = cat === 'Todos' ? allProducts.length : totalByCategory.get(cat) ?? 0
+                  const count = cat === 'Todos' ? products.length : totalByCategory.get(cat) ?? 0
                   return (
                     <button
                       key={cat}
