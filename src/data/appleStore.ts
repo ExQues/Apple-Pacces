@@ -21,55 +21,55 @@ export type TrustItem = {
   description: string
 }
 
-// URLs oficiais da CDN Apple em alta resolução (store.storeimages.cdn-apple.com).
+// URLs oficiais da CDN Apple testadas e com resposta HTTP 200 OK.
 const img = {
   // iPhone
-  iphone14: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-14-finish-select-202209-6-1inch-midnight?wid=1200&hei=1200&fmt=jpeg&qlt=90&.v=1707768406014',
-  iphone15: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-15-finish-select-202309-6-1inch-black?wid=1200&hei=1200&fmt=jpeg&qlt=90&.v=1725065422695',
-  iphone16e: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-16e-finish-select-202502-6-1inch-black?wid=1200&hei=1200&fmt=jpeg&qlt=90&.v=1738779923428',
-  iphone16: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-16-finish-select-202409-6-1inch-ultramarine?wid=1200&hei=1200&fmt=jpeg&qlt=90&.v=1723923878172',
-  iphone17: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-16-finish-select-202409-6-1inch-teal?wid=1200&hei=1200&fmt=jpeg&qlt=90',
-  iphone17Air: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-16-finish-select-202409-6-1inch-white?wid=1200&hei=1200&fmt=jpeg&qlt=90',
-  iphone17Pro: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-3inch-deserttitanium?wid=1200&hei=1200&fmt=jpeg&qlt=90',
-  iphone17ProMax: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-9inch-deserttitanium?wid=1200&hei=1200&fmt=jpeg&qlt=90',
-  iphone17e: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-16e-finish-select-202502-6-1inch-white?wid=1200&hei=1200&fmt=jpeg&qlt=90',
+  iphone14: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-14-finish-select-202209-6-1inch-midnight?wid=1200&hei=1200&fmt=jpeg&qlt=90',
+  iphone15: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-15-finish-select-202309-6-1inch-black?wid=1200&hei=1200&fmt=jpeg&qlt=90',
+  iphone16e: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-finish-select-202409-6-1inch-white?wid=1200&hei=1200&fmt=jpeg&qlt=90',
+  iphone16: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-finish-select-202409-6-1inch-ultramarine?wid=1200&hei=1200&fmt=jpeg&qlt=90',
+  iphone17: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-finish-select-202409-6-1inch-teal?wid=1200&hei=1200&fmt=jpeg&qlt=90',
+  iphone17Air: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-finish-select-202409-6-1inch-white?wid=1200&hei=1200&fmt=jpeg&qlt=90',
+  iphone17Pro: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-3inch-deserttitanium?wid=1200&hei=1200&fmt=jpeg&qlt=90',
+  iphone17ProMax: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-9inch-deserttitanium?wid=1200&hei=1200&fmt=jpeg&qlt=90',
+  iphone17e: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-finish-select-202409-6-1inch-white?wid=1200&hei=1200&fmt=jpeg&qlt=90',
 
   // Apple Watch
-  watchSE2: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/MRE53_VW_34FR+watch-40-alum-midnight-nc-s10_VW_34FR_WF_CO?wid=750&hei=712&trim=1%2C0&fmt=p-jpg&qlt=95&.v=1724165231160',
-  watchSE3: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/MYAF3_VW_34FR+watch-40-alum-midnight-cell-11_VW_34FR_WF_CO?wid=750&hei=712&trim=1%2C0&fmt=p-jpg&qlt=95&.v=1756853120411',
-  watchSeries11: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/MYA43_VW_34FR+watch-46-alum-jetblack-cell-11_VW_34FR_WF_CO?wid=750&hei=712&trim=1%2C0&fmt=p-jpg&qlt=95&.v=1756852999999',
-  watchUltra2: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/MX4E3_VW_34FR+watch-49-titanium-natural-cell-ultra2_VW_34FR_WF_CO?wid=750&hei=712&trim=1%2C0&fmt=p-jpg&qlt=95&.v=1724264460446',
-  watchUltra3: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/MYFY3_VW_34FR+watch-49-titanium-natural-cell-ultra3_VW_34FR_WF_CO?wid=750&hei=712&trim=1%2C0&fmt=p-jpg&qlt=95&.v=1756881744810',
+  watchSE2: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/watch-card-40-se-202309?wid=1200&hei=1200&fmt=jpeg&qlt=90',
+  watchSE3: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/watch-card-40-se-202309?wid=1200&hei=1200&fmt=jpeg&qlt=90',
+  watchSeries11: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/watch-card-40-s9-202309?wid=1200&hei=1200&fmt=jpeg&qlt=90',
+  watchUltra2: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/MPLL3?wid=1200&hei=1200&fmt=jpeg&qlt=90',
+  watchUltra3: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/MPLL3?wid=1200&hei=1200&fmt=jpeg&qlt=90',
 
   // iPad
-  ipadMini7: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-mini-finish-select-gallery-202410-space-gray-wifi?wid=1200&hei=1200&fmt=jpeg&qlt=90&.v=1727119715762',
-  ipad11: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-11-finish-select-gallery-202503-silver-wifi?wid=1200&hei=1200&fmt=jpeg&qlt=90&.v=1740518291816',
-  ipadAirM3: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-air-11-finish-select-gallery-202503-blue-wifi?wid=1200&hei=1200&fmt=jpeg&qlt=90&.v=1740518291816',
-  ipadAirM4: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-air-11-finish-select-gallery-202503-blue-wifi?wid=1200&hei=1200&fmt=jpeg&qlt=90&.v=1740518291816',
-  ipadProM5: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-pro-13-finish-select-gallery-202405-space-black-wifi?wid=1200&hei=1200&fmt=jpeg&qlt=90&.v=1713310656931',
+  ipadMini7: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/ipad-mini-finish-select-gallery-202410-space-gray-wifi?wid=1200&hei=1200&fmt=jpeg&qlt=90',
+  ipad11: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/ipad-10th-gen-finish-select-202212-blue?wid=1200&hei=1200&fmt=jpeg&qlt=90',
+  ipadAirM3: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/ipad-air-storage-select-202405-11inch-blue?wid=1200&hei=1200&fmt=jpeg&qlt=90',
+  ipadAirM4: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/ipad-air-storage-select-202405-11inch-blue?wid=1200&hei=1200&fmt=jpeg&qlt=90',
+  ipadProM5: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/ipad-pro-storage-select-202405-13inch-spaceblack?wid=1200&hei=1200&fmt=jpeg&qlt=90',
 
   // Mac
-  macMini: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/mac-mini-hero-202410?wid=1200&hei=1200&fmt=jpeg&qlt=90&.v=1729009989552',
-  macbookNeo: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/macbook-air-13-mid-select-202503-midnight?wid=1200&hei=1200&fmt=jpeg&qlt=90&.v=1740504665253',
-  macbookAirM4: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/macbook-air-13-mid-select-202503-sky-blue?wid=1200&hei=1200&fmt=jpeg&qlt=90&.v=1740504665253',
-  macbookAirM5: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/macbook-air-13-mid-select-202503-silver?wid=1200&hei=1200&fmt=jpeg&qlt=90&.v=1740504665253',
-  macbookProM5: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/macbook-pro-14-hero-202410-spaceblack?wid=1200&hei=1200&fmt=jpeg&qlt=90&.v=1729264981617',
+  macMini: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/mac-mini-hero-202410?wid=1200&hei=1200&fmt=jpeg&qlt=90',
+  macbookNeo: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/macbook-air-space-gray-select-201810?wid=1200&hei=1200&fmt=jpeg&qlt=90',
+  macbookAirM4: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/macbook-air-space-gray-select-201810?wid=1200&hei=1200&fmt=jpeg&qlt=90',
+  macbookAirM5: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/macbook-air-silver-select-201810?wid=1200&hei=1200&fmt=jpeg&qlt=90',
+  macbookProM5: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/mbp16-spaceblack-select-202310?wid=1200&hei=1200&fmt=jpeg&qlt=90',
 
   // AirPods
-  airpods4: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/airpods-4-select-202409?wid=976&hei=916&fmt=jpeg&qlt=90&.v=1724144219189',
-  airpods4Anc: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/airpods-4-anc-select-202409?wid=976&hei=916&fmt=jpeg&qlt=90&.v=1724144219189',
-  airpodsPro2: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/MTJV3?wid=1200&hei=1200&fmt=jpeg&qlt=90&.v=1693598943842',
-  airpodsPro3: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/airpods-pro-3-select-202509?wid=976&hei=916&fmt=jpeg&qlt=90&.v=1756923453999',
-  airpodsMax: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/airpods-max-select-202409-starlight?wid=976&hei=916&fmt=jpeg&qlt=90&.v=1724144219189',
+  airpods4: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/airpods-4-select-202409?wid=1200&hei=1200&fmt=jpeg&qlt=90',
+  airpods4Anc: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/airpods-4-anc-select-202409?wid=1200&hei=1200&fmt=jpeg&qlt=90',
+  airpodsPro2: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/MTJV3?wid=1200&hei=1200&fmt=jpeg&qlt=90',
+  airpodsPro3: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/MTJV3?wid=1200&hei=1200&fmt=jpeg&qlt=90',
+  airpodsMax: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/airpods-max-select-202409-starlight?wid=1200&hei=1200&fmt=jpeg&qlt=90',
 
   // AirTag
-  airtag: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/airtag-single-select-202104?wid=1200&hei=1200&fmt=jpeg&qlt=90&.v=1617761672000',
-  airtagPack: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/airtag-4pack-select-202104?wid=1200&hei=1200&fmt=jpeg&qlt=90&.v=1617761672000',
+  airtag: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/airtag-single-select-202104?wid=1200&hei=1200&fmt=jpeg&qlt=90',
+  airtagPack: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/airtag-4pack-select-202104?wid=1200&hei=1200&fmt=jpeg&qlt=90',
 
   // Apple Pencil
-  pencilUsbc: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/apple-pencil-usbc-select-202310?wid=1200&hei=1200&fmt=jpeg&qlt=90&.v=1696950027192',
-  pencil2: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/MU8F2?wid=1200&hei=1200&fmt=jpeg&qlt=90&.v=1657224900101',
-  pencilPro: 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/apple-pencil-pro-select-202405?wid=1200&hei=1200&fmt=jpeg&qlt=90&.v=1713812029973',
+  pencilUsbc: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/MQLU3?wid=1200&hei=1200&fmt=jpeg&qlt=90',
+  pencil2: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/MU8F2?wid=1200&hei=1200&fmt=jpeg&qlt=90',
+  pencilPro: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/MX2D3?wid=1200&hei=1200&fmt=jpeg&qlt=90',
 } as const
 
 export const categories: ProductCategory[] = [
