@@ -176,6 +176,8 @@ export default function Shop() {
   const [query, setQuery] = useState('')
   const [selected, setSelected] = useState<(typeof CATEGORY_FILTERS)[number]>('Todos')
 
+  const isSearching = query.trim().length > 0
+
   const filtered = useMemo(() => {
     const term = query.trim().toLowerCase()
     return products.filter((p) => {
@@ -200,39 +202,80 @@ export default function Shop() {
     <div className="min-h-screen bg-[#f8f8f6] text-zinc-950">
       <SiteHeader variant="shop" />
       <main className="px-5 pb-24 pt-32 lg:px-8 lg:pt-40">
-        <section className="mx-auto max-w-7xl">
-          <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
-            <div>
-              <h1 className="max-w-3xl font-display text-5xl font-semibold leading-[0.96] tracking-[-0.055em] text-zinc-950 sm:text-6xl">
-                Shopping Apple completo.
-              </h1>
-              <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-600">
-                Uma prateleira digital limpa para comparar iPhone, Mac, iPad, Apple Watch, Android e acessorios. Filtre por linha, busque pelo nome e fale direto com um consultor.
-              </p>
-            </div>
+        <section className="mx-auto max-w-7xl transition-all duration-300">
+          <div
+            className={`grid gap-8 transition-all duration-300 ${
+              isSearching ? 'grid-cols-1' : 'lg:grid-cols-[0.9fr_1.1fr] lg:items-end'
+            }`}
+          >
+            {/* Esconder titulo principal e texto explicativo quando o usuario comeca a digitar */}
+            {!isSearching && (
+              <div className="transition duration-300">
+                <h1 className="max-w-3xl font-display text-5xl font-semibold leading-[0.96] tracking-[-0.055em] text-zinc-950 sm:text-6xl">
+                  Shopping Apple completo.
+                </h1>
+                <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-600">
+                  Uma prateleira digital limpa para comparar iPhone, Mac, iPad, Apple Watch, Android e acessorios. Filtre por linha, busque pelo nome e fale direto com um consultor.
+                </p>
+              </div>
+            )}
 
-            <div className="rounded-[2rem] border border-zinc-200 bg-white p-5 shadow-xl">
-              <label className="flex items-center gap-3 rounded-full border border-zinc-200 bg-zinc-50 px-4 py-3 focus-within:border-zinc-400 focus-within:ring-4 focus-within:ring-zinc-100">
-                <Search className="size-4 text-zinc-500" aria-hidden="true" />
-                <input
-                  type="search"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Buscar por modelo, linha ou uso"
-                  className="w-full bg-transparent text-sm text-zinc-950 placeholder:text-zinc-400 focus:outline-none"
-                  aria-label="Buscar produtos"
-                />
-                {query && (
+            {/* Container da Busca expande e ganha foco total ao digitar */}
+            <div
+              className={`rounded-[2rem] border bg-white p-5 shadow-xl transition-all duration-300 ${
+                isSearching
+                  ? 'border-zinc-950/20 shadow-2xl ring-4 ring-zinc-950/5'
+                  : 'border-zinc-200'
+              }`}
+            >
+              <div className="flex items-center justify-between gap-4">
+                <label className="flex flex-1 items-center gap-3 rounded-full border border-zinc-200 bg-zinc-50 px-4 py-3 focus-within:border-zinc-400 focus-within:ring-4 focus-within:ring-zinc-100">
+                  <Search className="size-4 text-zinc-500" aria-hidden="true" />
+                  <input
+                    type="text"
+                    autoComplete="off"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder="Buscar por modelo, linha ou uso..."
+                    className="w-full bg-transparent text-sm text-zinc-950 placeholder:text-zinc-400 focus:outline-none [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none"
+                    aria-label="Buscar produtos"
+                  />
+                  {query && (
+                    <button
+                      type="button"
+                      onClick={() => setQuery('')}
+                      className="grid size-6 place-items-center rounded-full text-zinc-500 transition hover:bg-zinc-200 hover:text-zinc-950"
+                      aria-label="Limpar busca"
+                    >
+                      <X className="size-3.5" aria-hidden="true" />
+                    </button>
+                  )}
+                </label>
+
+                {isSearching && (
                   <button
                     type="button"
                     onClick={() => setQuery('')}
-                    className="grid size-6 place-items-center rounded-full text-zinc-500 transition hover:bg-zinc-200 hover:text-zinc-950"
-                    aria-label="Limpar busca"
+                    className="hidden rounded-full bg-zinc-100 px-4 py-2.5 text-xs font-semibold text-zinc-700 transition hover:bg-zinc-200 sm:block"
                   >
-                    <X className="size-3.5" aria-hidden="true" />
+                    Cancelar busca
                   </button>
                 )}
-              </label>
+              </div>
+
+              {/* Status de Busca Ativa */}
+              {isSearching && (
+                <div className="mt-3 flex items-center justify-between px-2 text-xs font-medium text-zinc-500">
+                  <span>
+                    Exibindo resultados para{' '}
+                    <strong className="font-semibold text-zinc-950">"{query}"</strong>
+                  </span>
+                  <span className="rounded-full bg-zinc-100 px-2.5 py-1 text-zinc-700 font-semibold">
+                    {filtered.length} produto(s)
+                  </span>
+                </div>
+              )}
+
               <div className="mt-4 flex flex-wrap gap-2">
                 {CATEGORY_FILTERS.map((cat) => {
                   const isActive = selected === cat
@@ -275,35 +318,38 @@ export default function Shop() {
           </div>
         </section>
 
-        <section className="mx-auto mt-12 max-w-7xl" aria-labelledby="shop-curation-title">
-          <div className="grid gap-5 rounded-[2.5rem] border border-zinc-200 bg-white p-5 shadow-[0_24px_70px_rgba(24,24,27,0.10)] lg:grid-cols-[1.1fr_0.9fr] lg:p-8">
-            <div className="rounded-[2rem] bg-zinc-950 p-8 text-white">
-              <p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm font-semibold text-white">
-                <BadgeCheck className="size-4" aria-hidden="true" />
-                Compra premium, menos duvida
-              </p>
-              <h2 id="shop-curation-title" className="mt-6 max-w-xl font-display text-4xl font-semibold tracking-[-0.045em]">
-                Curadoria que reduz arrependimento.
-              </h2>
-              <p className="mt-5 max-w-2xl text-base leading-8 text-zinc-300">
-                Estoque selecionado por uso real, com orientacao sobre memoria, geracao, garantia, acessorios e momento ideal de upgrade.
-              </p>
-            </div>
+        {/* Esconder a secao preta de curadoria ao digitar para focar 100% nos produtos procurados */}
+        {!isSearching && (
+          <section className="mx-auto mt-12 max-w-7xl transition duration-300" aria-labelledby="shop-curation-title">
+            <div className="grid gap-5 rounded-[2.5rem] border border-zinc-200 bg-white p-5 shadow-[0_24px_70px_rgba(24,24,27,0.10)] lg:grid-cols-[1.1fr_0.9fr] lg:p-8">
+              <div className="rounded-[2rem] bg-zinc-950 p-8 text-white">
+                <p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm font-semibold text-white">
+                  <BadgeCheck className="size-4" aria-hidden="true" />
+                  Compra premium, menos duvida
+                </p>
+                <h2 id="shop-curation-title" className="mt-6 max-w-xl font-display text-4xl font-semibold tracking-[-0.045em]">
+                  Curadoria que reduz arrependimento.
+                </h2>
+                <p className="mt-5 max-w-2xl text-base leading-8 text-zinc-300">
+                  Estoque selecionado por uso real, com orientacao sobre memoria, geracao, garantia, acessorios e momento ideal de upgrade.
+                </p>
+              </div>
 
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
-              {[
-                ['Modelos revisados', 'Produtos apresentados com configuracao e indicacao de uso claras.', PackageCheck],
-                ['Resposta em ate 24h', 'Consultoria rapida para comparar alternativas antes de fechar.', Clock3],
-              ].map(([title, description, Icon]) => (
-                <article key={title as string} className="rounded-[1.75rem] border border-zinc-200 bg-zinc-50 p-6">
-                  <Icon className="size-6 text-zinc-950" aria-hidden="true" />
-                  <h3 className="mt-5 text-xl font-semibold tracking-tight text-zinc-950">{title as string}</h3>
-                  <p className="mt-2 text-sm leading-6 text-zinc-600">{description as string}</p>
-                </article>
-              ))}
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+                {[
+                  ['Modelos revisados', 'Produtos apresentados com configuracao e indicacao de uso claras.', PackageCheck],
+                  ['Resposta em ate 24h', 'Consultoria rapida para comparar alternativas antes de fechar.', Clock3],
+                ].map(([title, description, Icon]) => (
+                  <article key={title as string} className="rounded-[1.75rem] border border-zinc-200 bg-zinc-50 p-6">
+                    <Icon className="size-6 text-zinc-950" aria-hidden="true" />
+                    <h3 className="mt-5 text-xl font-semibold tracking-tight text-zinc-950">{title as string}</h3>
+                    <p className="mt-2 text-sm leading-6 text-zinc-600">{description as string}</p>
+                  </article>
+                ))}
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
 
         <section className="mx-auto mt-14 max-w-7xl" aria-label="Lista completa de produtos Apple">
           {filtered.length === 0 ? (
