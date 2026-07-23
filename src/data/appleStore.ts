@@ -58,7 +58,7 @@ const img = {
   // Apple Watch
   watch_se: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/watch-card-40-se-202309?wid=1200&hei=1200&fmt=jpeg&qlt=90',
   watch_series: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/watch-card-40-s9-202309?wid=1200&hei=1200&fmt=jpeg&qlt=90',
-  watch_ultra: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/MPLL3?wid=1200&hei=1200&fmt=jpeg&qlt=90',
+  watch_ultra: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/watch-ultra2-digitalmat-gallery-1-202309?wid=1200&hei=1200&fmt=jpeg&qlt=90',
 
   // iPad
   ipad_mini: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/ipad-mini-finish-select-gallery-202410-space-gray-wifi?wid=1200&hei=1200&fmt=jpeg&qlt=90',
