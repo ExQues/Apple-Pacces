@@ -70,7 +70,7 @@ export function HeroSection() {
               alt="Composicao premium de dispositivos Apple em showroom minimalista"
               loading="eager"
               decoding="async"
-              fetchpriority="high"
+              fetchPriority="high"
               className="h-[440px] w-full rounded-[1.75rem] object-cover"
             />
             <div className="absolute bottom-8 left-8 right-8 rounded-3xl border border-white/70 bg-white/75 p-5 shadow-2xl backdrop-blur-xl">
