@@ -27,6 +27,17 @@ function FeaturedCard({ product }: { product: FeaturedProduct }) {
           ref={imgRef}
           src={product.image}
           alt={`Imagem oficial do ${product.name}`}
+          loading="lazy"
+          decoding="async"
+          onError={(e) => {
+            const target = e.currentTarget
+            target.onerror = null
+            target.src =
+              'data:image/svg+xml;utf8,' +
+              encodeURIComponent(
+                `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect width="400" height="300" fill="%23f5f5f7"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="system-ui" font-size="20" fill="%239ca3af">${product.name}</text></svg>`,
+              )
+          }}
           className="h-full w-full object-contain transition duration-500 group-hover:scale-105"
         />
       </div>

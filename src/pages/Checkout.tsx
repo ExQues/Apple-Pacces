@@ -69,8 +69,9 @@ export default function Checkout() {
 
       setSuccess(true)
       clearCart()
-    } catch (err: any) {
-      setError(err.message || 'Erro ao finalizar o pedido')
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Erro ao finalizar o pedido'
+      setError(message)
     } finally {
       setLoading(false)
     }

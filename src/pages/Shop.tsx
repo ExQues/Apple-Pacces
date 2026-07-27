@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from 'react'
-import { BadgeCheck, Clock3, PackageCheck, Search, ShoppingBag, SlidersHorizontal, X } from 'lucide-react'
+import { BadgeCheck, Clock3, PackageCheck, Search, ShoppingBag, X } from 'lucide-react'
 import { SiteHeader } from '@/components/SiteHeader'
 import { categories } from '@/data/appleStore'
 import { useCartStore } from '@/store/useCartStore'
@@ -55,6 +55,7 @@ function ProductCard({ product }: { product: FeaturedProduct }) {
             src={activeImage}
             alt={`Imagem do ${product.name} na cor ${selectedColor}`}
             loading="lazy"
+            decoding="async"
             onError={(e) => {
               const target = e.currentTarget
               target.onerror = null

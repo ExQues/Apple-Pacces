@@ -10,7 +10,7 @@ export function FlyingImage() {
   useEffect(() => {
     if (!flyingImage || !cartIconRef) return
 
-    const { src, startRect } = flyingImage
+    const { startRect } = flyingImage
     const targetRect = cartIconRef.getBoundingClientRect()
 
     // Fase 1: posicionar na origem (sobre a imagem do cartão)
