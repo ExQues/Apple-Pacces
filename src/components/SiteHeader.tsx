@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { ShoppingBag, User as UserIcon, LogOut } from 'lucide-react'
+import { ShoppingBag, User as UserIcon, LogOut, Menu, X, Package } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/useAuthStore'
 import { useCartStore } from '@/store/useCartStore'
@@ -26,12 +26,27 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
   const { setCartIconRef, isBouncing } = useFlyingAnimationStore()
   const navigate = useNavigate()
   const cartButtonRef = useRef<HTMLButtonElement | null>(null)
+  const userMenuRef = useRef<HTMLDivElement | null>(null)
+
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [userMenuOpen, setUserMenuOpen] = useState(false)
 
   // Registrar o ref do ícone da sacola na store global para a animação de voo
   useEffect(() => {
     setCartIconRef(cartButtonRef.current)
     return () => setCartIconRef(null)
   }, [setCartIconRef])
+
+  // Fechar dropdown de usuario ao clicar fora
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setUserMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   const [active, setActive] = useState<SectionId>('produtos')
   const [indicator, setIndicator] = useState<{ left: number; width: number; ready: boolean }>({
@@ -92,6 +107,8 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
   }, [recalcIndicator])
 
   const handleSignOut = async () => {
+    setUserMenuOpen(false)
+    setMobileMenuOpen(false)
     await signOut()
     navigate('/')
   }
@@ -109,6 +126,7 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
           <span className="hidden text-sm font-semibold tracking-[0.28em] text-zinc-950 sm:inline">PACCES</span>
         </Link>
 
+        {/* Menu Desktop */}
         <div
           ref={listRef}
           className="relative hidden items-center gap-1 rounded-full border border-zinc-200 bg-zinc-50/80 p-1 md:flex"
@@ -152,8 +170,8 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
           </Link>
         </div>
 
-        <div className="flex items-center gap-3">
-          {/* Ícone da Sacola com ref para animação + bounce */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* Botão da Sacola com ref para voo + indicador */}
           <button
             ref={cartButtonRef}
             type="button"
@@ -161,6 +179,7 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
             className={`relative rounded-full p-2 text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-950 ${
               isBouncing ? 'animate-cart-bounce' : ''
             }`}
+            aria-label="Ver sacola de compras"
           >
             <ShoppingBag className="size-5" />
             {totalItems() > 0 && (
@@ -171,32 +190,87 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
           </button>
           
           {user ? (
-            <div className="group relative">
-              <button className="flex items-center gap-2 rounded-full border border-zinc-200 bg-white px-4 py-2.5 text-sm font-semibold text-zinc-950 transition hover:bg-zinc-50">
+            <div ref={userMenuRef} className="relative">
+              <button
+                onClick={() => setUserMenuOpen(!userMenuOpen)}
+                className="flex items-center gap-2 rounded-full border border-zinc-200 bg-white px-3.5 py-2 text-sm font-semibold text-zinc-950 transition hover:bg-zinc-50 sm:px-4 sm:py-2.5"
+              >
                 <UserIcon className="size-4" />
                 <span className="hidden sm:inline">Minha Conta</span>
               </button>
-              <div className="absolute right-0 mt-2 hidden w-56 flex-col rounded-2xl border border-zinc-200 bg-white p-2 shadow-xl group-hover:flex">
-                <p className="truncate border-b border-zinc-100 px-3 py-3 mb-2 text-xs font-medium text-zinc-500">{user.email}</p>
-                <button 
-                  onClick={handleSignOut} 
-                  className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-50"
-                >
-                  <LogOut className="size-4" />
-                  Sair
-                </button>
-              </div>
+
+              {userMenuOpen && (
+                <div className="absolute right-0 mt-2 w-60 flex-col rounded-2xl border border-zinc-200 bg-white p-2 shadow-2xl animate-fade-in z-50">
+                  <div className="border-b border-zinc-100 px-3 py-3 mb-1">
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">Conectado como</p>
+                    <p className="truncate text-xs font-semibold text-zinc-950 mt-0.5">{user.email}</p>
+                  </div>
+
+                  <Link
+                    to="/pedidos"
+                    onClick={() => setUserMenuOpen(false)}
+                    className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium text-zinc-700 transition hover:bg-zinc-100 hover:text-zinc-950"
+                  >
+                    <Package className="size-4 text-zinc-500" />
+                    Meus Pedidos
+                  </Link>
+
+                  <button 
+                    onClick={handleSignOut} 
+                    className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-50"
+                  >
+                    <LogOut className="size-4" />
+                    Sair
+                  </button>
+                </div>
+              )}
             </div>
           ) : (
             <Link
               to="/login"
-              className="rounded-full bg-zinc-950 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(24,24,27,0.18)] transition hover:-translate-y-0.5 hover:bg-zinc-800"
+              className="rounded-full bg-zinc-950 px-4 py-2 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(24,24,27,0.18)] transition hover:-translate-y-0.5 hover:bg-zinc-800 sm:px-5 sm:py-2.5"
             >
               Entrar
             </Link>
           )}
+
+          {/* Botao Hambúrguer Mobile */}
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="grid size-10 place-items-center rounded-full border border-zinc-200 bg-white text-zinc-700 transition hover:bg-zinc-100 md:hidden"
+            aria-label={mobileMenuOpen ? 'Fechar menu' : 'Abrir menu de navegacao'}
+          >
+            {mobileMenuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+          </button>
         </div>
       </nav>
+
+      {/* Gaveta de Navegação Mobile */}
+      {mobileMenuOpen && (
+        <div className="mx-auto mt-2 max-w-7xl overflow-hidden rounded-3xl border border-zinc-200 bg-white/95 p-5 shadow-2xl backdrop-blur-2xl animate-fade-in md:hidden">
+          <div className="flex flex-col gap-2">
+            {links.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={() => setMobileMenuOpen(false)}
+                className="rounded-2xl px-4 py-3 text-base font-semibold text-zinc-800 transition hover:bg-zinc-100"
+              >
+                {link.label}
+              </a>
+            ))}
+            <Link
+              to="/shop"
+              onClick={() => setMobileMenuOpen(false)}
+              className="mt-2 flex items-center justify-center gap-2 rounded-2xl bg-sky-600 py-3.5 text-base font-semibold text-white shadow-lg shadow-sky-600/20"
+            >
+              <ShoppingBag className="size-5" />
+              Abrir Shopping
+            </Link>
+          </div>
+        </div>
+      )}
     </header>
   )
 }

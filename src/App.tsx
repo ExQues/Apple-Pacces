@@ -5,11 +5,14 @@ import Shop from "@/pages/Shop";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import Checkout from "@/pages/Checkout";
+import Orders from "@/pages/Orders";
 import { CartDrawer } from "@/components/CartDrawer";
 import { ProductModal } from "@/components/ProductModal";
 import { FlyingImage } from "@/components/FlyingImage";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { useAuthStore } from "@/store/useAuthStore";
+
+import { ScrollToTop } from "@/components/ScrollToTop";
 
 export default function App() {
   const { initialize } = useAuthStore();
@@ -20,6 +23,7 @@ export default function App() {
 
   return (
     <Router>
+      <ScrollToTop />
       <CartDrawer />
       <ProductModal />
       <FlyingImage />
@@ -33,6 +37,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <Checkout />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/pedidos"
+          element={
+            <ProtectedRoute>
+              <Orders />
             </ProtectedRoute>
           }
         />

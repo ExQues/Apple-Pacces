@@ -68,7 +68,7 @@ export function SmartChoiceSection() {
 export function TrustAndConsulting() {
   return (
     <>
-      <section id="diferenciais" className="px-5 py-20 lg:px-8">
+      <section id="diferenciais" className="scroll-mt-28 px-5 py-20 lg:px-8">
         <div className="mx-auto max-w-7xl rounded-[2.5rem] bg-zinc-950 p-6 text-white shadow-[0_35px_80px_rgba(24,24,27,0.26)] lg:p-10">
           <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
             {trustItems.map((item, index) => {
@@ -85,7 +85,7 @@ export function TrustAndConsulting() {
         </div>
       </section>
 
-      <section id="consultoria" className="px-5 py-20 lg:px-8">
+      <section id="consultoria" className="scroll-mt-28 px-5 py-20 lg:px-8">
         <div className="mx-auto grid max-w-7xl overflow-hidden rounded-[2.5rem] border border-zinc-200 bg-white shadow-2xl lg:grid-cols-[1fr_0.85fr]">
           <div className="p-8 sm:p-12 lg:p-16">
             <div className="mb-8 inline-flex items-center gap-2 rounded-full bg-sky-50 px-4 py-2 text-sm font-semibold text-sky-700">
@@ -155,7 +155,7 @@ export function ContactSection() {
   }
 
   return (
-    <section id="contato" className="px-5 py-20 lg:px-8">
+    <section id="contato" className="scroll-mt-28 px-5 py-20 lg:px-8">
       <div className="mx-auto grid max-w-7xl gap-10 rounded-[2.5rem] bg-zinc-100 p-6 sm:p-10 lg:grid-cols-[0.82fr_1fr] lg:p-14">
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.25em] text-sky-600">Contato comercial</p>

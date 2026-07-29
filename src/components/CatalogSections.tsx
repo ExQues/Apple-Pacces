@@ -1,10 +1,20 @@
 import { useRef } from 'react'
-import { ShoppingBag } from 'lucide-react'
-import { categories, featuredProducts } from '@/data/appleStore'
+import { ShoppingBag, Smartphone, Watch, Tablet, Laptop, Boxes, Headphones, ArrowRight } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { categories, featuredProducts, allProducts } from '@/data/appleStore'
 import { useCartStore } from '@/store/useCartStore'
 import { useProductModalStore } from '@/store/useProductModalStore'
 import { useFlyingAnimationStore } from '@/store/useFlyingAnimationStore'
 import type { FeaturedProduct } from '@/data/appleStore'
+
+const categoryIcons: Record<string, typeof Smartphone> = {
+  iPhone: Smartphone,
+  'Apple Watch': Watch,
+  iPad: Tablet,
+  Mac: Laptop,
+  Android: Boxes,
+  Acessorios: Headphones,
+}
 
 function FeaturedCard({ product }: { product: FeaturedProduct }) {
   const imgRef = useRef<HTMLImageElement | null>(null)
@@ -87,7 +97,7 @@ function FeaturedCard({ product }: { product: FeaturedProduct }) {
 
 export function CatalogSections() {
   return (
-    <section id="produtos" className="px-5 py-20 lg:px-8">
+    <section id="produtos" className="scroll-mt-28 px-5 py-20 lg:px-8">
       <div className="mx-auto max-w-7xl">
         <div className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
           <div>
@@ -101,15 +111,46 @@ export function CatalogSections() {
           </p>
         </div>
 
-        <div className="mt-12 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {categories.map((category) => (
-            <article key={category.name} className="group rounded-[2rem] border border-zinc-200 bg-white p-6 transition duration-300 hover:-translate-y-1 hover:border-zinc-300 hover:shadow-2xl">
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-zinc-400">Linha</p>
-              <h3 className="mt-3 text-2xl font-semibold tracking-tight text-zinc-950">{category.name}</h3>
-              <p className="mt-4 min-h-20 text-sm leading-6 text-zinc-600">{category.description}</p>
-              <p className="mt-6 border-t border-zinc-100 pt-5 text-sm font-semibold text-zinc-950">{category.highlight}</p>
-            </article>
-          ))}
+        {/* Grade simetrica de 3 colunas (2 linhas x 3 cards = 6 categorias) */}
+        <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+          {categories.map((category) => {
+            const Icon = categoryIcons[category.name] || Smartphone
+            const count = allProducts.filter((p) => p.category === category.name).length
+
+            return (
+              <Link
+                key={category.name}
+                to={`/shop?category=${encodeURIComponent(category.name)}`}
+                className="group relative flex flex-col justify-between overflow-hidden rounded-[2.25rem] border border-zinc-200/90 bg-white p-7 shadow-[0_4px_20px_rgba(0,0,0,0.03)] transition-all duration-300 hover:-translate-y-1.5 hover:border-zinc-400 hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)]"
+              >
+                <div>
+                  <div className="flex items-center justify-between">
+                    <div className="grid size-12 place-items-center rounded-2xl bg-zinc-950 text-white shadow-md shadow-zinc-950/10 transition duration-300 group-hover:scale-110 group-hover:bg-sky-600">
+                      <Icon className="size-5" aria-hidden="true" />
+                    </div>
+                    <span className="rounded-full bg-zinc-100 px-3 py-1 text-xs font-semibold text-zinc-600 group-hover:bg-sky-50 group-hover:text-sky-700">
+                      {count} modelo{count !== 1 ? 's' : ''}
+                    </span>
+                  </div>
+
+                  <h3 className="mt-6 text-2xl font-semibold tracking-tight text-zinc-950">
+                    {category.name}
+                  </h3>
+                  <p className="mt-3.5 text-sm leading-6 text-zinc-600">
+                    {category.description}
+                  </p>
+                </div>
+
+                <div className="mt-8 border-t border-zinc-100 pt-5">
+                  <p className="text-xs font-medium text-zinc-500 line-clamp-1">{category.highlight}</p>
+                  <div className="mt-4 flex items-center gap-1 text-xs font-semibold text-zinc-950 group-hover:text-sky-600">
+                    <span>Ver modelos</span>
+                    <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-1" />
+                  </div>
+                </div>
+              </Link>
+            )
+          })}
         </div>
 
         <div className="mt-16 grid gap-5 lg:grid-cols-3">

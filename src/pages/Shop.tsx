@@ -1,4 +1,5 @@
-import { useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { BadgeCheck, Clock3, PackageCheck, Search, ShoppingBag, X } from 'lucide-react'
 import { SiteHeader } from '@/components/SiteHeader'
 import { categories } from '@/data/appleStore'
@@ -203,27 +204,31 @@ export default function Shop() {
     <div className="min-h-screen bg-[#f8f8f6] text-zinc-950">
       <SiteHeader variant="shop" />
       <main className="px-5 pb-24 pt-32 lg:px-8 lg:pt-40">
-        <section className="mx-auto max-w-7xl transition-all duration-300">
+        <section className="mx-auto max-w-7xl">
           <div
-            className={`grid gap-8 transition-all duration-300 ${
+            className={`grid gap-8 transition-all duration-700 cubic-bezier(0.16,1,0.3,1) ${
               isSearching ? 'grid-cols-1' : 'lg:grid-cols-[0.9fr_1.1fr] lg:items-end'
             }`}
           >
-            {/* Esconder titulo principal e texto explicativo quando o usuario comeca a digitar */}
-            {!isSearching && (
-              <div className="transition duration-300">
-                <h1 className="max-w-3xl font-display text-5xl font-semibold leading-[0.96] tracking-[-0.055em] text-zinc-950 sm:text-6xl">
-                  Shopping Apple completo.
-                </h1>
-                <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-600">
-                  Uma prateleira digital limpa para comparar iPhone, Mac, iPad, Apple Watch, Android e acessorios. Filtre por linha, busque pelo nome e fale direto com um consultor.
-                </p>
-              </div>
-            )}
+            {/* Titulo principal com transicao suave de opacidade, altura e escala estilo Apple */}
+            <div
+              className={`transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                isSearching
+                  ? 'pointer-events-none max-h-0 -translate-y-4 scale-95 opacity-0 overflow-hidden lg:hidden'
+                  : 'max-h-[300px] translate-y-0 scale-100 opacity-100'
+              }`}
+            >
+              <h1 className="max-w-3xl font-display text-5xl font-semibold leading-[0.96] tracking-[-0.055em] text-zinc-950 sm:text-6xl">
+                Shopping Apple completo.
+              </h1>
+              <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-600">
+                Uma prateleira digital limpa para comparar iPhone, Mac, iPad, Apple Watch, Android e acessorios. Filtre por linha, busque pelo nome e fale direto com um consultor.
+              </p>
+            </div>
 
             {/* Container da Busca expande e ganha foco total ao digitar */}
             <div
-              className={`rounded-[2rem] border bg-white p-5 shadow-xl transition-all duration-300 ${
+              className={`rounded-[2rem] border bg-white p-5 shadow-xl transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
                 isSearching
                   ? 'border-zinc-950/20 shadow-2xl ring-4 ring-zinc-950/5'
                   : 'border-zinc-200'
@@ -266,12 +271,12 @@ export default function Shop() {
 
               {/* Status de Busca Ativa */}
               {isSearching && (
-                <div className="mt-3 flex items-center justify-between px-2 text-xs font-medium text-zinc-500">
+                <div className="mt-3 flex items-center justify-between px-2 text-xs font-medium text-zinc-500 animate-fade-in">
                   <span>
                     Exibindo resultados para{' '}
                     <strong className="font-semibold text-zinc-950">"{query}"</strong>
                   </span>
-                  <span className="rounded-full bg-zinc-100 px-2.5 py-1 text-zinc-700 font-semibold">
+                  <span className="rounded-full bg-zinc-100 px-2.5 py-1 font-semibold text-zinc-700">
                     {filtered.length} produto(s)
                   </span>
                 </div>
@@ -319,38 +324,43 @@ export default function Shop() {
           </div>
         </section>
 
-        {/* Esconder a secao preta de curadoria ao digitar para focar 100% nos produtos procurados */}
-        {!isSearching && (
-          <section className="mx-auto mt-12 max-w-7xl transition duration-300" aria-labelledby="shop-curation-title">
-            <div className="grid gap-5 rounded-[2.5rem] border border-zinc-200 bg-white p-5 shadow-[0_24px_70px_rgba(24,24,27,0.10)] lg:grid-cols-[1.1fr_0.9fr] lg:p-8">
-              <div className="rounded-[2rem] bg-zinc-950 p-8 text-white">
-                <p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm font-semibold text-white">
-                  <BadgeCheck className="size-4" aria-hidden="true" />
-                  Compra premium, menos duvida
-                </p>
-                <h2 id="shop-curation-title" className="mt-6 max-w-xl font-display text-4xl font-semibold tracking-[-0.045em]">
-                  Curadoria que reduz arrependimento.
-                </h2>
-                <p className="mt-5 max-w-2xl text-base leading-8 text-zinc-300">
-                  Estoque selecionado por uso real, com orientacao sobre memoria, geracao, garantia, acessorios e momento ideal de upgrade.
-                </p>
-              </div>
-
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
-                {[
-                  ['Modelos revisados', 'Produtos apresentados com configuracao e indicacao de uso claras.', PackageCheck],
-                  ['Resposta em ate 24h', 'Consultoria rapida para comparar alternativas antes de fechar.', Clock3],
-                ].map(([title, description, Icon]) => (
-                  <article key={title as string} className="rounded-[1.75rem] border border-zinc-200 bg-zinc-50 p-6">
-                    <Icon className="size-6 text-zinc-950" aria-hidden="true" />
-                    <h3 className="mt-5 text-xl font-semibold tracking-tight text-zinc-950">{title as string}</h3>
-                    <p className="mt-2 text-sm leading-6 text-zinc-600">{description as string}</p>
-                  </article>
-                ))}
-              </div>
+        {/* Secao de curadoria com transicao de recolhimento suave ao digitar */}
+        <section
+          className={`mx-auto max-w-7xl transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+            isSearching
+              ? 'pointer-events-none max-h-0 mt-0 opacity-0 overflow-hidden scale-95'
+              : 'max-h-[600px] mt-12 opacity-100 scale-100'
+          }`}
+          aria-labelledby="shop-curation-title"
+        >
+          <div className="grid gap-5 rounded-[2.5rem] border border-zinc-200 bg-white p-5 shadow-[0_24px_70px_rgba(24,24,27,0.10)] lg:grid-cols-[1.1fr_0.9fr] lg:p-8">
+            <div className="rounded-[2rem] bg-zinc-950 p-8 text-white">
+              <p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm font-semibold text-white">
+                <BadgeCheck className="size-4" aria-hidden="true" />
+                Compra premium, menos duvida
+              </p>
+              <h2 id="shop-curation-title" className="mt-6 max-w-xl font-display text-4xl font-semibold tracking-[-0.045em]">
+                Curadoria que reduz arrependimento.
+              </h2>
+              <p className="mt-5 max-w-2xl text-base leading-8 text-zinc-300">
+                Estoque selecionado por uso real, com orientacao sobre memoria, geracao, garantia, acessorios e momento ideal de upgrade.
+              </p>
             </div>
-          </section>
-        )}
+
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+              {[
+                ['Modelos revisados', 'Produtos apresentados com configuracao e indicacao de uso claras.', PackageCheck],
+                ['Resposta em ate 24h', 'Consultoria rapida para comparar alternativas antes de fechar.', Clock3],
+              ].map(([title, description, Icon]) => (
+                <article key={title as string} className="rounded-[1.75rem] border border-zinc-200 bg-zinc-50 p-6">
+                  <Icon className="size-6 text-zinc-950" aria-hidden="true" />
+                  <h3 className="mt-5 text-xl font-semibold tracking-tight text-zinc-950">{title as string}</h3>
+                  <p className="mt-2 text-sm leading-6 text-zinc-600">{description as string}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
 
         <section className="mx-auto mt-14 max-w-7xl" aria-label="Lista completa de produtos Apple">
           {filtered.length === 0 ? (

@@ -6,25 +6,38 @@ import { useCartStore } from '@/store/useCartStore'
 export function ProductModal() {
   const { product, isOpen, close } = useProductModalStore()
   const { addItem } = useCartStore()
-  const [selectedColor, setSelectedColor] = useState<string | null>(null)
+
+  // Estados locais de seleção no modal
+  const [selectedStorage, setSelectedStorage] = useState<string>('')
+  const [selectedColor, setSelectedColor] = useState<string>('')
   const [added, setAdded] = useState(false)
 
   if (!isOpen || !product) return null
 
-  const activeColor = selectedColor ?? product.colors[0]
+  // Definições padrões e cálculos de preço/imagem
+  const activeStorage = selectedStorage || product.storageOptions?.[0]?.storage || ''
+  const activeColor = selectedColor || product.colorOptions?.[0]?.name || product.colors[0] || ''
+
+  const activeStorageObj = product.storageOptions?.find((s) => s.storage === activeStorage)
+  const activePrice = activeStorageObj?.priceFrom || product.priceFrom
+
+  const activeColorObj = product.colorOptions?.find((c) => c.name === activeColor)
+  const activeImage = activeColorObj?.image || product.image
 
   const handleAddToCart = () => {
-    addItem(product, activeColor)
+    addItem(product, activeColor, activeStorage, activePrice, activeImage)
     setAdded(true)
     setTimeout(() => {
       setAdded(false)
-      setSelectedColor(null)
+      setSelectedStorage('')
+      setSelectedColor('')
       close()
     }, 1200)
   }
 
   const handleClose = () => {
-    setSelectedColor(null)
+    setSelectedStorage('')
+    setSelectedColor('')
     setAdded(false)
     close()
   }
@@ -38,15 +51,16 @@ export function ProductModal() {
       />
 
       {/* Modal */}
-      <div className="fixed inset-0 z-[61] flex items-center justify-center px-4 py-8">
+      <div className="fixed inset-0 z-[61] flex items-center justify-center px-4 py-8 overflow-y-auto">
         <div
-          className="relative w-full max-w-2xl overflow-hidden rounded-[2.5rem] border border-zinc-200 bg-white shadow-[0_40px_120px_rgba(0,0,0,0.25)]"
+          className="relative w-full max-w-2xl overflow-hidden rounded-[2.5rem] border border-zinc-200 bg-white shadow-[0_40px_120px_rgba(0,0,0,0.25)] my-auto"
           style={{ animation: 'modalIn 0.4s cubic-bezier(0.16, 1, 0.3, 1)' }}
         >
           {/* Close */}
           <button
             onClick={handleClose}
             className="absolute right-5 top-5 z-10 grid size-10 place-items-center rounded-full bg-zinc-100 text-zinc-500 transition hover:bg-zinc-200 hover:text-zinc-950"
+            aria-label="Fechar detalhes do produto"
           >
             <X className="size-5" />
           </button>
@@ -54,9 +68,9 @@ export function ProductModal() {
           {/* Imagem do Produto */}
           <div className="flex h-72 items-center justify-center bg-[#f5f5f7] p-10 sm:h-80">
             <img
-              src={product.image}
+              src={activeImage}
               alt={product.name}
-              className="h-full max-h-60 w-auto object-contain"
+              className="h-full max-h-60 w-auto object-contain transition-all duration-300"
               style={{ animation: 'fadeUp 0.5s ease-out 0.1s both' }}
             />
           </div>
@@ -85,36 +99,92 @@ export function ProductModal() {
               ))}
             </div>
 
+            {/* Seleção de Capacidade/Armazenamento se houver */}
+            {product.storageOptions && product.storageOptions.length > 0 && (
+              <div className="mt-6 border-t border-zinc-100 pt-6">
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-zinc-400">
+                  Capacidade
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {product.storageOptions.map((opt) => {
+                    const isActive = activeStorage === opt.storage
+                    return (
+                      <button
+                        key={opt.storage}
+                        onClick={() => setSelectedStorage(opt.storage)}
+                        className={`rounded-full px-4 py-2 text-xs font-semibold transition-all duration-200 ${
+                          isActive
+                            ? 'bg-zinc-950 text-white shadow-md shadow-zinc-950/20'
+                            : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200'
+                        }`}
+                      >
+                        {opt.storage}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
             {/* Seleção de Cor */}
-            <div className="mt-7 border-t border-zinc-100 pt-6">
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-zinc-400">
-                Escolha o acabamento
-              </p>
+            <div className="mt-6 border-t border-zinc-100 pt-6">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-zinc-400">
+                  Escolha o acabamento
+                </p>
+                <span className="text-xs font-semibold text-zinc-700">{activeColor}</span>
+              </div>
               <div className="mt-3 flex flex-wrap gap-2">
-                {product.colors.map((color) => {
-                  const isActive = activeColor === color
-                  return (
-                    <button
-                      key={color}
-                      onClick={() => setSelectedColor(color)}
-                      className={`relative rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 ${
-                        isActive
-                          ? 'bg-zinc-950 text-white shadow-lg shadow-zinc-950/20'
-                          : 'border border-zinc-200 bg-white text-zinc-600 hover:border-zinc-400 hover:text-zinc-950'
-                      }`}
-                    >
-                      {color}
-                    </button>
-                  )
-                })}
+                {product.colorOptions && product.colorOptions.length > 0
+                  ? product.colorOptions.map((c) => {
+                      const isActive = activeColor === c.name
+                      return (
+                        <button
+                          key={c.name}
+                          onClick={() => setSelectedColor(c.name)}
+                          className={`relative flex items-center gap-2 rounded-full px-4 py-2 text-xs font-medium transition-all duration-200 ${
+                            isActive
+                              ? 'border-zinc-950 bg-zinc-950 text-white shadow-md shadow-zinc-950/20'
+                              : 'border border-zinc-200 bg-white text-zinc-700 hover:border-zinc-400 hover:bg-zinc-50'
+                          }`}
+                        >
+                          {c.hex && (
+                            <span
+                              className="size-3 rounded-full border border-black/10 shadow-inner"
+                              style={{ backgroundColor: c.hex }}
+                            />
+                          )}
+                          {c.name}
+                        </button>
+                      )
+                    })
+                  : product.colors.map((color) => {
+                      const isActive = activeColor === color
+                      return (
+                        <button
+                          key={color}
+                          onClick={() => setSelectedColor(color)}
+                          className={`relative rounded-full px-4 py-2 text-xs font-medium transition-all duration-200 ${
+                            isActive
+                              ? 'bg-zinc-950 text-white shadow-md shadow-zinc-950/20'
+                              : 'border border-zinc-200 bg-white text-zinc-600 hover:border-zinc-400 hover:text-zinc-950'
+                          }`}
+                        >
+                          {color}
+                        </button>
+                      )
+                    })}
               </div>
             </div>
 
             {/* Preço e CTA */}
-            <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-2xl font-semibold tracking-tight text-zinc-950">
-                {product.priceFrom}
-              </p>
+            <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-t border-zinc-100 pt-6">
+              <div>
+                <span className="text-xs text-zinc-400">Preço final</span>
+                <p className="text-2xl font-bold tracking-tight text-zinc-950">
+                  {activePrice}
+                </p>
+              </div>
               <button
                 onClick={handleAddToCart}
                 disabled={added}
@@ -127,7 +197,7 @@ export function ProductModal() {
                 {added ? (
                   <>
                     <Check className="size-4" />
-                    Adicionado!
+                    Adicionado à Sacola!
                   </>
                 ) : (
                   <>
