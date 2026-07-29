@@ -96,56 +96,116 @@ function FeaturedCard({ product }: { product: FeaturedProduct }) {
 }
 
 export function CatalogSections() {
+  const categoryImages: Record<string, string> = {
+    iPhone: allProducts.find((p) => p.name === 'iPhone 17 Pro Max')?.image || allProducts[0].image,
+    Mac: allProducts.find((p) => p.name === 'MacBook Pro 14"')?.image || allProducts[0].image,
+    iPad: allProducts.find((p) => p.name === 'iPad Pro M5')?.image || allProducts[0].image,
+    'Apple Watch': allProducts.find((p) => p.name === 'Apple Watch Ultra 2 & 3')?.image || allProducts[0].image,
+    Acessorios: allProducts.find((p) => p.name === 'AirPods Max')?.image || allProducts[0].image,
+  }
+
   return (
     <section id="produtos" className="scroll-mt-28 px-5 py-20 lg:px-8">
       <div className="mx-auto max-w-7xl">
         <div className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.25em] text-sky-600">Catalogo curado</p>
+            <p className="text-sm font-semibold uppercase tracking-[0.25em] text-sky-600">Catálogo curado</p>
             <h2 className="mt-4 max-w-2xl font-display text-4xl font-semibold tracking-[-0.045em] text-zinc-950 sm:text-5xl">
-              Escolha por linha, finalize com orientacao.
+              Escolha por linha, finalize com orientação.
             </h2>
           </div>
           <p className="max-w-2xl text-lg leading-8 text-zinc-600 lg:justify-self-end">
-            O foco nao e mostrar tudo, e mostrar o que faz sentido para voce: modelos atuais, configuracoes inteligentes e uma compra sem excesso de informacao.
+            O foco não é mostrar tudo, é mostrar o que faz sentido para você: modelos atuais, configurações inteligentes e uma compra sem excesso de informação.
           </p>
         </div>
 
-        {/* Grade simetrica de 3 colunas (2 linhas x 3 cards = 6 categorias) */}
+        {/* Bento Grid Showcase Apple (5 categorias sem Android) */}
         <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {categories.map((category) => {
-            const Icon = categoryIcons[category.name] || Smartphone
+          {categories.map((category, index) => {
             const count = allProducts.filter((p) => p.category === category.name).length
+            const isHero = category.name === 'iPhone'
+            const productImage = categoryImages[category.name]
 
             return (
               <Link
                 key={category.name}
                 to={`/shop?category=${encodeURIComponent(category.name)}`}
-                className="group relative flex flex-col justify-between overflow-hidden rounded-[2.25rem] border border-zinc-200/90 bg-white p-7 shadow-[0_4px_20px_rgba(0,0,0,0.03)] transition-all duration-300 hover:-translate-y-1.5 hover:border-zinc-400 hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)]"
+                className={`group relative flex flex-col justify-between overflow-hidden rounded-[2.5rem] border p-8 transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_30px_70px_rgba(0,0,0,0.18)] ${
+                  isHero
+                    ? 'md:col-span-2 bg-zinc-950 text-white border-white/15 shadow-2xl'
+                    : category.name === 'Acessorios'
+                    ? 'bg-white text-zinc-950 border-zinc-200 shadow-lg'
+                    : 'bg-gradient-to-b from-zinc-900 to-zinc-950 text-white border-white/10 shadow-xl'
+                }`}
               >
-                <div>
-                  <div className="flex items-center justify-between">
-                    <div className="grid size-12 place-items-center rounded-2xl bg-zinc-950 text-white shadow-md shadow-zinc-950/10 transition duration-300 group-hover:scale-110 group-hover:bg-sky-600">
-                      <Icon className="size-5" aria-hidden="true" />
-                    </div>
-                    <span className="rounded-full bg-zinc-100 px-3 py-1 text-xs font-semibold text-zinc-600 group-hover:bg-sky-50 group-hover:text-sky-700">
-                      {count} modelo{count !== 1 ? 's' : ''}
-                    </span>
-                  </div>
+                {/* Glow Radial Decorativo para cards Dark */}
+                {category.name !== 'Acessorios' && (
+                  <div
+                    aria-hidden="true"
+                    className="pointer-events-none absolute -right-16 -top-16 size-72 rounded-full bg-[radial-gradient(circle,rgba(56,189,248,0.22),transparent_70%)] transition-transform duration-700 group-hover:scale-125"
+                  />
+                )}
 
-                  <h3 className="mt-6 text-2xl font-semibold tracking-tight text-zinc-950">
-                    {category.name}
-                  </h3>
-                  <p className="mt-3.5 text-sm leading-6 text-zinc-600">
-                    {category.description}
-                  </p>
+                <div className="relative z-10 flex items-start justify-between gap-4">
+                  <div>
+                    <span
+                      className={`inline-block rounded-full px-3.5 py-1 text-xs font-semibold uppercase tracking-wider ${
+                        isHero
+                          ? 'bg-sky-500/20 text-sky-300 backdrop-blur'
+                          : category.name === 'Acessorios'
+                          ? 'bg-zinc-100 text-zinc-600'
+                          : 'bg-white/10 text-zinc-300 backdrop-blur'
+                      }`}
+                    >
+                      Linha {category.name}
+                    </span>
+                    <h3 className="mt-4 font-display text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">
+                      {category.name}
+                    </h3>
+                  </div>
+                  <span
+                    className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                      category.name === 'Acessorios'
+                        ? 'bg-zinc-100 text-zinc-950'
+                        : 'bg-white/10 text-white'
+                    }`}
+                  >
+                    {count} modelo{count !== 1 ? 's' : ''}
+                  </span>
                 </div>
 
-                <div className="mt-8 border-t border-zinc-100 pt-5">
-                  <p className="text-xs font-medium text-zinc-500 line-clamp-1">{category.highlight}</p>
-                  <div className="mt-4 flex items-center gap-1 text-xs font-semibold text-zinc-950 group-hover:text-sky-600">
-                    <span>Ver modelos</span>
-                    <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-1" />
+                {/* Render do Produto em Destaque Flutuando com Efeito 3D Hover */}
+                <div
+                  className={`relative my-6 flex items-center justify-center ${
+                    isHero ? 'h-52 sm:h-64' : 'h-48'
+                  }`}
+                >
+                  <img
+                    src={productImage}
+                    alt={`Preview ${category.name}`}
+                    loading="lazy"
+                    className="h-full w-auto object-contain drop-shadow-[0_20px_35px_rgba(0,0,0,0.35)] transition-transform duration-700 ease-out group-hover:scale-110 group-hover:-translate-y-2"
+                  />
+                </div>
+
+                <div className="relative z-10 border-t border-white/10 pt-5">
+                  <p
+                    className={`text-sm leading-6 ${
+                      category.name === 'Acessorios' ? 'text-zinc-600' : 'text-zinc-300'
+                    }`}
+                  >
+                    {category.description}
+                  </p>
+
+                  <div
+                    className={`mt-5 flex items-center gap-2 text-xs font-semibold transition ${
+                      category.name === 'Acessorios'
+                        ? 'text-zinc-950 group-hover:text-sky-600'
+                        : 'text-white group-hover:text-sky-400'
+                    }`}
+                  >
+                    <span>Explorar {category.name}</span>
+                    <ArrowRight className="size-4 transition-transform group-hover:translate-x-1.5" />
                   </div>
                 </div>
               </Link>

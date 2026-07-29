@@ -174,9 +174,17 @@ function ProductCard({ product }: { product: FeaturedProduct }) {
 }
 
 export default function Shop() {
+  const [searchParams] = useSearchParams()
+  const categoryParam = searchParams.get('category')
   const { products } = useProducts()
   const [query, setQuery] = useState('')
   const [selected, setSelected] = useState<(typeof CATEGORY_FILTERS)[number]>('Todos')
+
+  useEffect(() => {
+    if (categoryParam && (CATEGORY_FILTERS as readonly string[]).includes(categoryParam)) {
+      setSelected(categoryParam as (typeof CATEGORY_FILTERS)[number])
+    }
+  }, [categoryParam])
 
   const isSearching = query.trim().length > 0
 
@@ -205,30 +213,26 @@ export default function Shop() {
       <SiteHeader variant="shop" />
       <main className="px-5 pb-24 pt-32 lg:px-8 lg:pt-40">
         <section className="mx-auto max-w-7xl">
-          <div
-            className={`grid gap-8 transition-all duration-700 cubic-bezier(0.16,1,0.3,1) ${
-              isSearching ? 'grid-cols-1' : 'lg:grid-cols-[0.9fr_1.1fr] lg:items-end'
-            }`}
-          >
-            {/* Titulo principal com transicao suave de opacidade, altura e escala estilo Apple */}
+          <div className="flex flex-col gap-8 lg:flex-row lg:items-end">
+            {/* Titulo principal com transicao ultra suave de largura, opacidade e escala estilo Apple (1000ms) */}
             <div
-              className={`transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+              className={`transition-all duration-1000 ease-[cubic-bezier(0.2,0.8,0.2,1)] ${
                 isSearching
-                  ? 'pointer-events-none max-h-0 -translate-y-4 scale-95 opacity-0 overflow-hidden lg:hidden'
-                  : 'max-h-[300px] translate-y-0 scale-100 opacity-100'
+                  ? 'pointer-events-none max-h-0 -translate-x-6 scale-95 opacity-0 overflow-hidden lg:max-w-0 lg:max-h-none'
+                  : 'max-h-[300px] translate-x-0 scale-100 opacity-100 lg:max-w-[45%] lg:max-h-none'
               }`}
             >
               <h1 className="max-w-3xl font-display text-5xl font-semibold leading-[0.96] tracking-[-0.055em] text-zinc-950 sm:text-6xl">
                 Shopping Apple completo.
               </h1>
               <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-600">
-                Uma prateleira digital limpa para comparar iPhone, Mac, iPad, Apple Watch, Android e acessorios. Filtre por linha, busque pelo nome e fale direto com um consultor.
+                Uma prateleira digital limpa para comparar iPhone, Mac, iPad, Apple Watch e acessorios. Filtre por linha, busque pelo nome e fale direto com um consultor.
               </p>
             </div>
 
-            {/* Container da Busca expande e ganha foco total ao digitar */}
+            {/* Container da Busca expande em 1000ms no mesmo ritmo sedoso */}
             <div
-              className={`rounded-[2rem] border bg-white p-5 shadow-xl transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+              className={`w-full flex-1 rounded-[2rem] border bg-white p-5 shadow-xl transition-all duration-1000 ease-[cubic-bezier(0.2,0.8,0.2,1)] ${
                 isSearching
                   ? 'border-zinc-950/20 shadow-2xl ring-4 ring-zinc-950/5'
                   : 'border-zinc-200'

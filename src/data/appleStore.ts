@@ -106,11 +106,6 @@ export const categories: ProductCategory[] = [
     highlight: 'Chips Apple Silicon M-series e autonomia impressionante',
   },
   {
-    name: 'Android',
-    description: 'Xiaomi, Redmi e POCO lacrados com excelente custo-beneficio.',
-    highlight: 'Bateria longa e desempenho para o dia a dia',
-  },
-  {
     name: 'Acessorios',
     description: 'AirPods, AirTag e Apple Pencils originais para o seu ecossistema.',
     highlight: 'Audio imersivo, rastreamento de precisao e escrita digital',
