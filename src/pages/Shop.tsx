@@ -211,33 +211,36 @@ export default function Shop() {
   return (
     <div className="min-h-screen bg-[#f8f8f6] text-zinc-950">
       <SiteHeader variant="shop" />
-      <main className="px-5 pb-24 pt-32 lg:px-8 lg:pt-40">
+      <main
+        className={`px-5 pb-24 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+          isSearching ? 'pt-24 sm:pt-28' : 'pt-32 lg:pt-40'
+        }`}
+      >
         <section className="mx-auto max-w-7xl">
-          <div className="flex flex-col gap-8 lg:flex-row lg:items-end">
-            {/* Titulo principal com transicao ultra suave de largura, opacidade e escala estilo Apple (1000ms) */}
-            <div
-              className={`transition-all duration-1000 ease-[cubic-bezier(0.2,0.8,0.2,1)] ${
-                isSearching
-                  ? 'pointer-events-none max-h-0 -translate-x-6 scale-95 opacity-0 overflow-hidden lg:max-w-0 lg:max-h-none'
-                  : 'max-h-[300px] translate-x-0 scale-100 opacity-100 lg:max-w-[45%] lg:max-h-none'
-              }`}
-            >
-              <h1 className="max-w-3xl font-display text-5xl font-semibold leading-[0.96] tracking-[-0.055em] text-zinc-950 sm:text-6xl">
-                Shopping Apple completo.
-              </h1>
-              <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-600">
-                Uma prateleira digital limpa para comparar iPhone, Mac, iPad, Apple Watch e acessorios. Filtre por linha, busque pelo nome e fale direto com um consultor.
-              </p>
-            </div>
+          {/* Titulo principal com recolhimento suave de altura e opacidade ao digitar */}
+          <div
+            className={`transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+              isSearching
+                ? 'pointer-events-none max-h-0 -translate-y-4 scale-95 opacity-0 overflow-hidden mb-0'
+                : 'max-h-[300px] translate-y-0 scale-100 opacity-100 mb-8'
+            }`}
+          >
+            <h1 className="max-w-3xl font-display text-5xl font-semibold leading-[0.96] tracking-[-0.055em] text-zinc-950 sm:text-6xl">
+              Shopping Apple completo.
+            </h1>
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-600">
+              Uma prateleira digital limpa para comparar iPhone, Mac, iPad, Apple Watch e acessorios. Filtre por linha, busque pelo nome e fale direto com um consultor.
+            </p>
+          </div>
 
-            {/* Container da Busca expande em 1000ms no mesmo ritmo sedoso */}
-            <div
-              className={`w-full flex-1 rounded-[2rem] border bg-white p-5 shadow-xl transition-all duration-1000 ease-[cubic-bezier(0.2,0.8,0.2,1)] ${
-                isSearching
-                  ? 'border-zinc-950/20 shadow-2xl ring-4 ring-zinc-950/5'
-                  : 'border-zinc-200'
-              }`}
-            >
+          {/* Container da Busca fixado de forma limpa no topo */}
+          <div
+            className={`rounded-[2rem] border bg-white p-5 shadow-xl transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+              isSearching
+                ? 'border-zinc-950/20 shadow-2xl ring-4 ring-zinc-950/5'
+                : 'border-zinc-200'
+            }`}
+          >
               <div className="flex items-center justify-between gap-4">
                 <label className="flex flex-1 items-center gap-3 rounded-full border border-zinc-200 bg-zinc-50 px-4 py-3 focus-within:border-zinc-400 focus-within:ring-4 focus-within:ring-zinc-100">
                   <Search className="size-4 text-zinc-500" aria-hidden="true" />
@@ -325,7 +328,6 @@ export default function Shop() {
                 </div>
               </div>
             </div>
-          </div>
         </section>
 
         {/* Secao de curadoria com transicao de recolhimento suave ao digitar */}

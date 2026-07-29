@@ -174,9 +174,9 @@ export function CatalogSections() {
                   </span>
                 </div>
 
-                {/* Render do Produto em Destaque Flutuando com Efeito 3D Hover */}
+                {/* Render do Produto em Destaque dentro de um Display Pod Limpo */}
                 <div
-                  className={`relative my-6 flex items-center justify-center ${
+                  className={`relative my-6 flex items-center justify-center overflow-hidden rounded-2xl bg-[#f5f5f7] p-4 shadow-inner border border-zinc-200/60 ${
                     isHero ? 'h-52 sm:h-64' : 'h-48'
                   }`}
                 >
@@ -184,7 +184,7 @@ export function CatalogSections() {
                     src={productImage}
                     alt={`Preview ${category.name}`}
                     loading="lazy"
-                    className="h-full w-auto object-contain drop-shadow-[0_20px_35px_rgba(0,0,0,0.35)] transition-transform duration-700 ease-out group-hover:scale-110 group-hover:-translate-y-2"
+                    className="h-full w-auto object-contain transition-transform duration-700 ease-out group-hover:scale-110 group-hover:-translate-y-1"
                   />
                 </div>
 
