@@ -121,7 +121,7 @@ export function CatalogSections() {
 
         {/* Bento Grid Showcase Apple (5 categorias sem Android) */}
         <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {categories.map((category, index) => {
+          {categories.map((category) => {
             const count = allProducts.filter((p) => p.category === category.name).length
             const isHero = category.name === 'iPhone'
             const productImage = categoryImages[category.name]
@@ -130,53 +130,41 @@ export function CatalogSections() {
               <Link
                 key={category.name}
                 to={`/shop?category=${encodeURIComponent(category.name)}`}
-                className={`group relative flex flex-col justify-between overflow-hidden rounded-[2.5rem] border p-8 transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_30px_70px_rgba(0,0,0,0.18)] ${
+                className={`group relative flex flex-col justify-between overflow-hidden rounded-[2.5rem] border p-8 transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_25px_60px_rgba(0,0,0,0.12)] ${
                   isHero
-                    ? 'md:col-span-2 bg-zinc-950 text-white border-white/15 shadow-2xl'
-                    : category.name === 'Acessorios'
-                    ? 'bg-white text-zinc-950 border-zinc-200 shadow-lg'
-                    : 'bg-gradient-to-b from-zinc-900 to-zinc-950 text-white border-white/10 shadow-xl'
+                    ? 'md:col-span-2 bg-gradient-to-br from-slate-100 via-zinc-100 to-slate-200/90 text-zinc-950 border-zinc-300/80 shadow-md hover:border-zinc-400'
+                    : 'bg-gradient-to-b from-zinc-50 via-slate-100/70 to-zinc-100/90 text-zinc-950 border-zinc-200/90 shadow-sm hover:border-zinc-300'
                 }`}
               >
-                {/* Glow Radial Decorativo para cards Dark */}
-                {category.name !== 'Acessorios' && (
-                  <div
-                    aria-hidden="true"
-                    className="pointer-events-none absolute -right-16 -top-16 size-72 rounded-full bg-[radial-gradient(circle,rgba(56,189,248,0.22),transparent_70%)] transition-transform duration-700 group-hover:scale-125"
-                  />
-                )}
+                {/* Glow Radial Decorativo Suave Titanium */}
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute -right-16 -top-16 size-72 rounded-full bg-[radial-gradient(circle,rgba(56,189,248,0.14),transparent_70%)] transition-transform duration-700 group-hover:scale-125"
+                />
 
                 <div className="relative z-10 flex items-start justify-between gap-4">
                   <div>
                     <span
                       className={`inline-block rounded-full px-3.5 py-1 text-xs font-semibold uppercase tracking-wider ${
                         isHero
-                          ? 'bg-sky-500/20 text-sky-300 backdrop-blur'
-                          : category.name === 'Acessorios'
-                          ? 'bg-zinc-100 text-zinc-600'
-                          : 'bg-white/10 text-zinc-300 backdrop-blur'
+                          ? 'bg-sky-500/15 text-sky-800 border border-sky-200/60'
+                          : 'bg-zinc-200/70 text-zinc-700 border border-zinc-300/40'
                       }`}
                     >
                       Linha {category.name}
                     </span>
-                    <h3 className="mt-4 font-display text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">
+                    <h3 className="mt-4 font-display text-3xl font-semibold tracking-[-0.035em] text-zinc-950 sm:text-4xl">
                       {category.name}
                     </h3>
                   </div>
-                  <span
-                    className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                      category.name === 'Acessorios'
-                        ? 'bg-zinc-100 text-zinc-950'
-                        : 'bg-white/10 text-white'
-                    }`}
-                  >
+                  <span className="rounded-full bg-white/90 px-3.5 py-1 text-xs font-semibold text-zinc-800 shadow-xs border border-zinc-200/80">
                     {count} modelo{count !== 1 ? 's' : ''}
                   </span>
                 </div>
 
-                {/* Render do Produto em Destaque dentro de um Display Pod Limpo */}
+                {/* Render do Produto em Destaque no Display Titanium Harmonioso */}
                 <div
-                  className={`relative my-6 flex items-center justify-center overflow-hidden rounded-2xl bg-[#f5f5f7] p-4 shadow-inner border border-zinc-200/60 ${
+                  className={`relative my-6 flex items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-b from-white/90 to-zinc-50/70 p-4 shadow-inner border border-zinc-200/70 backdrop-blur-sm ${
                     isHero ? 'h-52 sm:h-64' : 'h-48'
                   }`}
                 >
@@ -184,26 +172,16 @@ export function CatalogSections() {
                     src={productImage}
                     alt={`Preview ${category.name}`}
                     loading="lazy"
-                    className="h-full w-auto object-contain transition-transform duration-700 ease-out group-hover:scale-110 group-hover:-translate-y-1"
+                    className="h-full w-auto object-contain transition-transform duration-700 ease-out group-hover:scale-110 group-hover:-translate-y-1 drop-shadow-sm"
                   />
                 </div>
 
-                <div className="relative z-10 border-t border-white/10 pt-5">
-                  <p
-                    className={`text-sm leading-6 ${
-                      category.name === 'Acessorios' ? 'text-zinc-600' : 'text-zinc-300'
-                    }`}
-                  >
+                <div className="relative z-10 border-t border-zinc-200/80 pt-5">
+                  <p className="text-sm leading-6 text-zinc-600">
                     {category.description}
                   </p>
 
-                  <div
-                    className={`mt-5 flex items-center gap-2 text-xs font-semibold transition ${
-                      category.name === 'Acessorios'
-                        ? 'text-zinc-950 group-hover:text-sky-600'
-                        : 'text-white group-hover:text-sky-400'
-                    }`}
-                  >
+                  <div className="mt-5 flex items-center gap-2 text-xs font-semibold text-zinc-950 transition group-hover:text-sky-600">
                     <span>Explorar {category.name}</span>
                     <ArrowRight className="size-4 transition-transform group-hover:translate-x-1.5" />
                   </div>
