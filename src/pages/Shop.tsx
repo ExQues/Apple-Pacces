@@ -36,6 +36,31 @@ function ProductCard({ product }: { product: FeaturedProduct }) {
   const activeColorObj = product.colorOptions?.find((c) => c.name === selectedColor)
   const activeImage = activeColorObj?.image || product.image
 
+  // Pré-carregamento em cache das imagens de todas as variações de cores do produto
+  useEffect(() => {
+    if (product.colorOptions && product.colorOptions.length > 0) {
+      product.colorOptions.forEach((opt) => {
+        const img = new Image()
+        img.src = opt.image
+      })
+    }
+  }, [product])
+
+  // Transição suave de troca de imagem sem tela branca / piscada
+  const [displaySrc, setDisplaySrc] = useState(activeImage)
+  const [isChanging, setIsChanging] = useState(false)
+
+  useEffect(() => {
+    if (activeImage !== displaySrc) {
+      setIsChanging(true)
+      const timeout = setTimeout(() => {
+        setDisplaySrc(activeImage)
+        setIsChanging(false)
+      }, 100)
+      return () => clearTimeout(timeout)
+    }
+  }, [activeImage, displaySrc])
+
   const handleAddToCart = () => {
     if (imgRef.current) {
       const rect = imgRef.current.getBoundingClientRect()
@@ -53,7 +78,7 @@ function ProductCard({ product }: { product: FeaturedProduct }) {
         <div className="flex h-72 items-center justify-center bg-gradient-to-b from-slate-100/90 via-zinc-100/80 to-slate-200/60 p-8 border-b border-zinc-200/60">
           <img
             ref={imgRef}
-            src={activeImage}
+            src={displaySrc}
             alt={`Imagem do ${product.name} na cor ${selectedColor}`}
             loading="lazy"
             decoding="async"
@@ -66,7 +91,9 @@ function ProductCard({ product }: { product: FeaturedProduct }) {
                   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect width="400" height="300" fill="%23f5f5f7"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="system-ui" font-size="20" fill="%239ca3af">${product.name}</text></svg>`,
                 )
             }}
-            className="h-full w-full object-contain transition duration-500 group-hover:scale-105 drop-shadow-sm"
+            className={`h-full w-full object-contain transition-all duration-300 ease-out group-hover:scale-105 drop-shadow-sm ${
+              isChanging ? 'opacity-40 scale-95' : 'opacity-100 scale-100'
+            }`}
           />
         </div>
         <div className="absolute left-5 top-5 flex gap-2">
@@ -213,20 +240,10 @@ export default function Shop() {
   return (
     <div className="min-h-screen bg-[#f8f8f6] text-zinc-950">
       <SiteHeader variant="shop" />
-      <main
-        className={`px-5 pb-24 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-          isSearching ? 'pt-24 sm:pt-28' : 'pt-32 lg:pt-40'
-        }`}
-      >
+      <main className="px-5 pb-24 pt-28 sm:pt-32 lg:pt-36">
         <section className="mx-auto max-w-7xl">
-          {/* Titulo principal com recolhimento suave de altura e opacidade ao digitar */}
-          <div
-            className={`transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-              isSearching
-                ? 'pointer-events-none max-h-0 -translate-y-4 scale-95 opacity-0 overflow-hidden mb-0'
-                : 'max-h-[300px] translate-y-0 scale-100 opacity-100 mb-8'
-            }`}
-          >
+          {/* Titulo principal estavel */}
+          <div className="mb-8">
             <h1 className="max-w-3xl font-display text-5xl font-semibold leading-[0.96] tracking-[-0.055em] text-zinc-950 sm:text-6xl">
               Shopping Apple completo.
             </h1>
@@ -235,16 +252,10 @@ export default function Shop() {
             </p>
           </div>
 
-          {/* Container da Busca fixado de forma limpa no topo */}
-          <div
-            className={`rounded-[2rem] border bg-white p-5 shadow-xl transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-              isSearching
-                ? 'border-zinc-950/20 shadow-2xl ring-4 ring-zinc-950/5'
-                : 'border-zinc-200'
-            }`}
-          >
+          {/* Container da Busca Fluida e Estável */}
+          <div className="rounded-[2rem] border border-zinc-200 bg-white p-5 shadow-xl transition-all duration-300">
               <div className="flex items-center justify-between gap-4">
-                <label className="flex flex-1 items-center gap-3 rounded-full border border-zinc-200 bg-zinc-50 px-4 py-3 focus-within:border-zinc-400 focus-within:ring-4 focus-within:ring-zinc-100">
+                <label className="flex flex-1 items-center gap-3 rounded-full border border-zinc-200 bg-zinc-50 px-4 py-3 focus-within:border-zinc-400 focus-within:ring-4 focus-within:ring-zinc-100 transition">
                   <Search className="size-4 text-zinc-500" aria-hidden="true" />
                   <input
                     type="text"
@@ -259,7 +270,7 @@ export default function Shop() {
                     <button
                       type="button"
                       onClick={() => setQuery('')}
-                      className="grid size-6 place-items-center rounded-full text-zinc-500 transition hover:bg-zinc-200 hover:text-zinc-950"
+                      className="grid size-6 place-items-center rounded-full text-zinc-500 transition hover:bg-zinc-200 hover:text-zinc-950 active:scale-90"
                       aria-label="Limpar busca"
                     >
                       <X className="size-3.5" aria-hidden="true" />
@@ -271,9 +282,9 @@ export default function Shop() {
                   <button
                     type="button"
                     onClick={() => setQuery('')}
-                    className="hidden rounded-full bg-zinc-100 px-4 py-2.5 text-xs font-semibold text-zinc-700 transition hover:bg-zinc-200 sm:block"
+                    className="hidden rounded-full bg-zinc-100 px-4 py-2.5 text-xs font-semibold text-zinc-700 transition hover:bg-zinc-200 active:scale-95 sm:block"
                   >
-                    Cancelar busca
+                    Limpar busca
                   </button>
                 )}
               </div>
@@ -283,9 +294,9 @@ export default function Shop() {
                 <div className="mt-3 flex items-center justify-between px-2 text-xs font-medium text-zinc-500 animate-fade-in">
                   <span>
                     Exibindo resultados para{' '}
-                    <strong className="font-semibold text-zinc-950">"{query}"</strong>
+                    <strong className="font-semibold text-zinc-950">"{query}"</strong> em todo o catálogo
                   </span>
-                  <span className="rounded-full bg-zinc-100 px-2.5 py-1 font-semibold text-zinc-700">
+                  <span className="rounded-full bg-sky-50 px-2.5 py-1 font-semibold text-sky-700 border border-sky-200/60">
                     {filtered.length} produto(s)
                   </span>
                 </div>
@@ -301,7 +312,7 @@ export default function Shop() {
                       type="button"
                       onClick={() => setSelected(cat)}
                       aria-pressed={isActive}
-                      className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition ${
+                      className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition active:scale-95 ${
                         isActive
                           ? 'bg-zinc-950 text-white shadow-sm'
                           : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-950'
@@ -332,15 +343,9 @@ export default function Shop() {
             </div>
         </section>
 
-        {/* Secao de curadoria com transicao de recolhimento suave ao digitar */}
-        <section
-          className={`mx-auto max-w-7xl transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-            isSearching
-              ? 'pointer-events-none max-h-0 mt-0 opacity-0 overflow-hidden scale-95'
-              : 'max-h-[600px] mt-12 opacity-100 scale-100'
-          }`}
-          aria-labelledby="shop-curation-title"
-        >
+        {/* Secao de curadoria */}
+        {!isSearching && (
+          <section className="mx-auto max-w-7xl mt-12 animate-fade-in" aria-labelledby="shop-curation-title">
           <div className="grid gap-5 rounded-[2.5rem] border border-zinc-200 bg-white p-5 shadow-[0_24px_70px_rgba(24,24,27,0.10)] lg:grid-cols-[1.1fr_0.9fr] lg:p-8">
             <div className="rounded-[2rem] bg-zinc-950 p-8 text-white">
               <p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm font-semibold text-white">
@@ -369,6 +374,7 @@ export default function Shop() {
             </div>
           </div>
         </section>
+        )}
 
         <section className="mx-auto mt-14 max-w-7xl" aria-label="Lista completa de produtos Apple">
           {filtered.length === 0 ? (
