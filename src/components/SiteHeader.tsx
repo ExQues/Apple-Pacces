@@ -113,13 +113,25 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
     navigate('/')
   }
 
+  // Travar scroll quando o menu mobile estiver aberto
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [mobileMenuOpen])
+
   return (
     <header className="fixed inset-x-0 top-0 z-50 px-3 pt-3">
       <nav
         className="mx-auto flex max-w-7xl items-center justify-between rounded-full border border-white/70 bg-white/85 px-4 py-3 shadow-[0_18px_60px_rgba(24,24,27,0.10)] backdrop-blur-2xl lg:px-5"
         aria-label="Navegacao principal"
       >
-        <Link to="/" className="group flex items-center gap-3" aria-label="Apple Pacces">
+        <Link to="/" className="group flex items-center gap-3 active:scale-95 transition-transform" aria-label="Apple Pacces">
           <span className="grid size-10 place-items-center rounded-full border border-zinc-200 bg-zinc-950 text-sm font-semibold text-white shadow-sm transition group-hover:scale-105">
             AP
           </span>
@@ -139,7 +151,7 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
               width: indicator.width,
               opacity: indicator.ready && variant === 'home' ? 1 : 0,
               transition:
-                'left 500ms cubic-bezier(0.4, 0, 0.2, 1), width 500ms cubic-bezier(0.4, 0, 0.2, 1), opacity 220ms ease',
+                'left 500ms cubic-bezier(0.16, 1, 0.3, 1), width 500ms cubic-bezier(0.16, 1, 0.3, 1), opacity 220ms ease',
             }}
           />
           {links.map((link) => {
@@ -163,7 +175,7 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
           <Link
             to="/shop"
             aria-current={variant === 'shop' ? 'page' : undefined}
-            className="relative z-10 ml-1 inline-flex items-center gap-2 rounded-full bg-sky-600 px-4 py-2 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(2,132,199,0.28)] transition hover:-translate-y-0.5 hover:bg-sky-500"
+            className="relative z-10 ml-1 inline-flex items-center gap-2 rounded-full bg-sky-600 px-4 py-2 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(2,132,199,0.28)] transition hover:-translate-y-0.5 hover:bg-sky-500 active:scale-95"
           >
             <ShoppingBag className="size-4" aria-hidden="true" />
             Shopping
@@ -176,14 +188,14 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
             ref={cartButtonRef}
             type="button"
             onClick={toggleDrawer}
-            className={`relative rounded-full p-2 text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-950 ${
+            className={`relative rounded-full p-2 text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-950 active:scale-90 ${
               isBouncing ? 'animate-cart-bounce' : ''
             }`}
             aria-label="Ver sacola de compras"
           >
             <ShoppingBag className="size-5" />
             {totalItems() > 0 && (
-              <span className="absolute right-0 top-0 flex h-4 w-4 items-center justify-center rounded-full bg-sky-600 text-[10px] font-bold text-white">
+              <span className="absolute right-0 top-0 flex h-4 w-4 items-center justify-center rounded-full bg-sky-600 text-[10px] font-bold text-white shadow-sm">
                 {totalItems()}
               </span>
             )}
@@ -193,14 +205,14 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
             <div ref={userMenuRef} className="relative">
               <button
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
-                className="flex items-center gap-2 rounded-full border border-zinc-200 bg-white px-3.5 py-2 text-sm font-semibold text-zinc-950 transition hover:bg-zinc-50 sm:px-4 sm:py-2.5"
+                className="flex items-center gap-2 rounded-full border border-zinc-200 bg-white px-3.5 py-2 text-sm font-semibold text-zinc-950 transition hover:bg-zinc-50 active:scale-95 sm:px-4 sm:py-2.5"
               >
                 <UserIcon className="size-4" />
                 <span className="hidden sm:inline">Minha Conta</span>
               </button>
 
               {userMenuOpen && (
-                <div className="absolute right-0 mt-2 w-60 flex-col rounded-2xl border border-zinc-200 bg-white p-2 shadow-2xl animate-fade-in z-50">
+                <div className="absolute right-0 mt-2 w-60 max-w-[calc(100vw-2rem)] flex-col rounded-2xl border border-zinc-200/90 bg-white/95 p-2 shadow-2xl backdrop-blur-xl animate-fade-in z-50">
                   <div className="border-b border-zinc-100 px-3 py-3 mb-1">
                     <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">Conectado como</p>
                     <p className="truncate text-xs font-semibold text-zinc-950 mt-0.5">{user.email}</p>
@@ -228,7 +240,7 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
           ) : (
             <Link
               to="/login"
-              className="rounded-full bg-zinc-950 px-4 py-2 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(24,24,27,0.18)] transition hover:-translate-y-0.5 hover:bg-zinc-800 sm:px-5 sm:py-2.5"
+              className="rounded-full bg-zinc-950 px-4 py-2 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(24,24,27,0.18)] transition hover:-translate-y-0.5 hover:bg-zinc-800 active:scale-95 sm:px-5 sm:py-2.5"
             >
               Entrar
             </Link>
@@ -238,7 +250,7 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="grid size-10 place-items-center rounded-full border border-zinc-200 bg-white text-zinc-700 transition hover:bg-zinc-100 md:hidden"
+            className="grid size-10 place-items-center rounded-full border border-zinc-200 bg-white text-zinc-700 transition hover:bg-zinc-100 active:scale-90 md:hidden"
             aria-label={mobileMenuOpen ? 'Fechar menu' : 'Abrir menu de navegacao'}
           >
             {mobileMenuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
@@ -248,14 +260,14 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
 
       {/* Gaveta de Navegação Mobile */}
       {mobileMenuOpen && (
-        <div className="mx-auto mt-2 max-w-7xl overflow-hidden rounded-3xl border border-zinc-200 bg-white/95 p-5 shadow-2xl backdrop-blur-2xl animate-fade-in md:hidden">
+        <div className="mx-auto mt-2 max-w-7xl overflow-hidden rounded-3xl border border-zinc-200/90 bg-white/95 p-5 shadow-2xl backdrop-blur-2xl animate-fade-in md:hidden">
           <div className="flex flex-col gap-2">
             {links.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className="rounded-2xl px-4 py-3 text-base font-semibold text-zinc-800 transition hover:bg-zinc-100"
+                className="rounded-2xl px-4 py-3 text-base font-semibold text-zinc-800 transition hover:bg-zinc-100 active:bg-zinc-200"
               >
                 {link.label}
               </a>
@@ -263,7 +275,7 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
             <Link
               to="/shop"
               onClick={() => setMobileMenuOpen(false)}
-              className="mt-2 flex items-center justify-center gap-2 rounded-2xl bg-sky-600 py-3.5 text-base font-semibold text-white shadow-lg shadow-sky-600/20"
+              className="mt-2 flex items-center justify-center gap-2 rounded-2xl bg-sky-600 py-3.5 text-base font-semibold text-white shadow-lg shadow-sky-600/20 active:scale-98"
             >
               <ShoppingBag className="size-5" />
               Abrir Shopping

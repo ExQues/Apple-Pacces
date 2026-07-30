@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { X, ShoppingBag, Check } from 'lucide-react'
 import { useProductModalStore } from '@/store/useProductModalStore'
 import { useCartStore } from '@/store/useCartStore'
@@ -11,6 +11,18 @@ export function ProductModal() {
   const [selectedStorage, setSelectedStorage] = useState<string>('')
   const [selectedColor, setSelectedColor] = useState<string>('')
   const [added, setAdded] = useState(false)
+
+  // Trava de scroll quando o modal estiver visível
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [isOpen])
 
   if (!isOpen || !product) return null
 
@@ -59,18 +71,18 @@ export function ProductModal() {
           {/* Close */}
           <button
             onClick={handleClose}
-            className="absolute right-5 top-5 z-10 grid size-10 place-items-center rounded-full bg-zinc-100 text-zinc-500 transition hover:bg-zinc-200 hover:text-zinc-950"
+            className="absolute right-5 top-5 z-10 grid size-10 place-items-center rounded-full bg-zinc-100/90 text-zinc-500 transition hover:bg-zinc-200 hover:text-zinc-950 active:scale-90"
             aria-label="Fechar detalhes do produto"
           >
             <X className="size-5" />
           </button>
 
-          {/* Imagem do Produto */}
-          <div className="flex h-72 items-center justify-center bg-[#f5f5f7] p-10 sm:h-80">
+          {/* Imagem do Produto em Container Titanium Suave */}
+          <div className="flex h-64 items-center justify-center bg-gradient-to-b from-slate-100/90 via-zinc-100/80 to-slate-200/60 p-8 sm:h-80 border-b border-zinc-200/60">
             <img
               src={activeImage}
               alt={product.name}
-              className="h-full max-h-60 w-auto object-contain transition-all duration-300"
+              className="h-full max-h-56 sm:max-h-64 w-auto object-contain transition-all duration-300 drop-shadow-md"
               style={{ animation: 'fadeUp 0.5s ease-out 0.1s both' }}
             />
           </div>

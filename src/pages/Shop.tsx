@@ -50,7 +50,7 @@ function ProductCard({ product }: { product: FeaturedProduct }) {
       className="group overflow-hidden rounded-[2rem] border border-zinc-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-2xl"
     >
       <div className="relative overflow-hidden bg-zinc-100">
-        <div className="flex h-72 items-center justify-center bg-[#f5f5f7] p-8">
+        <div className="flex h-72 items-center justify-center bg-gradient-to-b from-slate-100/90 via-zinc-100/80 to-slate-200/60 p-8 border-b border-zinc-200/60">
           <img
             ref={imgRef}
             src={activeImage}
@@ -66,11 +66,11 @@ function ProductCard({ product }: { product: FeaturedProduct }) {
                   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect width="400" height="300" fill="%23f5f5f7"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="system-ui" font-size="20" fill="%239ca3af">${product.name}</text></svg>`,
                 )
             }}
-            className="h-full w-full object-contain transition duration-500 group-hover:scale-105"
+            className="h-full w-full object-contain transition duration-500 group-hover:scale-105 drop-shadow-sm"
           />
         </div>
         <div className="absolute left-5 top-5 flex gap-2">
-          <span className="rounded-full bg-white/85 px-3 py-1.5 text-xs font-semibold text-zinc-700 shadow-sm backdrop-blur">
+          <span className="rounded-full bg-white/90 px-3 py-1.5 text-xs font-semibold text-zinc-700 shadow-sm backdrop-blur border border-zinc-200/60">
             {product.category}
           </span>
           {product.status === 'em-falta' && (
@@ -94,7 +94,7 @@ function ProductCard({ product }: { product: FeaturedProduct }) {
                 <button
                   key={opt.storage}
                   onClick={() => setSelectedStorage(opt.storage)}
-                  className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
+                  className={`rounded-full px-3 py-1.5 text-xs font-medium transition active:scale-95 ${
                     selectedStorage === opt.storage
                       ? 'bg-zinc-950 font-semibold text-white shadow-sm'
                       : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
@@ -120,7 +120,7 @@ function ProductCard({ product }: { product: FeaturedProduct }) {
                   key={c.name}
                   onClick={() => setSelectedColor(c.name)}
                   title={c.name}
-                  className={`relative flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition ${
+                  className={`relative flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition active:scale-95 ${
                     selectedColor === c.name
                       ? 'border-zinc-950 bg-zinc-950 text-white shadow-sm'
                       : 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-400 hover:bg-zinc-50'
@@ -153,13 +153,13 @@ function ProductCard({ product }: { product: FeaturedProduct }) {
               <>
                 <button
                   onClick={() => openModal({ ...product, priceFrom: activePrice, image: activeImage })}
-                  className="rounded-full bg-zinc-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-zinc-800"
+                  className="rounded-full bg-zinc-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-zinc-800 active:scale-95"
                 >
                   Comprar
                 </button>
                 <button
                   onClick={handleAddToCart}
-                  className="grid size-10 place-items-center rounded-full border border-zinc-200 text-zinc-500 transition hover:border-zinc-400 hover:bg-zinc-50 hover:text-zinc-950"
+                  className="grid size-10 place-items-center rounded-full border border-zinc-200 text-zinc-500 transition hover:border-zinc-400 hover:bg-zinc-50 hover:text-zinc-950 active:scale-90"
                   aria-label={`Adicionar ${product.name} à sacola`}
                 >
                   <ShoppingBag className="size-4" />

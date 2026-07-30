@@ -100,16 +100,16 @@ export function CartDrawer() {
               {items.map((item, index) => (
                 <li
                   key={item.cartItemId}
-                  className="overflow-hidden rounded-[1.25rem] border border-zinc-100 bg-white shadow-[0_2px_12px_rgba(0,0,0,0.04)] transition-all hover:shadow-[0_4px_20px_rgba(0,0,0,0.07)]"
+                  className="overflow-hidden rounded-[1.25rem] border border-zinc-200/80 bg-white shadow-[0_2px_12px_rgba(0,0,0,0.04)] transition-all hover:shadow-[0_4px_20px_rgba(0,0,0,0.07)]"
                   style={{ animationDelay: `${index * 60}ms` }}
                 >
                   <div className="flex gap-0">
-                    {/* Thumbnail */}
-                    <div className="flex w-[90px] flex-shrink-0 items-center justify-center bg-[#f5f5f7] p-3">
+                    {/* Thumbnail em Gradiente Titanium */}
+                    <div className="flex w-[90px] flex-shrink-0 items-center justify-center bg-gradient-to-b from-slate-100/90 to-zinc-100/70 p-3 border-r border-zinc-200/60">
                       <img
                         src={item.image}
                         alt={item.name}
-                        className="h-16 w-16 object-contain"
+                        className="h-16 w-16 object-contain drop-shadow-xs"
                       />
                     </div>
 
@@ -122,7 +122,7 @@ export function CartDrawer() {
                         </div>
                         <button
                           onClick={() => removeItem(item.cartItemId)}
-                          className="flex-shrink-0 rounded-lg p-1 text-zinc-300 transition hover:bg-red-50 hover:text-red-500"
+                          className="flex-shrink-0 rounded-lg p-1 text-zinc-300 transition hover:bg-red-50 hover:text-red-500 active:scale-90"
                           aria-label={`Remover ${item.name}`}
                         >
                           <Trash2 className="size-3.5" />
@@ -136,7 +136,7 @@ export function CartDrawer() {
                         <div className="inline-flex items-center rounded-full border border-zinc-200 bg-zinc-50/80">
                           <button
                             onClick={() => updateQuantity(item.cartItemId, Math.max(1, item.quantity - 1))}
-                            className="grid size-7 place-items-center rounded-full text-zinc-400 transition hover:text-zinc-950"
+                            className="grid size-7 place-items-center rounded-full text-zinc-400 transition hover:text-zinc-950 active:scale-90"
                           >
                             <Minus className="size-3" />
                           </button>
@@ -145,7 +145,7 @@ export function CartDrawer() {
                           </span>
                           <button
                             onClick={() => updateQuantity(item.cartItemId, item.quantity + 1)}
-                            className="grid size-7 place-items-center rounded-full text-zinc-400 transition hover:text-zinc-950"
+                            className="grid size-7 place-items-center rounded-full text-zinc-400 transition hover:text-zinc-950 active:scale-90"
                           >
                             <Plus className="size-3" />
                           </button>
@@ -173,7 +173,7 @@ export function CartDrawer() {
             {/* CTA */}
             <button
               onClick={handleCheckout}
-              className="group flex w-full items-center justify-center gap-2.5 rounded-full bg-zinc-950 px-7 py-4 text-sm font-semibold text-white shadow-[0_10px_30px_rgba(24,24,27,0.22)] transition-all hover:-translate-y-0.5 hover:bg-zinc-800 hover:shadow-[0_14px_40px_rgba(24,24,27,0.30)]"
+              className="group flex w-full items-center justify-center gap-2.5 rounded-full bg-zinc-950 px-7 py-4 text-sm font-semibold text-white shadow-[0_10px_30px_rgba(24,24,27,0.22)] transition-all hover:-translate-y-0.5 hover:bg-zinc-800 hover:shadow-[0_14px_40px_rgba(24,24,27,0.30)] active:scale-95"
             >
               Finalizar Compra
               <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
