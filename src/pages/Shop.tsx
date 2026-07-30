@@ -9,7 +9,7 @@ import { useFlyingAnimationStore } from '@/store/useFlyingAnimationStore'
 import { useProducts } from '@/hooks/useProducts'
 import type { FeaturedProduct } from '@/data/appleStore'
 
-const CATEGORY_FILTERS = ['Todos', 'iPhone', 'Mac', 'iPad', 'Apple Watch', 'Android', 'Acessorios'] as const
+const CATEGORY_FILTERS = ['Todos', 'iPhone', 'Mac', 'iPad', 'Apple Watch', 'Acessorios'] as const
 
 function slugify(value: string) {
   return value.toLowerCase().replace(/\s+/g, '-')
@@ -191,12 +191,14 @@ export default function Shop() {
   const filtered = useMemo(() => {
     const term = query.trim().toLowerCase()
     return products.filter((p) => {
-      const inCategory = selected === 'Todos' || p.category === selected
+      // Ao digitar uma busca, ignora a restrição de categoria individual para buscar em todo o catálogo
+      const inCategory = term ? true : (selected === 'Todos' || p.category === selected)
       if (!inCategory) return false
       if (!term) return true
       return (
         p.name.toLowerCase().includes(term) ||
         p.line.toLowerCase().includes(term) ||
+        p.category.toLowerCase().includes(term) ||
         p.description.toLowerCase().includes(term)
       )
     })

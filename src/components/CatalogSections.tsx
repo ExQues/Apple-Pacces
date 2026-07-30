@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { ShoppingBag, Smartphone, Watch, Tablet, Laptop, Boxes, Headphones, ArrowRight } from 'lucide-react'
+import { ShoppingBag, Smartphone, Watch, Tablet, Laptop, Headphones, ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { categories, featuredProducts, allProducts } from '@/data/appleStore'
 import { useCartStore } from '@/store/useCartStore'
@@ -12,7 +12,6 @@ const categoryIcons: Record<string, typeof Smartphone> = {
   'Apple Watch': Watch,
   iPad: Tablet,
   Mac: Laptop,
-  Android: Boxes,
   Acessorios: Headphones,
 }
 
