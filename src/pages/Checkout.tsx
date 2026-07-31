@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { ArrowLeft, CheckCircle, ShoppingBag, ArrowRight, CreditCard, QrCode, ShieldCheck, Truck } from 'lucide-react'
+import { ArrowLeft, CheckCircle, ShoppingBag, ArrowRight, CreditCard, QrCode, ShieldCheck, Truck, User, MapPin, Search } from 'lucide-react'
 import { useCartStore } from '@/store/useCartStore'
 import { useAuthStore } from '@/store/useAuthStore'
 import { supabase } from '@/lib/supabase'
@@ -16,6 +16,22 @@ export default function Checkout() {
   const [error, setError] = useState<string | null>(null)
   const [paymentMethod, setPaymentMethod] = useState<'pix' | 'credit_card' | 'delivery'>('pix')
   const [caktoPaymentUrl, setCaktoPaymentUrl] = useState<string | null>(null)
+
+  // Dados Pessoais do Cliente
+  const [fullName, setFullName] = useState(user?.user_metadata?.name || '')
+  const [email, setEmail] = useState(user?.email || '')
+  const [cpf, setCpf] = useState('')
+  const [phone, setPhone] = useState(user?.user_metadata?.whatsapp || '')
+
+  // Endereço de Entrega
+  const [cep, setCep] = useState('')
+  const [street, setStreet] = useState('')
+  const [number, setNumber] = useState('')
+  const [complement, setComplement] = useState('')
+  const [neighborhood, setNeighborhood] = useState('')
+  const [city, setCity] = useState('')
+  const [state, setState] = useState('')
+  const [loadingCep, setLoadingCep] = useState(false)
 
   const parseItemPrice = (priceFrom: string) => {
     if (!priceFrom) return 0
@@ -34,9 +50,61 @@ export default function Checkout() {
     }, 0)
   }
 
-  const handleCheckout = async () => {
+  // Mascaras de formatacao
+  const formatCpf = (val: string) => {
+    const d = val.replace(/\D/g, '').slice(0, 11)
+    if (d.length <= 3) return d
+    if (d.length <= 6) return `${d.slice(0, 3)}.${d.slice(3)}`
+    if (d.length <= 9) return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6)}`
+    return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6, 9)}-${d.slice(9)}`
+  }
+
+  const formatPhone = (val: string) => {
+    const d = val.replace(/\D/g, '').slice(0, 11)
+    if (d.length <= 2) return d
+    if (d.length <= 7) return `(${d.slice(0, 2)}) ${d.slice(2)}`
+    return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`
+  }
+
+  // Busca Automatica de CEP via API ViaCEP
+  const handleCepChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawDigits = e.target.value.replace(/\D/g, '').slice(0, 8)
+    const formatted = rawDigits.length > 5 ? `${rawDigits.slice(0, 5)}-${rawDigits.slice(5)}` : rawDigits
+    setCep(formatted)
+
+    if (rawDigits.length === 8) {
+      setLoadingCep(true)
+      try {
+        const res = await fetch(`https://viacep.com.br/ws/${rawDigits}/json/`)
+        const data = await res.json()
+        if (!data.erro) {
+          setStreet(data.logradouro || '')
+          setNeighborhood(data.bairro || '')
+          setCity(data.localidade || '')
+          setState(data.uf || '')
+          setError(null)
+        } else {
+          setError('CEP não encontrado. Por favor, preencha o endereço manualmente.')
+        }
+      } catch (err) {
+        console.warn('Erro ao consultar CEP:', err)
+      } finally {
+        setLoadingCep(false)
+      }
+    }
+  }
+
+  const handleCheckout = async (e: React.FormEvent) => {
+    e.preventDefault()
+
     if (!user) {
       navigate('/login')
+      return
+    }
+
+    // Validacao dos campos obrigatorios do Primeiro Checkout (Oficial do site)
+    if (!fullName.trim() || !cpf.trim() || !phone.trim() || !cep.trim() || !street.trim() || !number.trim() || !neighborhood.trim() || !city.trim() || !state.trim()) {
+      setError('Por favor, preencha todos os campos obrigatórios de contato e endereço de entrega.')
       return
     }
 
@@ -45,20 +113,34 @@ export default function Checkout() {
     const total = calculateTotal()
 
     try {
-      // 1. Gravar pedido no Supabase
+      // 1. Gravar pedido completo no Supabase (incluindo endereco e dados do cliente)
+      const shippingAddress = {
+        fullName,
+        cpf,
+        phone,
+        cep,
+        street,
+        number,
+        complement,
+        neighborhood,
+        city,
+        state
+      }
+
       const { data: order, error: orderError } = await supabase
         .from('orders')
         .insert({
           user_id: user.id,
           total_price: total,
-          status: 'pending'
+          status: 'pending',
+          shipping_address: shippingAddress
         })
         .select()
         .single()
 
       if (orderError) console.warn('Alerta ordens Supabase:', orderError)
 
-      // 2. Tentar inserir os itens do pedido no Supabase se houver tabela
+      // 2. Gravar os itens do pedido no Supabase
       if (order) {
         try {
           const { data: productsData } = await supabase.from('products').select('id, name')
@@ -82,14 +164,15 @@ export default function Checkout() {
         }
       }
 
-      // 3. Gerar Cobrança Dinâmica na API Cakto se for Pix ou Cartão
+      // 3. Gerar Cobrança Dinâmica na API Cakto se for Pix ou Cartão repassando dados pre-preenchidos
       if (paymentMethod === 'pix' || paymentMethod === 'credit_card') {
         const caktoRes = await createCaktoCheckoutSession({
           totalAmount: total,
           paymentMethod: paymentMethod === 'credit_card' ? 'credit_card' : 'pix',
           customer: {
-            name: user.email?.split('@')[0] || 'Cliente Apple Pacces',
-            email: user.email || '',
+            name: fullName,
+            email: email,
+            phone: phone.replace(/\D/g, ''),
           },
           items: items.map((i) => ({
             name: i.name,
@@ -99,9 +182,13 @@ export default function Checkout() {
         })
 
         if (caktoRes.checkoutUrl) {
-          setCaktoPaymentUrl(caktoRes.checkoutUrl)
-          // Se houver URL do Checkout Cakto, redireciona o cliente após registrar
-          window.location.href = caktoRes.checkoutUrl
+          // Adiciona parametros pre-preenchidos de cliente e documento na URL da Cakto
+          const cleanCpf = cpf.replace(/\D/g, '')
+          const cleanPhone = phone.replace(/\D/g, '')
+          const finalUrl = `${caktoRes.checkoutUrl}&docNumber=${encodeURIComponent(cleanCpf)}&phone=${encodeURIComponent(cleanPhone)}`
+          
+          setCaktoPaymentUrl(finalUrl)
+          window.location.href = finalUrl
           return
         }
       }
@@ -129,7 +216,7 @@ export default function Checkout() {
             Pedido Confirmado!
           </h2>
           <p className="mx-auto mt-4 max-w-xs text-[15px] leading-7 text-zinc-500">
-            Sua solicitação foi registrada com sucesso. As chaves de cobrança Cakto foram geradas para o valor atualizado.
+            Sua solicitação de pedido foi gravada no sistema com sucesso.
           </p>
 
           {caktoPaymentUrl && (
@@ -137,7 +224,7 @@ export default function Checkout() {
               href={caktoPaymentUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-6 inline-flex items-center gap-2 rounded-full bg-sky-600 px-8 py-4 text-sm font-semibold text-white shadow-lg transition hover:bg-sky-500 active:scale-95"
+              className="mt-6 inline-flex items-center gap-2 rounded-full bg-emerald-600 px-8 py-4 text-sm font-semibold text-white shadow-lg transition hover:bg-emerald-500 active:scale-95"
             >
               Ir para Pagamento Cakto
               <ArrowRight className="size-4" />
@@ -157,10 +244,10 @@ export default function Checkout() {
 
   return (
     <div className="min-h-screen bg-[#f8f8f6] px-5 pb-20 pt-12 animate-page-in sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-3xl">
+      <div className="mx-auto max-w-4xl">
         <Link
           to="/shop"
-          className="mb-10 inline-flex items-center gap-2 text-sm font-medium text-zinc-400 transition hover:text-zinc-950"
+          className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-zinc-400 transition hover:text-zinc-950"
         >
           <ArrowLeft className="size-4" />
           Voltar para a loja
@@ -169,8 +256,8 @@ export default function Checkout() {
         <h1 className="font-display text-4xl font-semibold tracking-[-0.04em] text-zinc-950">
           Finalizar Pedido
         </h1>
-        <p className="mt-3 text-[15px] text-zinc-500">
-          Escolha a forma de pagamento e revise seus itens.
+        <p className="mt-2 text-[15px] text-zinc-500">
+          Preencha suas informações de entrega e escolha a forma de pagamento.
         </p>
         
         {items.length === 0 ? (
@@ -188,40 +275,193 @@ export default function Checkout() {
             </Link>
           </div>
         ) : (
-          <div className="mt-10 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+          <form onSubmit={handleCheckout} className="mt-8 grid gap-8 lg:grid-cols-[1.3fr_0.7fr]">
             <div className="space-y-6">
-              {/* Lista de itens */}
+              
+              {/* 1. SEÇÃO DE DADOS PESSOAIS */}
               <div className="rounded-[2rem] border border-zinc-200/80 bg-white p-6 shadow-sm sm:p-8">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400">
-                  {items.length === 1 ? '1 item' : `${items.length} itens`}
-                </p>
-                <ul className="mt-5 divide-y divide-zinc-100">
-                  {items.map(item => (
-                    <li key={item.cartItemId} className="flex items-center gap-4 py-5 first:pt-0 last:pb-0">
-                      <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-b from-slate-100 to-zinc-100 p-2 border border-zinc-200/60">
-                        <img src={item.image} alt={item.name} className="h-full w-full object-contain drop-shadow-xs" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="truncate text-sm font-semibold text-zinc-950">{item.name}</p>
-                        <p className="mt-0.5 text-xs text-zinc-400">
-                          {item.selectedColor} · Qtd: {item.quantity}
-                        </p>
-                      </div>
-                      <p className="flex-shrink-0 text-sm font-semibold text-zinc-950">{item.priceFrom}</p>
-                    </li>
-                  ))}
-                </ul>
+                <div className="flex items-center gap-3 border-b border-zinc-100 pb-4">
+                  <div className="grid size-9 place-items-center rounded-xl bg-zinc-100 text-zinc-950">
+                    <User className="size-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-semibold text-zinc-950">1. Dados do Cliente</h3>
+                    <p className="text-xs text-zinc-400">Informações de identificação para o pedido</p>
+                  </div>
+                </div>
+
+                <div className="mt-6 grid gap-4 sm:grid-cols-2">
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs font-semibold text-zinc-700">Nome Completo *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Ex: João da Silva"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      className="mt-1.5 w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-4 py-3 text-sm font-medium text-zinc-950 placeholder-zinc-400 transition focus:border-zinc-950 focus:bg-white focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-700">CPF *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="000.000.000-00"
+                      value={cpf}
+                      onChange={(e) => setCpf(formatCpf(e.target.value))}
+                      className="mt-1.5 w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-4 py-3 text-sm font-medium text-zinc-950 placeholder-zinc-400 transition focus:border-zinc-950 focus:bg-white focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-700">WhatsApp / Celular *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="(00) 00000-0000"
+                      value={phone}
+                      onChange={(e) => setPhone(formatPhone(e.target.value))}
+                      className="mt-1.5 w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-4 py-3 text-sm font-medium text-zinc-950 placeholder-zinc-400 transition focus:border-zinc-950 focus:bg-white focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs font-semibold text-zinc-700">E-mail *</label>
+                    <input
+                      type="email"
+                      required
+                      placeholder="seuemail@exemplo.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="mt-1.5 w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-4 py-3 text-sm font-medium text-zinc-950 placeholder-zinc-400 transition focus:border-zinc-950 focus:bg-white focus:outline-none"
+                    />
+                  </div>
+                </div>
               </div>
 
-              {/* Seletor de Forma de Pagamento */}
+              {/* 2. SEÇÃO DE ENDEREÇO DE ENTREGA */}
               <div className="rounded-[2rem] border border-zinc-200/80 bg-white p-6 shadow-sm sm:p-8">
-                <div className="flex items-center gap-2">
-                  <ShieldCheck className="size-5 text-sky-600" />
-                  <h3 className="text-base font-semibold text-zinc-950">Forma de Pagamento</h3>
+                <div className="flex items-center gap-3 border-b border-zinc-100 pb-4">
+                  <div className="grid size-9 place-items-center rounded-xl bg-zinc-100 text-zinc-950">
+                    <MapPin className="size-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-semibold text-zinc-950">2. Endereço de Entrega</h3>
+                    <p className="text-xs text-zinc-400">Informe onde você deseja receber seu aparelho</p>
+                  </div>
                 </div>
-                <p className="mt-1 text-xs text-zinc-500">Cobrança dinâmica em tempo real via Cakto Pay</p>
 
-                <div className="mt-5 space-y-3">
+                <div className="mt-6 grid gap-4 sm:grid-cols-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-700">CEP *</label>
+                    <div className="relative mt-1.5">
+                      <input
+                        type="text"
+                        required
+                        placeholder="00000-000"
+                        value={cep}
+                        onChange={handleCepChange}
+                        className="w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-4 py-3 pr-10 text-sm font-medium text-zinc-950 placeholder-zinc-400 transition focus:border-zinc-950 focus:bg-white focus:outline-none"
+                      />
+                      {loadingCep ? (
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                          <div className="apple-spinner apple-spinner--dark size-4" />
+                        </div>
+                      ) : (
+                        <Search className="absolute right-3 top-1/2 size-4 -translate-y-1/2 text-zinc-400" />
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs font-semibold text-zinc-700">Rua / Logradouro *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Ex: Av. Paulista"
+                      value={street}
+                      onChange={(e) => setStreet(e.target.value)}
+                      className="mt-1.5 w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-4 py-3 text-sm font-medium text-zinc-950 placeholder-zinc-400 transition focus:border-zinc-950 focus:bg-white focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-700">Número *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Ex: 1000"
+                      value={number}
+                      onChange={(e) => setNumber(e.target.value)}
+                      className="mt-1.5 w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-4 py-3 text-sm font-medium text-zinc-950 placeholder-zinc-400 transition focus:border-zinc-950 focus:bg-white focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs font-semibold text-zinc-700">Complemento (Opcional)</label>
+                    <input
+                      type="text"
+                      placeholder="Ex: Apto 42, Bloco B"
+                      value={complement}
+                      onChange={(e) => setComplement(e.target.value)}
+                      className="mt-1.5 w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-4 py-3 text-sm font-medium text-zinc-950 placeholder-zinc-400 transition focus:border-zinc-950 focus:bg-white focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-700">Bairro *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Bairro"
+                      value={neighborhood}
+                      onChange={(e) => setNeighborhood(e.target.value)}
+                      className="mt-1.5 w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-4 py-3 text-sm font-medium text-zinc-950 placeholder-zinc-400 transition focus:border-zinc-950 focus:bg-white focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-700">Cidade *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Cidade"
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                      className="mt-1.5 w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-4 py-3 text-sm font-medium text-zinc-950 placeholder-zinc-400 transition focus:border-zinc-950 focus:bg-white focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-700">Estado (UF) *</label>
+                    <input
+                      type="text"
+                      required
+                      maxLength={2}
+                      placeholder="SP"
+                      value={state}
+                      onChange={(e) => setState(e.target.value.toUpperCase())}
+                      className="mt-1.5 w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-4 py-3 text-sm font-medium text-zinc-950 placeholder-zinc-400 transition focus:border-zinc-950 focus:bg-white focus:outline-none uppercase"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* 3. SEÇÃO DE FORMA DE PAGAMENTO */}
+              <div className="rounded-[2rem] border border-zinc-200/80 bg-white p-6 shadow-sm sm:p-8">
+                <div className="flex items-center gap-3 border-b border-zinc-100 pb-4">
+                  <div className="grid size-9 place-items-center rounded-xl bg-sky-50 text-sky-600">
+                    <ShieldCheck className="size-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-semibold text-zinc-950">3. Forma de Pagamento</h3>
+                    <p className="text-xs text-zinc-400">Cobrança segura no valor do dia via Cakto Pay</p>
+                  </div>
+                </div>
+
+                <div className="mt-6 space-y-3">
                   {/* Opção Pix */}
                   <button
                     type="button"
@@ -274,7 +514,7 @@ export default function Checkout() {
                     </div>
                   </button>
 
-                  {/* Opção Pagamento na Entrega / Presencial */}
+                  {/* Opção Presencial */}
                   <button
                     type="button"
                     onClick={() => setPaymentMethod('delivery')}
@@ -298,65 +538,82 @@ export default function Checkout() {
               </div>
             </div>
 
-            {/* Resumo */}
+            {/* RESUMO DO PEDIDO */}
             <div className="space-y-4">
-              <div className="rounded-[2rem] border border-zinc-200/80 bg-white p-6 shadow-sm sm:p-8">
+              <div className="sticky top-6 rounded-[2rem] border border-zinc-200/80 bg-white p-6 shadow-sm sm:p-8">
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400">Resumo do Pedido</p>
 
-                <div className="mt-5 space-y-3 text-sm">
+                {/* Lista compacta de itens */}
+                <ul className="mt-4 divide-y divide-zinc-100 border-b border-zinc-100 pb-4">
+                  {items.map(item => (
+                    <li key={item.cartItemId} className="flex items-center gap-3 py-3 first:pt-0 last:pb-0">
+                      <div className="flex size-12 flex-shrink-0 items-center justify-center rounded-lg bg-zinc-50 p-1 border border-zinc-100">
+                        <img src={item.image} alt={item.name} className="h-full w-full object-contain" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="truncate text-xs font-semibold text-zinc-950">{item.name}</p>
+                        <p className="text-[11px] text-zinc-400">{item.selectedColor} · Qtd: {item.quantity}</p>
+                      </div>
+                      <p className="text-xs font-semibold text-zinc-950">{item.priceFrom}</p>
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="mt-4 space-y-2.5 text-xs">
                   <div className="flex justify-between text-zinc-500">
-                    <span>Subtotal</span>
-                    <span>R$ {calculateTotal().toLocaleString('pt-BR')}</span>
+                    <span>Subtotal ({items.length} {items.length === 1 ? 'item' : 'itens'})</span>
+                    <span className="font-medium text-zinc-950">R$ {calculateTotal().toLocaleString('pt-BR')}</span>
                   </div>
                   <div className="flex justify-between text-zinc-500">
-                    <span>Método de cobrança</span>
-                    <span className="font-semibold text-zinc-950 uppercase text-xs">
+                    <span>Pagamento</span>
+                    <span className="font-semibold text-zinc-950 uppercase">
                       {paymentMethod === 'pix' ? 'Pix (Cakto)' : paymentMethod === 'credit_card' ? 'Cartão 12x' : 'Presencial'}
                     </span>
                   </div>
                   <div className="flex justify-between text-zinc-500">
-                    <span>Frete</span>
-                    <span className="text-emerald-600 font-medium">A combinar</span>
+                    <span>Frete de Envio</span>
+                    <span className="font-semibold text-emerald-600">A combinar</span>
                   </div>
                 </div>
 
-                <div className="mt-5 flex items-center justify-between border-t border-zinc-100 pt-5">
+                <div className="mt-5 flex items-center justify-between border-t border-zinc-100 pt-4">
                   <span className="text-sm font-medium text-zinc-700">Total do dia</span>
-                  <span className="text-xl font-semibold tracking-tight text-zinc-950">
+                  <span className="text-2xl font-bold tracking-tight text-zinc-950">
                     R$ {calculateTotal().toLocaleString('pt-BR')}
                   </span>
                 </div>
-              </div>
 
-              {error && (
-                <div className="rounded-2xl border border-red-100 bg-red-50/80 px-4 py-3.5 text-sm font-medium text-red-600">
-                  {error}
-                </div>
-              )}
-
-              <button
-                onClick={handleCheckout}
-                disabled={loading || items.length === 0}
-                className="group flex w-full items-center justify-center gap-2.5 rounded-full bg-zinc-950 py-4 text-sm font-semibold text-white shadow-[0_10px_30px_rgba(24,24,27,0.22)] transition-all hover:-translate-y-0.5 hover:bg-zinc-800 hover:shadow-[0_14px_40px_rgba(24,24,27,0.30)] active:scale-95 disabled:translate-y-0 disabled:opacity-60"
-              >
-                {loading ? (
-                  <div className="apple-spinner apple-spinner--light" />
-                ) : (
-                  <>
-                    Confirmar e Pagar com Cakto
-                    <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
-                  </>
+                {error && (
+                  <div className="mt-4 rounded-2xl border border-red-100 bg-red-50/80 p-4 text-xs font-medium leading-relaxed text-red-600">
+                    {error}
+                  </div>
                 )}
-              </button>
 
-              <p className="text-center text-[11px] text-zinc-400">
-                A cobrança é gerada em tempo real pela Cakto no valor atualizado do dia.
-              </p>
+                <button
+                  type="submit"
+                  disabled={loading || items.length === 0}
+                  className="mt-6 group flex w-full items-center justify-center gap-2.5 rounded-full bg-zinc-950 py-4 text-sm font-semibold text-white shadow-[0_10px_30px_rgba(24,24,27,0.22)] transition-all hover:-translate-y-0.5 hover:bg-zinc-800 hover:shadow-[0_14px_40px_rgba(24,24,27,0.30)] active:scale-95 disabled:translate-y-0 disabled:opacity-60"
+                >
+                  {loading ? (
+                    <div className="apple-spinner apple-spinner--light" />
+                  ) : (
+                    <>
+                      Confirmar e Ir para Pagamento
+                      <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+                    </>
+                  )}
+                </button>
+
+                <p className="mt-4 text-center text-[11px] text-zinc-400">
+                  🔒 Seus dados de entrega estão protegidos por criptografia de ponta a ponta.
+                </p>
+              </div>
             </div>
-          </div>
+          </form>
         )}
       </div>
     </div>
   )
 }
+
 
