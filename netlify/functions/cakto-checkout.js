@@ -12,8 +12,8 @@ exports.handler = async function (event) {
     const body = JSON.parse(event.body || '{}')
     const { totalAmount, items, customer, paymentMethod = 'pix' } = body
 
-    const clientId = process.env.VITE_CAKTO_CLIENT_ID || process.env.CAKTO_CLIENT_ID || 'y3yPWtLmNcR7CKdW7ishsbvjtn5agIrTWs8O6bmQ'
-    const clientSecret = process.env.VITE_CAKTO_CLIENT_SECRET || process.env.CAKTO_CLIENT_SECRET || 'vJElmAdv9rMqT67Ix4hbeGmps42ycjadwPmOSThbp86lysVueLlLghqqC4jneWuzSkuULGa5qF2EikvL3pQhnUZ5OCM3JFeTzoN5J8IR6S3Z3HuHXLw72yjryywpVk0h'
+    const clientId = process.env.VITE_CAKTO_CLIENT_ID || process.env.CAKTO_CLIENT_ID || 'CrCaKFvxASx3VePomyUBQo1VGqRlnm2Zz6HdSRKA'
+    const clientSecret = process.env.VITE_CAKTO_CLIENT_SECRET || process.env.CAKTO_CLIENT_SECRET || 'FPeTaj31IBQpThJYqMvMMAavyGhZtDq1YwCB4wkaSMAVRkW1KIPrmjrhPoYSHTXmfE1BB3wP8xIWBra47XA506BaTFvL5izClPwSA03Ibe66iUYLF2J6lKZQkG4UiZpD'
 
     if (!clientId || !clientSecret) {
       return {
