@@ -22,49 +22,29 @@ exports.handler = async function (event) {
       }
     }
 
-    // 1. Tentar autenticação OAuth2 / Client Credentials na API da Cakto
+    // 1. Autenticação na API oficial da Cakto (OAuth2)
     let token = ''
     try {
-      const authRes = await fetch('https://api.cakto.com.br/oauth/token', {
+      const authRes = await fetch('https://api.cakto.com.br/public_api/token/', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
+          'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: JSON.stringify({
+        body: new URLSearchParams({
           client_id: clientId,
           client_secret: clientSecret,
-          grant_type: 'client_credentials',
-        }),
+        }).toString(),
       })
 
       if (authRes.ok) {
         const authData = await authRes.json()
         token = authData.access_token || authData.token || ''
+      } else {
+        const errBody = await authRes.json()
+        console.warn('Resposta de erro na autenticação Cakto:', authRes.status, errBody)
       }
     } catch (authErr) {
-      console.warn('Alerta OAuth Cakto:', authErr)
-    }
-
-    // Se o endpoint OAuth principal não retornar token, tenta endpoint alternativo
-    if (!token) {
-      try {
-        const authV1Res = await fetch('https://api.cakto.com.br/v1/auth/token', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            client_id: clientId,
-            client_secret: clientSecret,
-          }),
-        })
-
-        if (authV1Res.ok) {
-          const authV1Data = await authV1Res.json()
-          token = authV1Data.access_token || authV1Data.token || ''
-        }
-      } catch (authV1Err) {
-        console.warn('Alerta auth/token v1 Cakto:', authV1Err)
-      }
+      console.warn('Erro na chamada public_api/token/ Cakto:', authErr)
     }
 
     // 2. Criar Transação na API Cakto se obtivermos token
