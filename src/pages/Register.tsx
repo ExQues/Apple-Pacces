@@ -33,6 +33,13 @@ export default function Register() {
     const { data, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        data: {
+          full_name: name,
+          name,
+          whatsapp,
+        },
+      },
     })
 
     if (signUpError) {
@@ -46,16 +53,14 @@ export default function Register() {
     }
 
     if (data.user) {
-      const { error: profileError } = await supabase.from('profiles').insert({
-        id: data.user.id,
-        name,
-        whatsapp,
-      })
-
-      if (profileError) {
-        setError(profileError.message)
-        setLoading(false)
-        return
+      try {
+        await supabase.from('profiles').upsert({
+          id: data.user.id,
+          name,
+          whatsapp,
+        })
+      } catch (err) {
+        console.warn('Nota RLS profiles Supabase:', err)
       }
     }
 
