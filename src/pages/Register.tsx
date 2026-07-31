@@ -43,8 +43,11 @@ export default function Register() {
     })
 
     if (signUpError) {
-      if (signUpError.message.includes('already registered')) {
-        setError('Este email já está cadastrado. Tente fazer login.')
+      const msg = signUpError.message.toLowerCase()
+      if (msg.includes('already registered') || msg.includes('already exists')) {
+        setError('Este e-mail já foi criado nas tentativas anteriores! Clique em "Fazer login" abaixo para entrar com sua senha.')
+      } else if (msg.includes('rate limit') || msg.includes('limit exceeded')) {
+        setError('Limite temporário de envio de e-mail atingido no Supabase por tentativas seguidas. Aguarde 2 minutos ou tente fazer login caso sua conta já tenha sido criada.')
       } else {
         setError(signUpError.message)
       }
