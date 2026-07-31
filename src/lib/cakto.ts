@@ -51,7 +51,7 @@ export async function createCaktoCheckoutSession({
     console.warn('Alerta na requisição de checkout Cakto:', err)
     return {
       success: true,
-      checkoutUrl: `https://pay.cakto.com.br/checkout?amount=${totalAmount}&email=${encodeURIComponent(
+      checkoutUrl: `https://pay.cakto.com.br/e5mby49?email=${encodeURIComponent(
         customer.email,
       )}&name=${encodeURIComponent(customer.name)}`,
       fallback: true,

@@ -50,15 +50,10 @@ exports.handler = async function (event) {
     // 2. Criar Oferta Dinâmica na Cakto para o Valor do Dia
     if (token) {
       try {
-        // Obter produto ativo da conta Cakto do cliente
-        const prodRes = await fetch('https://api.cakto.com.br/public_api/products/', {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        const prodData = await prodRes.json()
-        const activeProduct = (prodData.results || []).find((p) => p.status === 'active') || prodData.results?.[0]
-        const productId = activeProduct ? activeProduct.id : '1d7d4471-45fe-4150-9201-6ff8649cbcb1'
+        // ID do Produto Ativo na conta Cakto do usuário
+        const productId = '1d7d4471-45fe-4150-9201-6ff8649cbcb1'
 
-        // Nome resumido dos itens
+        // Nome formatado para a oferta
         const orderTitle = items && items.length > 0
           ? items.map((i) => i.name).join(', ').substring(0, 80)
           : 'Pedido Apple Pacces'
@@ -104,8 +99,8 @@ exports.handler = async function (event) {
       }
     }
 
-    // Fallback gracioso com estrutura de checkout da Cakto
-    const fallbackCheckoutUrl = `https://pay.cakto.com.br/checkout?amount=${totalAmount}&email=${encodeURIComponent(
+    // Fallback seguro usando oferta ativa da conta (NUNCA usar /checkout que vai pra home)
+    const fallbackCheckoutUrl = `https://pay.cakto.com.br/e5mby49?email=${encodeURIComponent(
       customer.email || '',
     )}&name=${encodeURIComponent(customer.name || '')}`
 
