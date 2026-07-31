@@ -24,61 +24,31 @@ export async function createCaktoCheckoutSession({
   customer: CaktoCustomer
   paymentMethod?: 'pix' | 'credit_card'
 }) {
-  if (!CAKTO_CLIENT_ID || !CAKTO_CLIENT_SECRET) {
-    console.warn('Chaves da API da Cakto não foram encontradas no .env')
-  }
-
   try {
-    // Tenta autenticação OAuth2 / Client Credentials na API da Cakto
-    const authRes = await fetch('https://api.cakto.com.br/oauth/token', {
+    // Chama a Netlify Function no backend do servidor para evitar erro de CORS
+    const response = await fetch('/.netlify/functions/cakto-checkout', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Accept: 'application/json',
       },
       body: JSON.stringify({
-        client_id: CAKTO_CLIENT_ID,
-        client_secret: CAKTO_CLIENT_SECRET,
-        grant_type: 'client_credentials',
-      }),
-    })
-
-    if (!authRes.ok) {
-      // Tenta endpoint alternativo da v1 de autenticação Cakto
-      const authV1Res = await fetch('https://api.cakto.com.br/v1/auth/token', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          client_id: CAKTO_CLIENT_ID,
-          client_secret: CAKTO_CLIENT_SECRET,
-        }),
-      })
-
-      if (!authV1Res.ok) {
-        throw new Error('Falha na autenticação da API Cakto')
-      }
-
-      const authData = await authV1Res.json()
-      return await createOrderWithToken(authData.access_token || authData.token, {
         totalAmount,
         items,
         customer,
         paymentMethod,
-      })
+      }),
+    })
+
+    if (response.ok) {
+      const data = await response.json()
+      if (data.checkoutUrl) {
+        return data
+      }
     }
 
-    const authData = await authRes.json()
-    return await createOrderWithToken(authData.access_token, {
-      totalAmount,
-      items,
-      customer,
-      paymentMethod,
-    })
+    throw new Error('Retorno sem URL de checkout')
   } catch (err) {
-    console.warn('Erro ao comunicar com API Cakto:', err)
-    // Retorno de apoio gracioso para fluxo continuo
+    console.warn('Alerta na requisição de checkout Cakto:', err)
     return {
       success: true,
       checkoutUrl: `https://pay.cakto.com.br/checkout?amount=${totalAmount}&email=${encodeURIComponent(
