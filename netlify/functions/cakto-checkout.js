@@ -47,43 +47,60 @@ exports.handler = async function (event) {
       console.warn('Erro na chamada public_api/token/ Cakto:', authErr)
     }
 
-    // 2. Criar Transação na API Cakto se obtivermos token
+    // 2. Criar Oferta Dinâmica na Cakto para o Valor do Dia
     if (token) {
-      const orderRes = await fetch('https://api.cakto.com.br/v1/transactions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          amount: Math.round(totalAmount * 100), // Em centavos
-          payment_method: paymentMethod,
-          customer: {
-            name: customer.name || 'Cliente Apple Pacces',
-            email: customer.email || '',
-            phone: customer.phone || '',
-          },
-          items: (items || []).map((i) => ({
-            title: i.name,
-            unit_price: Math.round((i.price || 0) * 100),
-            quantity: i.quantity || 1,
-          })),
-        }),
-      })
+      try {
+        // Obter produto ativo da conta Cakto do cliente
+        const prodRes = await fetch('https://api.cakto.com.br/public_api/products/', {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        const prodData = await prodRes.json()
+        const activeProduct = (prodData.results || []).find((p) => p.status === 'active') || prodData.results?.[0]
+        const productId = activeProduct ? activeProduct.id : '1d7d4471-45fe-4150-9201-6ff8649cbcb1'
 
-      if (orderRes.ok) {
-        const orderData = await orderRes.json()
-        return {
-          statusCode: 200,
-          headers: { 'Content-Type': 'application/json' },
+        // Nome resumido dos itens
+        const orderTitle = items && items.length > 0
+          ? items.map((i) => i.name).join(', ').substring(0, 80)
+          : 'Pedido Apple Pacces'
+
+        // Criar Oferta Dinâmica na API da Cakto com o valor do dia
+        const offerRes = await fetch('https://api.cakto.com.br/public_api/offers/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify({
-            success: true,
-            checkoutUrl: orderData.checkout_url || orderData.payment_url || orderData.qr_code_url,
-            pixQrCode: orderData.pix_qr_code,
-            pixCopiaECola: orderData.pix_copia_e_cola,
-            data: orderData,
+            product: productId,
+            name: orderTitle,
+            price: Number(totalAmount),
+            currency: 'BRL',
           }),
+        })
+
+        if (offerRes.ok || offerRes.status === 201) {
+          const offerData = await offerRes.json()
+          if (offerData.id) {
+            const checkoutUrl = `https://pay.cakto.com.br/${offerData.id}?email=${encodeURIComponent(
+              customer.email || '',
+            )}&name=${encodeURIComponent(customer.name || '')}`
+
+            return {
+              statusCode: 200,
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                success: true,
+                checkoutUrl,
+                offerId: offerData.id,
+              }),
+            }
+          }
+        } else {
+          const offerErr = await offerRes.text()
+          console.warn('Erro ao criar oferta dinâmica na Cakto:', offerRes.status, offerErr)
         }
+      } catch (orderErr) {
+        console.warn('Erro ao processar oferta dinâmica Cakto:', orderErr)
       }
     }
 
