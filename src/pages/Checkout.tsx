@@ -17,17 +17,21 @@ export default function Checkout() {
   const [paymentMethod, setPaymentMethod] = useState<'pix' | 'credit_card' | 'delivery'>('pix')
   const [caktoPaymentUrl, setCaktoPaymentUrl] = useState<string | null>(null)
 
-  const calculateTotal = () => {
-    return items.reduce((total, item) => {
-      const priceString = item.priceFrom.replace(/\D/g, '')
-      const price = priceString ? parseInt(priceString, 10) : 0
-      return total + (price * item.quantity)
-    }, 0)
+  const parseItemPrice = (priceFrom: string) => {
+    if (!priceFrom) return 0
+    let cleaned = priceFrom.trim()
+    if (cleaned.includes(',')) {
+      cleaned = cleaned.split(',')[0]
+    }
+    const priceString = cleaned.replace(/\D/g, '')
+    return priceString ? parseInt(priceString, 10) : 0
   }
 
-  const parseItemPrice = (priceFrom: string) => {
-    const priceString = priceFrom.replace(/\D/g, '')
-    return priceString ? parseInt(priceString, 10) : 0
+  const calculateTotal = () => {
+    return items.reduce((total, item) => {
+      const price = parseItemPrice(item.priceFrom)
+      return total + (price * item.quantity)
+    }, 0)
   }
 
   const handleCheckout = async () => {

@@ -1,4 +1,4 @@
-const fetch = require('node-fetch') || globalThis.fetch
+const fetch = globalThis.fetch
 
 exports.handler = async function (event) {
   if (event.httpMethod !== 'POST') {
