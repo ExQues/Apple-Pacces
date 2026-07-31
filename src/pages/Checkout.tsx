@@ -164,33 +164,33 @@ export default function Checkout() {
         }
       }
 
-      // 3. Gerar Cobrança Dinâmica na API Cakto se for Pix ou Cartão repassando dados pre-preenchidos
-      if (paymentMethod === 'pix' || paymentMethod === 'credit_card') {
-        const caktoRes = await createCaktoCheckoutSession({
-          totalAmount: total,
-          paymentMethod: paymentMethod === 'credit_card' ? 'credit_card' : 'pix',
-          customer: {
-            name: fullName,
-            email: email,
-            phone: phone.replace(/\D/g, ''),
-          },
-          items: items.map((i) => ({
-            name: i.name,
-            quantity: i.quantity,
-            price: parseItemPrice(i.priceFrom),
-          })),
-        })
+      // 3. Gerar Cobrança Dinâmica na API Cakto repassando dados pre-preenchidos
+      const cleanCpf = cpf.replace(/\D/g, '')
+      const cleanPhone = phone.replace(/\D/g, '')
 
-        if (caktoRes.checkoutUrl) {
-          // Adiciona parametros pre-preenchidos de cliente e documento na URL da Cakto
-          const cleanCpf = cpf.replace(/\D/g, '')
-          const cleanPhone = phone.replace(/\D/g, '')
-          const finalUrl = `${caktoRes.checkoutUrl}&docNumber=${encodeURIComponent(cleanCpf)}&phone=${encodeURIComponent(cleanPhone)}`
-          
-          setCaktoPaymentUrl(finalUrl)
-          window.location.href = finalUrl
-          return
-        }
+      const caktoRes = await createCaktoCheckoutSession({
+        totalAmount: total,
+        paymentMethod: 'pix',
+        customer: {
+          name: fullName.trim(),
+          email: email.trim(),
+          phone: cleanPhone,
+          docNumber: cleanCpf,
+        },
+        items: items.map((i) => ({
+          name: i.name,
+          quantity: i.quantity,
+          price: parseItemPrice(i.priceFrom),
+        })),
+      })
+
+      if (caktoRes.checkoutUrl) {
+        // Garante que todos os nomes de parametros suportados pela Cakto estejam na URL final
+        const finalUrl = `${caktoRes.checkoutUrl}&name=${encodeURIComponent(fullName.trim())}&full_name=${encodeURIComponent(fullName.trim())}&nome=${encodeURIComponent(fullName.trim())}&email=${encodeURIComponent(email.trim())}&phone=${encodeURIComponent(cleanPhone)}&cellphone=${encodeURIComponent(cleanPhone)}&docNumber=${encodeURIComponent(cleanCpf)}&cpf=${encodeURIComponent(cleanCpf)}&document=${encodeURIComponent(cleanCpf)}`
+        
+        setCaktoPaymentUrl(finalUrl)
+        window.location.href = finalUrl
+        return
       }
 
       setSuccess(true)
@@ -446,94 +446,6 @@ export default function Checkout() {
                       className="mt-1.5 w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-4 py-3 text-sm font-medium text-zinc-950 placeholder-zinc-400 transition focus:border-zinc-950 focus:bg-white focus:outline-none uppercase"
                     />
                   </div>
-                </div>
-              </div>
-
-              {/* 3. SEÇÃO DE FORMA DE PAGAMENTO */}
-              <div className="rounded-[2rem] border border-zinc-200/80 bg-white p-6 shadow-sm sm:p-8">
-                <div className="flex items-center gap-3 border-b border-zinc-100 pb-4">
-                  <div className="grid size-9 place-items-center rounded-xl bg-sky-50 text-sky-600">
-                    <ShieldCheck className="size-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-base font-semibold text-zinc-950">3. Forma de Pagamento</h3>
-                    <p className="text-xs text-zinc-400">Cobrança segura no valor do dia via Cakto Pay</p>
-                  </div>
-                </div>
-
-                <div className="mt-6 space-y-3">
-                  {/* Opção Pix */}
-                  <button
-                    type="button"
-                    onClick={() => setPaymentMethod('pix')}
-                    className={`flex w-full items-start gap-4 rounded-2xl border p-4 text-left transition active:scale-98 ${
-                      paymentMethod === 'pix'
-                        ? 'border-zinc-950 bg-zinc-950 text-white shadow-md'
-                        : 'border-zinc-200 bg-white text-zinc-800 hover:border-zinc-300'
-                    }`}
-                  >
-                    <div className={`grid size-10 flex-shrink-0 place-items-center rounded-xl ${paymentMethod === 'pix' ? 'bg-white/15 text-white' : 'bg-emerald-50 text-emerald-600'}`}>
-                      <QrCode className="size-5" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <p className="font-semibold text-sm">Pix Instantâneo (Cakto)</p>
-                        <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold ${paymentMethod === 'pix' ? 'bg-emerald-400/20 text-emerald-300' : 'bg-emerald-50 text-emerald-700'}`}>
-                          Aprovação imediata
-                        </span>
-                      </div>
-                      <p className={`mt-1 text-xs ${paymentMethod === 'pix' ? 'text-zinc-300' : 'text-zinc-500'}`}>
-                        Gera o QR Code / Copia e Cola no valor exato do dia (R$ {calculateTotal().toLocaleString('pt-BR')})
-                      </p>
-                    </div>
-                  </button>
-
-                  {/* Opção Cartão de Crédito */}
-                  <button
-                    type="button"
-                    onClick={() => setPaymentMethod('credit_card')}
-                    className={`flex w-full items-start gap-4 rounded-2xl border p-4 text-left transition active:scale-98 ${
-                      paymentMethod === 'credit_card'
-                        ? 'border-zinc-950 bg-zinc-950 text-white shadow-md'
-                        : 'border-zinc-200 bg-white text-zinc-800 hover:border-zinc-300'
-                    }`}
-                  >
-                    <div className={`grid size-10 flex-shrink-0 place-items-center rounded-xl ${paymentMethod === 'credit_card' ? 'bg-white/15 text-white' : 'bg-sky-50 text-sky-600'}`}>
-                      <CreditCard className="size-5" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <p className="font-semibold text-sm">Cartão de Crédito (até 12x)</p>
-                        <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold ${paymentMethod === 'credit_card' ? 'bg-sky-400/20 text-sky-300' : 'bg-sky-50 text-sky-700'}`}>
-                          Até 12x
-                        </span>
-                      </div>
-                      <p className={`mt-1 text-xs ${paymentMethod === 'credit_card' ? 'text-zinc-300' : 'text-zinc-500'}`}>
-                        Parcelamento seguro via Cakto Pay em até 12 vezes no cartão
-                      </p>
-                    </div>
-                  </button>
-
-                  {/* Opção Presencial */}
-                  <button
-                    type="button"
-                    onClick={() => setPaymentMethod('delivery')}
-                    className={`flex w-full items-start gap-4 rounded-2xl border p-4 text-left transition active:scale-98 ${
-                      paymentMethod === 'delivery'
-                        ? 'border-zinc-950 bg-zinc-950 text-white shadow-md'
-                        : 'border-zinc-200 bg-white text-zinc-800 hover:border-zinc-300'
-                    }`}
-                  >
-                    <div className={`grid size-10 flex-shrink-0 place-items-center rounded-xl ${paymentMethod === 'delivery' ? 'bg-white/15 text-white' : 'bg-zinc-100 text-zinc-700'}`}>
-                      <Truck className="size-5" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-semibold text-sm">Combinar no Atendimento / Retirada</p>
-                      <p className={`mt-1 text-xs ${paymentMethod === 'delivery' ? 'text-zinc-300' : 'text-zinc-500'}`}>
-                        Pagamento presencial no momento da entrega ou retirada do aparelho
-                      </p>
-                    </div>
-                  </button>
                 </div>
               </div>
             </div>

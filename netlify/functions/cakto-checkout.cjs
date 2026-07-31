@@ -74,9 +74,27 @@ exports.handler = async function (event) {
         if (offerRes.ok || offerRes.status === 201) {
           const offerData = await offerRes.json()
           if (offerData.id) {
-            const checkoutUrl = `https://pay.cakto.com.br/${offerData.id}?email=${encodeURIComponent(
-              customer.email || '',
-            )}&name=${encodeURIComponent(customer.name || '')}`
+            const params = new URLSearchParams()
+            if (customer.name) {
+              params.set('name', customer.name)
+              params.set('full_name', customer.name)
+              params.set('nome', customer.name)
+            }
+            if (customer.email) params.set('email', customer.email)
+            if (customer.phone) {
+              params.set('phone', customer.phone)
+              params.set('cellphone', customer.phone)
+              params.set('telephone', customer.phone)
+              params.set('celular', customer.phone)
+            }
+            if (customer.docNumber) {
+              params.set('docNumber', customer.docNumber)
+              params.set('cpf', customer.docNumber)
+              params.set('document', customer.docNumber)
+              params.set('cpf_cnpj', customer.docNumber)
+            }
+
+            const checkoutUrl = `https://pay.cakto.com.br/${offerData.id}?${params.toString()}`
 
             return {
               statusCode: 200,
@@ -97,10 +115,17 @@ exports.handler = async function (event) {
       }
     }
 
-    // Fallback seguro usando oferta ativa da conta (NUNCA usar /checkout que vai pra home)
-    const fallbackCheckoutUrl = `https://pay.cakto.com.br/e5mby49?email=${encodeURIComponent(
-      customer.email || '',
-    )}&name=${encodeURIComponent(customer.name || '')}`
+    // Fallback seguro usando oferta ativa da conta
+    const fallbackParams = new URLSearchParams()
+    if (customer.name) {
+      fallbackParams.set('name', customer.name)
+      fallbackParams.set('full_name', customer.name)
+    }
+    if (customer.email) fallbackParams.set('email', customer.email)
+    if (customer.phone) fallbackParams.set('phone', customer.phone)
+    if (customer.docNumber) fallbackParams.set('docNumber', customer.docNumber)
+
+    const fallbackCheckoutUrl = `https://pay.cakto.com.br/e5mby49?${fallbackParams.toString()}`
 
     return {
       statusCode: 200,

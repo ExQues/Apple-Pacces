@@ -8,6 +8,7 @@ export type CaktoCustomer = {
   name: string
   email: string
   phone?: string
+  docNumber?: string
 }
 
 const CAKTO_CLIENT_ID = import.meta.env.VITE_CAKTO_CLIENT_ID || ''
