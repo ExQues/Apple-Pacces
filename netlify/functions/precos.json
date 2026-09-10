@@ -1,0 +1,91 @@
+{
+  "iPhone 15": {
+    "128 GB": 4249,
+    "256 GB": 4699
+  },
+  "iPhone 16e": {
+    "128 GB": 3799
+  },
+  "iPhone 16": {
+    "128 GB": 4699,
+    "256 GB": 4999
+  },
+  "iPhone 17": {
+    "256 GB": 5699
+  },
+  "iPhone 17 Air": {
+    "256 GB": 5899,
+    "512 GB": 7199
+  },
+  "iPhone 17 Pro": {
+    "256 GB": 7299,
+    "512 GB": 8499
+  },
+  "iPhone 17 Pro Max": {
+    "256 GB": 7799,
+    "512 GB": 9299,
+    "1 TB": 10399
+  },
+  "iPhone 17e": {
+    "256 GB": 4599
+  },
+  "Apple Watch SE 2": {
+    "40 mm": 1899,
+    "44 mm": 1999
+  },
+  "Apple Watch SE 3": {
+    "40 mm": 2199,
+    "44 mm": 2299
+  },
+  "Apple Watch Series 11": {
+    "42 mm": 2799,
+    "46 mm": 2999
+  },
+  "Apple Watch Ultra 2 & 3": {
+    "Ultra 2 (49mm)": 4499,
+    "Ultra 3 (49mm)": 5199
+  },
+  "iPad mini 7": {
+    "128 GB": 4499
+  },
+  "iPad 11": {
+    "128 GB": 3299
+  },
+  "iPad Air (M3 & M4)": {
+    "128GB (M3)": 4099,
+    "128GB (M4)": 5199
+  },
+  "iPad Pro M5": {
+    "256 GB": 7999
+  },
+  "Mac mini M4": {
+    "256 GB": 5399
+  },
+  "MacBook Air 13\"": {
+    "Neo 256GB": 5199,
+    "M5 512GB": 8749
+  },
+  "MacBook Pro 14\"": {
+    "512 GB": 11999
+  },
+  "AirPods 4": {
+    "Sem ANC": 1349,
+    "Com ANC": 1799
+  },
+  "AirPods Pro (2ª & 3ª Gen)": {
+    "Pro 2": 1849,
+    "Pro 3": 2099
+  },
+  "AirPods Max": {
+    "USB-C Standard": 3799
+  },
+  "AirTag": {
+    "Unitário (1x)": 749,
+    "Pack 4 Unidades": 1299
+  },
+  "Apple Pencil": {
+    "Pencil 2": 1099,
+    "Pencil USB-C": 1149,
+    "Pencil Pro": 1349
+  }
+}

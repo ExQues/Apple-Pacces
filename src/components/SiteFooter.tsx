@@ -19,6 +19,8 @@ const COLUMNS: { title: string; links: FooterLink[] }[] = [
     links: [
       { label: 'Fale com um especialista', to: '/#contato' },
       { label: 'Reservar iPhone 18 Pro', to: '/#contato' },
+      { label: 'Trocas e devoluções', to: '/trocas' },
+      { label: 'Política de privacidade', to: '/privacidade' },
     ],
   },
   {

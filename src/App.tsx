@@ -18,6 +18,8 @@ const Register = lazy(() => import("@/pages/Register"));
 const Checkout = lazy(() => import("@/pages/Checkout"));
 const Orders = lazy(() => import("@/pages/Orders"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
+const Privacidade = lazy(() => import("@/pages/Privacidade"));
+const Trocas = lazy(() => import("@/pages/Trocas"));
 
 export default function App() {
   const { initialize } = useAuthStore();
@@ -56,6 +58,8 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/privacidade" element={<Privacidade />} />
+          <Route path="/trocas" element={<Trocas />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>

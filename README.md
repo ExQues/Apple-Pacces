@@ -1,69 +1,67 @@
 # Apple Pacces
 
-A vitrine digital e catálogo premium para venda consultiva do ecossistema Apple. Focado em uma experiência de usuário de alto nível (UI/UX), curadoria inteligente e design minimalista.
+Loja online de iPhone, Mac, iPad, Apple Watch e acessórios lacrados, com garantia Apple de 1 ano e pagamento em até 18x.
 
-## Tecnologias e Stack
+- **Site:** https://aple-pacces.netlify.app
+- **Hospedagem:** Netlify, publicada automaticamente a cada envio para a branch `main`
+- **Arquitetura e fluxo de compra:** [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+- **Identidade visual:** [docs/brand/](docs/brand/)
 
-Este projeto foi construído utilizando as melhores práticas do ecossistema front-end moderno:
+## Tecnologias
 
-- **React 18** - Biblioteca de UI
-- **Vite** - Bundler ultrarrápido
-- **TypeScript** - Tipagem estática para maior segurança do código
-- **Tailwind CSS** - Estilização utility-first (com suporte a animações e efeitos de glassmorphism)
-- **React Router DOM** - Navegação fluida entre páginas (SPA)
-- **Lucide React** - Ícones minimalistas
-- **Zustand** - Gerenciamento de estado (preparado para futuras integrações)
+React 18, TypeScript, Vite, Tailwind CSS, React Router, Zustand (estado da sacola e do login), Supabase (contas e banco de dados), Cakto (pagamento) e Netlify Functions (servidor do pagamento).
 
-## 📁 Estrutura de Diretórios
+## Rodar no computador
 
-O projeto segue uma arquitetura baseada em features e componentes:
+Precisa de Node.js 20 ou mais novo.
 
-```text
-src/
-├── assets/         # Imagens estáticas e recursos visuais
-├── components/     # Componentes reutilizáveis de UI
-│   ├── CatalogSections.tsx   # Vitrine de produtos e categorias
-│   ├── ConversionSections.tsx # Passos de venda, diferenciais e formulário
-│   ├── HeroSection.tsx       # Dobra principal da landing page
-│   └── SiteHeader.tsx        # Navegação principal global
-├── data/           # Mock data para o catálogo de produtos
-│   └── appleStore.ts         # Produtos, categorias e textos do site
-├── hooks/          # React hooks customizados
-├── lib/            # Utilitários gerais (ex: junção de classes tailwind)
-└── pages/          # Páginas roteáveis da aplicação
-    ├── Home.tsx              # Landing page principal
-    └── Shop.tsx              # Catálogo expandido com todos os produtos
+```bash
+npm install
+cp .env.example .env   # preencha com as chaves reais
+npm run dev            # abre em http://localhost:5173
 ```
 
-## Instalação e Execução
+| Comando | O que faz |
+|---|---|
+| `npm run dev` | Servidor de desenvolvimento |
+| `npm run build` | Gera a tabela de preços do servidor e o site de produção em `dist/` |
+| `npm run precos` | Só regenera `netlify/functions/precos.json` a partir do catálogo |
+| `npm test` | Testes automáticos |
+| `npm run lint` | Verifica o padrão do código |
 
-Para rodar o projeto localmente, certifique-se de ter o Node.js instalado (versão 18+ recomendada).
+## Variáveis de ambiente
 
-1. **Clone o repositório:**
-   ```bash
-   git clone https://github.com/ExQues/Apple-Pacces.git
-   cd Apple-Pacces
-   ```
+Nunca envie o `.env` para o GitHub. Em produção, cadastre as variáveis no painel da Netlify (Site configuration → Environment variables).
 
-2. **Instale as dependências:**
-   ```bash
-   npm install
-   ```
+| Variável | Onde é usada | Secreta? |
+|---|---|---|
+| `VITE_SUPABASE_URL` | Navegador | Não (protegida por RLS) |
+| `VITE_SUPABASE_ANON_KEY` | Navegador | Não (protegida por RLS) |
+| `CAKTO_CLIENT_ID` | Função de pagamento | **Sim** |
+| `CAKTO_CLIENT_SECRET` | Função de pagamento | **Sim** |
 
-3. **Inicie o servidor de desenvolvimento:**
-   ```bash
-   npm run dev
-   ```
+Variáveis com prefixo `VITE_` vão para o navegador. Nunca coloque uma chave secreta com esse prefixo.
 
-4. Acesse no navegador em `http://localhost:5173`.
+## Catálogo e preços
 
-## Próximos Passos (Roadmap Backend)
+O catálogo fica em `src/data/appleStore.ts`. A regra de preço é **preço do fornecedor + R$ 500** em todos os produtos, inclusive acessórios. Produtos marcados `status: 'em-falta'` aparecem na loja, mas não podem ser comprados.
 
-Atualmente o site funciona de forma estática no front-end. O próximo passo lógico da evolução da plataforma inclui:
+Ao mudar um preço, basta editar `appleStore.ts`: o build regenera a tabela usada pelo servidor, que calcula o valor cobrado sem confiar no navegador.
 
-1. **Integração com Supabase:** Mover os dados locais (`src/data/appleStore.ts`) para um banco de dados PostgreSQL real.
-2. **Captação de Leads:** Conectar o formulário de "Solicitar atendimento" a uma tabela de contatos ou a um webhook (ex: envio direto para WhatsApp ou e-mail comercial).
-3. **Gerenciamento do Catálogo:** Criação de um painel administrativo (ou integração direta pelo painel do Supabase) para adicionar, remover e alterar o preço dos dispositivos dinamicamente.
+As fotos são oficiais da Apple, recortadas e hospedadas em `public/products/`.
 
----
-*Desenvolvido com padrão de curadoria premium.*
+## Estrutura
+
+```text
+├── docs/                    Arquitetura e identidade visual
+├── netlify/functions/       Servidor do pagamento (Cakto) e tabela de preços
+├── public/                  Fotos dos produtos, ícones e imagem de compartilhamento
+├── scripts/                 Gerador da tabela de preços
+└── src/
+    ├── components/          Menu, rodapé, seções da home, sacola, janelas
+    ├── data/appleStore.ts   Catálogo, preços, categorias e textos de confiança
+    ├── hooks/               useProducts (catálogo)
+    ├── lib/                 Supabase e Cakto
+    ├── pages/               Início, Loja, Login, Cadastro, Checkout, Pedidos, 404, Privacidade, Trocas
+    └── store/               Sacola, login, janela de produto e animação
+```

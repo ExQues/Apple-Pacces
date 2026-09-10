@@ -1,21 +1,19 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { ArrowLeft, CheckCircle, ShoppingBag, ArrowRight, CreditCard, QrCode, ShieldCheck, Truck, User, MapPin, Search } from 'lucide-react'
+import { ArrowLeft, ShoppingBag, ArrowRight, User, MapPin, Search } from 'lucide-react'
 import { useCartStore } from '@/store/useCartStore'
 import { useAuthStore } from '@/store/useAuthStore'
 import { supabase } from '@/lib/supabase'
 import { createCaktoCheckoutSession } from '@/lib/cakto'
 
 export default function Checkout() {
-  const { items, clearCart } = useCartStore()
+  const { items } = useCartStore()
   const { user } = useAuthStore()
   const navigate = useNavigate()
   
   const [loading, setLoading] = useState(false)
-  const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [paymentMethod, setPaymentMethod] = useState<'pix' | 'credit_card' | 'delivery'>('pix')
-  const [caktoPaymentUrl, setCaktoPaymentUrl] = useState<string | null>(null)
+  const [paymentMethod] = useState<'pix' | 'credit_card' | 'delivery'>('pix')
 
   // Dados Pessoais do Cliente
   const [fullName, setFullName] = useState(user?.user_metadata?.name || '')
@@ -168,9 +166,8 @@ export default function Checkout() {
       const cleanCpf = cpf.replace(/\D/g, '')
       const cleanPhone = phone.replace(/\D/g, '')
 
+      // O servidor calcula o valor; aqui vai só o que foi escolhido
       const caktoRes = await createCaktoCheckoutSession({
-        totalAmount: total,
-        paymentMethod: 'pix',
         customer: {
           name: fullName.trim(),
           email: email.trim(),
@@ -178,68 +175,22 @@ export default function Checkout() {
           docNumber: cleanCpf,
         },
         items: items.map((i) => ({
-          name: i.name,
+          product:
+            i.selectedStorage && i.name.endsWith(` (${i.selectedStorage})`)
+              ? i.name.slice(0, -(i.selectedStorage.length + 3))
+              : i.name,
+          storage: i.selectedStorage,
           quantity: i.quantity,
-          price: parseItemPrice(i.priceFrom),
         })),
       })
 
-      if (caktoRes.checkoutUrl) {
-        // Garante que todos os nomes de parametros suportados pela Cakto estejam na URL final
-        const finalUrl = `${caktoRes.checkoutUrl}&name=${encodeURIComponent(fullName.trim())}&full_name=${encodeURIComponent(fullName.trim())}&nome=${encodeURIComponent(fullName.trim())}&email=${encodeURIComponent(email.trim())}&phone=${encodeURIComponent(cleanPhone)}&cellphone=${encodeURIComponent(cleanPhone)}&docNumber=${encodeURIComponent(cleanCpf)}&cpf=${encodeURIComponent(cleanCpf)}&document=${encodeURIComponent(cleanCpf)}`
-        
-        setCaktoPaymentUrl(finalUrl)
-        window.location.href = finalUrl
-        return
-      }
-
-      setSuccess(true)
-      clearCart()
+      window.location.href = caktoRes.checkoutUrl
     } catch (err) {
       console.warn('Erro ao processar checkout:', err)
-      setSuccess(true)
-      clearCart()
+      setError('Não conseguimos gerar o pagamento agora. Sua sacola continua salva: tente de novo em alguns minutos ou fale com a gente pelo WhatsApp.')
     } finally {
       setLoading(false)
     }
-  }
-
-  if (success) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f8f8f6] px-5 py-12 animate-page-in">
-        <div className="w-full max-w-md text-center">
-          <div className="relative mx-auto mb-8 grid size-24 place-items-center rounded-full bg-emerald-50">
-            <CheckCircle className="size-12 text-emerald-500" />
-            <div className="absolute inset-0 animate-ping rounded-full bg-emerald-100 opacity-30" />
-          </div>
-          <h2 className="font-display text-4xl font-semibold tracking-[-0.04em] text-zinc-950">
-            Pedido Confirmado!
-          </h2>
-          <p className="mx-auto mt-4 max-w-xs text-[15px] leading-7 text-zinc-500">
-            Sua solicitação de pedido foi gravada no sistema com sucesso.
-          </p>
-
-          {caktoPaymentUrl && (
-            <a
-              href={caktoPaymentUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-6 inline-flex items-center gap-2 rounded-full bg-emerald-600 px-8 py-4 text-sm font-semibold text-white shadow-lg transition hover:bg-emerald-500 active:scale-95"
-            >
-              Ir para Pagamento Cakto
-              <ArrowRight className="size-4" />
-            </a>
-          )}
-
-          <Link
-            to="/"
-            className="mt-4 inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white px-8 py-3.5 text-sm font-semibold text-zinc-950 transition hover:bg-zinc-50 active:scale-95"
-          >
-            Voltar para o início
-          </Link>
-        </div>
-      </div>
-    )
   }
 
   return (
