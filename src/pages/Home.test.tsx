@@ -12,10 +12,11 @@ describe('Home', () => {
     )
 
     expect(
-      screen.getByRole('heading', { name: /iphone 17 pro\.\s*chegou/i }),
+      screen.getByRole('heading', { name: /iphone 18 pro\.\s*pré-venda aberta/i }),
     ).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /comprar iphone 17/i })).toHaveAttribute('href', '/shop?category=iPhone')
-    expect(screen.getByRole('link', { name: /falar com consultor/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /reservar meu iphone 18/i })).toHaveAttribute('href', '#contato')
+    expect(screen.getByRole('link', { name: /comprar a pronta entrega/i })).toHaveAttribute('href', '/shop?category=iPhone')
+    expect(screen.getAllByRole('link', { name: /^reservar$/i })).toHaveLength(2)
     expect(screen.getByRole('link', { name: /shopping/i })).toHaveAttribute('href', '/shop')
 
 

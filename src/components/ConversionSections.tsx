@@ -226,6 +226,7 @@ export function ContactSection() {
                 <option value="">
                   Selecione uma linha
                 </option>
+                <option value="iPhone 18 Pro (pré-venda)">iPhone 18 Pro / Pro Max (pré-venda)</option>
                 <option value="iPhone">iPhone</option>
                 <option value="Mac">Mac</option>
                 <option value="iPad">iPad</option>
