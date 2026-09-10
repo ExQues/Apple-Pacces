@@ -9,7 +9,7 @@ type SiteHeaderProps = {
   variant?: 'home' | 'shop'
 }
 
-const SECTIONS = ['produtos', 'diferenciais', 'consultoria', 'contato'] as const
+const SECTIONS = ['produtos', 'diferenciais', 'contato'] as const
 type SectionId = (typeof SECTIONS)[number]
 
 export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
@@ -17,7 +17,6 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
   const links: { label: string; id: SectionId; href: string }[] = [
     { label: 'Produtos', id: 'produtos', href: `${sectionPrefix}#produtos` },
     { label: 'Diferenciais', id: 'diferenciais', href: `${sectionPrefix}#diferenciais` },
-    { label: 'Consultoria', id: 'consultoria', href: `${sectionPrefix}#consultoria` },
     { label: 'Contato', id: 'contato', href: `${sectionPrefix}#contato` },
   ]
 
@@ -175,10 +174,10 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
           <Link
             to="/shop"
             aria-current={variant === 'shop' ? 'page' : undefined}
-            className="relative z-10 ml-1 inline-flex items-center gap-2 rounded-full bg-orange-600 px-4 py-2 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(234,88,12,0.28)] transition hover:-translate-y-0.5 hover:bg-orange-500 active:scale-95"
+            className="relative z-10 ml-1 inline-flex items-center gap-2 rounded-full bg-zinc-950 px-4 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-zinc-800 active:scale-95"
           >
             <ShoppingBag className="size-4" aria-hidden="true" />
-            Shopping
+            Loja
           </Link>
         </div>
 
@@ -195,7 +194,7 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
           >
             <ShoppingBag className="size-5" />
             {totalItems() > 0 && (
-              <span className="absolute right-0 top-0 flex h-4 w-4 items-center justify-center rounded-full bg-orange-600 text-[10px] font-bold text-white shadow-sm">
+              <span className="absolute right-0 top-0 flex h-4 w-4 items-center justify-center rounded-full bg-zinc-950 text-[10px] font-bold text-white shadow-sm">
                 {totalItems()}
               </span>
             )}
@@ -251,7 +250,7 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="grid size-10 place-items-center rounded-full border border-zinc-200 bg-white text-zinc-700 transition hover:bg-zinc-100 active:scale-90 md:hidden"
-            aria-label={mobileMenuOpen ? 'Fechar menu' : 'Abrir menu de navegacao'}
+            aria-label={mobileMenuOpen ? 'Fechar menu' : 'Abrir menu de navegação'}
           >
             {mobileMenuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
           </button>
@@ -275,10 +274,10 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
             <Link
               to="/shop"
               onClick={() => setMobileMenuOpen(false)}
-              className="mt-2 flex items-center justify-center gap-2 rounded-2xl bg-orange-600 py-3.5 text-base font-semibold text-white shadow-lg shadow-orange-600/20 active:scale-98"
+              className="mt-2 flex items-center justify-center gap-2 rounded-2xl bg-zinc-950 py-3.5 text-base font-semibold text-white shadow-lg shadow-zinc-900/20 active:scale-98"
             >
               <ShoppingBag className="size-5" />
-              Abrir Shopping
+              Ver a Loja
             </Link>
           </div>
         </div>

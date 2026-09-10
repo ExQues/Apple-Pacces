@@ -83,7 +83,7 @@ export function CartDrawer() {
               </div>
               <p className="mt-6 text-sm font-semibold text-zinc-950">Sua sacola esta vazia</p>
               <p className="mt-1.5 max-w-[220px] text-center text-[13px] leading-5 text-zinc-400">
-                Explore o catalogo e encontre o dispositivo perfeito para voce.
+                Explore o catálogo e encontre o aparelho ideal para você.
               </p>
               <button
                 onClick={() => {
@@ -180,7 +180,7 @@ export function CartDrawer() {
             </button>
 
             <p className="mt-3 text-center text-[11px] text-zinc-400">
-              Frete e condicoes calculados no checkout
+              Frete e condições calculados no checkout
             </p>
           </div>
         )}

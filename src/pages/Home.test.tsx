@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 import Home from './Home'
 
 describe('Home', () => {
-  it('apresenta uma vitrine premium com catálogo, confiança e contato comercial', () => {
+  it('apresenta o lançamento, as categorias, a confiança e o contato comercial', () => {
     render(
       <MemoryRouter>
         <Home />
@@ -17,19 +17,14 @@ describe('Home', () => {
     expect(screen.getByRole('link', { name: /reservar meu iphone 18/i })).toHaveAttribute('href', '#contato')
     expect(screen.getByRole('link', { name: /comprar a pronta entrega/i })).toHaveAttribute('href', '/shop?category=iPhone')
     expect(screen.getAllByRole('link', { name: /^reservar$/i })).toHaveLength(2)
-    expect(screen.getByRole('link', { name: /shopping/i })).toHaveAttribute('href', '/shop')
-
-
-    expect(screen.getAllByText(/iphone/i).length).toBeGreaterThan(0)
-    expect(screen.getAllByText(/mac/i).length).toBeGreaterThan(0)
-    expect(screen.getAllByText(/ipad/i).length).toBeGreaterThan(0)
-    expect(screen.getAllByText(/apple watch/i).length).toBeGreaterThan(0)
+    expect(screen.getByRole('link', { name: /^loja$/i })).toHaveAttribute('href', '/shop')
 
     expect(screen.getAllByText(/iPhone 17 Pro/i).length).toBeGreaterThan(0)
-    expect(screen.getAllByText(/iPhone 17 Air/i).length).toBeGreaterThan(0)
-    expect(screen.getByText(/Garantia e proced/i)).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: /escolha inteligente em 3 passos/i })).toBeInTheDocument()
-    expect(screen.getByText(/compare perfil, orçamento e ciclo de troca/i)).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /abrir shop completo/i })).toHaveAttribute('href', '/shop')
+    expect(screen.getByRole('heading', { name: /compre por categoria/i })).toBeInTheDocument()
+    for (const category of ['iPhone', 'Mac', 'iPad', 'Apple Watch', 'Acessórios']) {
+      expect(screen.getByRole('heading', { name: category })).toBeInTheDocument()
+    }
+    expect(screen.getByText(/garantia e procedência/i)).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /fale com um especialista/i })).toBeInTheDocument()
   })
 })

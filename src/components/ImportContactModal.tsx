@@ -35,7 +35,7 @@ export function ImportContactModal({ open, onClose }: ImportContactModalProps) {
     const cleanedPhone = phone.replace(/\D/g, '')
     const text = encodeURIComponent(
       [
-        'Ola! Quero solicitar a importacao de um produto Apple pela Pacces.',
+        'Olá! Quero solicitar a importação de um produto Apple pela Pacces.',
         '',
         `Nome completo: ${name}`,
         `WhatsApp: ${cleanedPhone}`,
@@ -128,14 +128,14 @@ export function ImportContactModal({ open, onClose }: ImportContactModalProps) {
               rows={3}
               value={product}
               onChange={(event) => setProduct(event.target.value)}
-              placeholder="Ex: iPhone 16 Pro Max 256GB, cor Titanio Deserto"
+              placeholder="Ex: iPhone 16 Pro Max 256GB, cor Titânio Deserto"
               className="mt-2 w-full rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-zinc-950 placeholder:text-zinc-400 focus:border-zinc-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-zinc-100"
             />
           </div>
 
           <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs leading-5 text-amber-900">
             <strong>Importante:</strong> a importacao exige pagamento adiantado para reserva de estoque e
-            inicio do processo logistico. Voce recebera o orcamento completo e as condicoes por WhatsApp
+            início do processo logístico. Você receberá o orçamento completo e as condições por WhatsApp
             antes de qualquer cobranca.
           </div>
 

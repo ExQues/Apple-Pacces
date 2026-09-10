@@ -4,15 +4,15 @@ import App from './App'
 import { allProducts } from './data/appleStore'
 
 describe('App', () => {
-  it('renderiza a pagina Shop com todos os produtos ao acessar /shop', () => {
+  it('renderiza a página da loja com todos os produtos ao acessar /shop', () => {
     window.history.pushState({}, '', '/shop')
 
     render(<App />)
 
-    expect(screen.getByRole('heading', { name: /shopping apple completo/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /^loja\.$/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^todos/i })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: /curadoria que reduz arrependimento/i })).toBeInTheDocument()
-    expect(screen.getByText(/estoque selecionado por uso real/i)).toBeInTheDocument()
+    expect(screen.getByText(/lacrados, com garantia apple de 1 ano/i)).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'iPhone 17 Pro Max' })).toBeInTheDocument()
   })
 
   it('mantem catalogo consistente sem depender de imagens geradas por IA', () => {
@@ -24,4 +24,3 @@ describe('App', () => {
     expect(productImages.every((src) => !src.includes('core-normal.traeapi'))).toBe(true)
   })
 })
-
