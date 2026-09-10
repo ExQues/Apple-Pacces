@@ -54,12 +54,9 @@ export function HeroSection() {
 
       <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
         <div className="animate-rise">
-          <span className="inline-flex items-center gap-2 rounded-full border border-rose-300/25 bg-rose-500/10 px-3.5 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-rose-200">
-            <span className="size-1.5 animate-pulse rounded-full bg-rose-400" />
-            Lançamento
-          </span>
+          <p className="text-lg font-semibold text-rose-300">Novo</p>
 
-          <h1 className="mt-6 font-display text-5xl font-semibold leading-[0.95] tracking-[-0.055em] sm:text-6xl lg:text-8xl">
+          <h1 className="mt-3 font-display text-5xl font-semibold leading-[0.95] tracking-[-0.055em] sm:text-6xl lg:text-8xl">
             iPhone 18 Pro.
             <span className="block bg-gradient-to-r from-rose-200 via-rose-400 to-red-700 bg-clip-text text-transparent">
               Pré-venda aberta.

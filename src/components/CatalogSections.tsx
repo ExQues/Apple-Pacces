@@ -28,8 +28,8 @@ export function CatalogSections() {
   return (
     <section id="produtos" className="scroll-mt-28 bg-[#f5f5f7] px-5 py-24 lg:px-8">
       <div className="mx-auto max-w-7xl">
-        <h2 className="max-w-3xl font-display text-4xl font-semibold tracking-[-0.04em] text-zinc-950 sm:text-5xl">
-          Compre por categoria. <span className="text-zinc-500">Todos lacrados, com garantia Apple de 1 ano.</span>
+        <h2 className="max-w-4xl text-balance font-display text-4xl font-semibold tracking-[-0.04em] text-zinc-950 sm:text-5xl">
+          Compre por categoria. <span className="text-zinc-500">Tudo lacrado e com garantia Apple.</span>
         </h2>
 
         <div className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">

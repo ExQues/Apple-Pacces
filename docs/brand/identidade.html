@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Apple Pacces · Identidade visual</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; background: #f5f5f7; color: #0b0b0c; width: 1600px; padding: 72px; }
+  h1 { font-size: 48px; font-weight: 600; letter-spacing: -0.04em; }
+  .sub { color: #6e6e73; font-size: 19px; margin-top: 10px; }
+  h2 { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; margin: 56px 0 18px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 44px; }
+  .card { position: relative; display: flex; align-items: center; justify-content: center; min-height: 320px; border-radius: 30px; padding: 56px; }
+  .label { position: absolute; left: 30px; top: 24px; font-size: 13px; opacity: 0.55; }
+  .logo { display: flex; align-items: center; gap: 20px; }
+  .logo svg { height: 72px; width: auto; }
+  .word { font-size: 52px; letter-spacing: -0.03em; }
+  .word .a { font-weight: 400; opacity: 0.7; }
+  .word .p { font-weight: 600; }
+  .icons { display: flex; align-items: flex-end; gap: 40px; }
+  .icons figure { display: flex; flex-direction: column; align-items: center; gap: 12px; font-size: 13px; color: #6e6e73; }
+  .swatches { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; }
+  .sw { border-radius: 22px; overflow: hidden; background: #fff; }
+  .sw .c { height: 120px; }
+  .sw .t { padding: 16px 18px; font-size: 14px; }
+  .sw .t b { display: block; font-weight: 600; }
+  .sw .t span { color: #6e6e73; font-family: ui-monospace, monospace; font-size: 13px; }
+  .type { display: grid; grid-template-columns: 1.3fr 1fr; gap: 24px; }
+  .type .box { background: #fff; border-radius: 30px; padding: 44px; }
+  .big { font-size: 64px; font-weight: 600; letter-spacing: -0.055em; line-height: 1; }
+  .big em { font-style: normal; color: #7a2233; }
+  .body { font-size: 18px; color: #6e6e73; line-height: 1.6; margin-top: 18px; }
+  .rules li { font-size: 16px; line-height: 1.7; color: #3a3a3c; margin-left: 20px; }
+</style>
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute">
+    <symbol id="s" viewBox="0 0 22 40">
+      <path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M6.5 0h9A6.5 6.5 0 0 1 22 6.5v27a6.5 6.5 0 0 1-6.5 6.5h-9A6.5 6.5 0 0 1 0 33.5v-27A6.5 6.5 0 0 1 6.5 0Zm1.7 3a1.2 1.2 0 0 0 0 2.4h5.6a1.2 1.2 0 0 0 0-2.4H8.2ZM6 13h5.5a4.5 4.5 0 0 1 0 9H9v6H6V13Zm3 3v3h2.5a1.5 1.5 0 0 0 0-3H9Z"/>
+    </symbol>
+  </svg>
+
+  <h1>Apple Pacces</h1>
+  <p class="sub">Identidade visual · símbolo, logotipo, cores e tipografia</p>
+
+  <div class="grid">
+    <div class="card" style="background:#fff">
+      <span class="label">Logotipo · fundo claro</span>
+      <div class="logo"><svg viewBox="0 0 22 40"><use href="#s"/></svg><span class="word"><span class="a">Apple</span> <span class="p">Pacces</span></span></div>
+    </div>
+    <div class="card" style="background:#0b0b0c;color:#fff">
+      <span class="label">Logotipo · fundo escuro</span>
+      <div class="logo"><svg viewBox="0 0 22 40"><use href="#s"/></svg><span class="word"><span class="a">Apple</span> <span class="p">Pacces</span></span></div>
+    </div>
+    <div class="card" style="background:#fff">
+      <span class="label">Símbolo e ícones</span>
+      <div class="icons">
+        <figure><svg width="140" height="140" viewBox="0 0 512 512"><rect width="512" height="512" rx="112" fill="#0b0b0c"/><g transform="translate(168 96) scale(8)" style="color:#fff"><use href="#s" width="22" height="40"/></g></svg>Perfil / app</figure>
+        <figure><svg width="64" height="64" viewBox="0 0 512 512"><rect width="512" height="512" rx="112" fill="#0b0b0c"/><g transform="translate(168 96) scale(8)" style="color:#fff"><use href="#s" width="22" height="40"/></g></svg>64 px</figure>
+        <figure><svg width="32" height="32" viewBox="0 0 512 512"><rect width="512" height="512" rx="112" fill="#0b0b0c"/><g transform="translate(168 96) scale(8)" style="color:#fff"><use href="#s" width="22" height="40"/></g></svg>Favicon</figure>
+        <figure><svg width="40" height="72" viewBox="0 0 22 40" style="color:#0b0b0c"><use href="#s"/></svg>Símbolo</figure>
+      </div>
+    </div>
+    <div class="card" style="background:#7a2233;color:#fff">
+      <span class="label">Logotipo · cor de lançamento</span>
+      <div class="logo"><svg viewBox="0 0 22 40"><use href="#s"/></svg><span class="word"><span class="a">Apple</span> <span class="p">Pacces</span></span></div>
+    </div>
+  </div>
+
+  <h2>Cores</h2>
+  <div class="swatches">
+    <div class="sw"><div class="c" style="background:#0b0b0c"></div><div class="t"><b>Grafite</b><span>#0B0B0C</span></div></div>
+    <div class="sw"><div class="c" style="background:#ffffff;border-bottom:1px solid #e5e5ea"></div><div class="t"><b>Branco</b><span>#FFFFFF</span></div></div>
+    <div class="sw"><div class="c" style="background:#f5f5f7;border-bottom:1px solid #e5e5ea"></div><div class="t"><b>Névoa</b><span>#F5F5F7</span></div></div>
+    <div class="sw"><div class="c" style="background:#6e6e73"></div><div class="t"><b>Cinza texto</b><span>#6E6E73</span></div></div>
+    <div class="sw"><div class="c" style="background:#7a2233"></div><div class="t"><b>Bordô lançamento</b><span>#7A2233</span></div></div>
+    <div class="sw"><div class="c" style="background:#0066cc"></div><div class="t"><b>Azul link</b><span>#0066CC</span></div></div>
+  </div>
+
+  <h2>Tipografia e uso</h2>
+  <div class="type">
+    <div class="box">
+      <p class="big">iPhone 18 Pro.<br><em>Pré-venda aberta.</em></p>
+      <p class="body">Plus Jakarta Sans. Títulos em Semibold com espaçamento apertado; textos em Regular, cinza, com bastante respiro.</p>
+    </div>
+    <div class="box">
+      <ul class="rules">
+        <li>O nome é sempre “Apple Pacces”: “Apple” mais leve, “Pacces” em destaque.</li>
+        <li>O símbolo pode aparecer sozinho no perfil, no favicon e em embalagens.</li>
+        <li>Preto e branco no dia a dia; Bordô só em campanhas de lançamento.</li>
+        <li>Nunca usar a maçã da Apple junto com o logotipo.</li>
+        <li>Deixe espaço livre em volta do logo igual à altura do “P”.</li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>

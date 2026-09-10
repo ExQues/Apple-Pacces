@@ -190,6 +190,8 @@ export default function Shop() {
   useEffect(() => {
     if (categoryParam && (CATEGORY_FILTERS as readonly string[]).includes(categoryParam)) {
       setSelected(categoryParam as (typeof CATEGORY_FILTERS)[number])
+    } else {
+      setSelected('Todos')
     }
   }, [categoryParam])
 
@@ -229,7 +231,7 @@ export default function Shop() {
         </section>
 
         {/* Filtros e busca */}
-        <div className="sticky top-24 z-30 mx-auto mt-10 max-w-7xl bg-[#f5f5f7]/85 py-3 backdrop-blur-xl">
+        <div className="sticky top-12 z-30 mx-auto mt-10 max-w-7xl bg-[#f5f5f7]/85 py-3 backdrop-blur-xl">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
               {CATEGORY_FILTERS.map((cat) => {

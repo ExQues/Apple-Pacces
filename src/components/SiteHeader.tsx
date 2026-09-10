@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ShoppingBag, User as UserIcon, LogOut, Menu, X, Package } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
+import { BrandLogo } from '@/components/BrandLogo'
 import { useAuthStore } from '@/store/useAuthStore'
 import { useCartStore } from '@/store/useCartStore'
 import { useFlyingAnimationStore } from '@/store/useFlyingAnimationStore'
@@ -9,16 +10,17 @@ type SiteHeaderProps = {
   variant?: 'home' | 'shop'
 }
 
-const SECTIONS = ['produtos', 'diferenciais', 'contato'] as const
-type SectionId = (typeof SECTIONS)[number]
+const STORE_LINKS = [
+  { label: 'Loja', to: '/shop' },
+  { label: 'iPhone', to: '/shop?category=iPhone' },
+  { label: 'Mac', to: '/shop?category=Mac' },
+  { label: 'iPad', to: '/shop?category=iPad' },
+  { label: 'Watch', to: `/shop?category=${encodeURIComponent('Apple Watch')}` },
+  { label: 'Acessórios', to: `/shop?category=${encodeURIComponent('Acessórios')}` },
+]
 
 export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
-  const sectionPrefix = variant === 'home' ? '' : '/'
-  const links: { label: string; id: SectionId; href: string }[] = [
-    { label: 'Produtos', id: 'produtos', href: `${sectionPrefix}#produtos` },
-    { label: 'Diferenciais', id: 'diferenciais', href: `${sectionPrefix}#diferenciais` },
-    { label: 'Contato', id: 'contato', href: `${sectionPrefix}#contato` },
-  ]
+  const contactHref = variant === 'home' ? '#contato' : '/#contato'
 
   const { user, signOut } = useAuthStore()
   const { toggleDrawer, totalItems } = useCartStore()
@@ -30,13 +32,30 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
 
+  // Barra escura enquanto estiver sobre o hero escuro da home; clara no resto
+  const [overDark, setOverDark] = useState(variant === 'home')
+
+  useEffect(() => {
+    const update = () => {
+      const hero = document.getElementById('inicio')
+      setOverDark(variant === 'home' && !!hero && hero.getBoundingClientRect().bottom > 48)
+    }
+    update()
+    window.addEventListener('scroll', update, { passive: true })
+    window.addEventListener('resize', update)
+    return () => {
+      window.removeEventListener('scroll', update)
+      window.removeEventListener('resize', update)
+    }
+  }, [variant])
+
   // Registrar o ref do ícone da sacola na store global para a animação de voo
   useEffect(() => {
     setCartIconRef(cartButtonRef.current)
     return () => setCartIconRef(null)
   }, [setCartIconRef])
 
-  // Fechar dropdown de usuario ao clicar fora
+  // Fechar dropdown de usuário ao clicar fora
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
@@ -47,63 +66,13 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  const [active, setActive] = useState<SectionId>('produtos')
-  const [indicator, setIndicator] = useState<{ left: number; width: number; ready: boolean }>({
-    left: 0,
-    width: 0,
-    ready: false,
-  })
-  const listRef = useRef<HTMLDivElement | null>(null)
-  const itemRefs = useRef<Record<string, HTMLAnchorElement | null>>({})
-
+  // Travar scroll quando o menu mobile estiver aberto
   useEffect(() => {
-    if (variant !== 'home') return
-    if (typeof window === 'undefined') return
-
-    const computeActive = () => {
-      const trigger = window.innerHeight * 0.35
-      let current: SectionId = 'produtos'
-      for (const id of SECTIONS) {
-        const el = document.getElementById(id)
-        if (!el) continue
-        const rect = el.getBoundingClientRect()
-        if (rect.top - trigger <= 0) {
-          current = id
-        }
-      }
-      setActive(current)
-    }
-
-    computeActive()
-    window.addEventListener('scroll', computeActive, { passive: true })
-    window.addEventListener('resize', computeActive)
+    document.body.style.overflow = mobileMenuOpen ? 'hidden' : ''
     return () => {
-      window.removeEventListener('scroll', computeActive)
-      window.removeEventListener('resize', computeActive)
+      document.body.style.overflow = ''
     }
-  }, [variant])
-
-  const recalcIndicator = useCallback(() => {
-    const container = listRef.current
-    const target = itemRefs.current[active]
-    if (!container || !target) return
-    const containerRect = container.getBoundingClientRect()
-    const targetRect = target.getBoundingClientRect()
-    setIndicator({
-      left: targetRect.left - containerRect.left,
-      width: targetRect.width,
-      ready: true,
-    })
-  }, [active])
-
-  useLayoutEffect(() => {
-    recalcIndicator()
-  }, [recalcIndicator])
-
-  useEffect(() => {
-    window.addEventListener('resize', recalcIndicator)
-    return () => window.removeEventListener('resize', recalcIndicator)
-  }, [recalcIndicator])
+  }, [mobileMenuOpen])
 
   const handleSignOut = async () => {
     setUserMenuOpen(false)
@@ -112,123 +81,81 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
     navigate('/')
   }
 
-  // Travar scroll quando o menu mobile estiver aberto
-  useEffect(() => {
-    if (mobileMenuOpen) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = ''
-    }
-    return () => {
-      document.body.style.overflow = ''
-    }
-  }, [mobileMenuOpen])
+  const dark = overDark && !mobileMenuOpen
+  const barClass = dark
+    ? 'border-white/10 bg-black/70 text-white'
+    : 'border-black/5 bg-[#f5f5f7]/80 text-zinc-900'
+  const linkClass = 'text-[13px] opacity-80 transition-opacity hover:opacity-100'
+  const count = totalItems()
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 px-3 pt-3">
-      <nav
-        className="mx-auto flex max-w-7xl items-center justify-between rounded-full border border-white/70 bg-white/85 px-4 py-3 shadow-[0_18px_60px_rgba(24,24,27,0.10)] backdrop-blur-2xl lg:px-5"
-        aria-label="Navegacao principal"
-      >
-        <Link to="/" className="group flex items-center gap-3 active:scale-95 transition-transform" aria-label="Apple Pacces">
-          <span className="grid size-10 place-items-center rounded-full border border-zinc-200 bg-zinc-950 text-sm font-semibold text-white shadow-sm transition group-hover:scale-105">
-            AP
-          </span>
-          <span className="hidden text-sm font-semibold tracking-[0.28em] text-zinc-950 sm:inline">PACCES</span>
+    <header className={`fixed inset-x-0 top-0 z-50 border-b backdrop-blur-xl backdrop-saturate-150 transition-colors duration-300 ${barClass}`}>
+      <nav className="mx-auto flex h-12 max-w-7xl items-center justify-between gap-6 px-5 lg:px-8" aria-label="Navegação principal">
+        <Link to="/" aria-label="Apple Pacces, página inicial" className="flex-none transition-opacity hover:opacity-80">
+          <BrandLogo />
         </Link>
 
-        {/* Menu Desktop */}
-        <div
-          ref={listRef}
-          className="relative hidden items-center gap-1 rounded-full border border-zinc-200 bg-zinc-50/80 p-1 md:flex"
-        >
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute bottom-1 top-1 rounded-full bg-zinc-950"
-            style={{
-              left: indicator.left,
-              width: indicator.width,
-              opacity: indicator.ready && variant === 'home' ? 1 : 0,
-              transition:
-                'left 500ms cubic-bezier(0.16, 1, 0.3, 1), width 500ms cubic-bezier(0.16, 1, 0.3, 1), opacity 220ms ease',
-            }}
-          />
-          {links.map((link) => {
-            const isActive = variant === 'home' && active === link.id
-            return (
-              <a
-                key={link.href}
-                ref={(el) => {
-                  itemRefs.current[link.id] = el
-                }}
-                href={link.href}
-                aria-current={isActive ? 'page' : undefined}
-                className={`relative z-10 rounded-full px-4 py-2 text-sm font-medium transition-colors duration-300 ${
-                  isActive ? 'text-white' : 'text-zinc-500 hover:text-zinc-950'
-                }`}
-              >
-                {link.label}
-              </a>
-            )
-          })}
-          <Link
-            to="/shop"
-            aria-current={variant === 'shop' ? 'page' : undefined}
-            className="relative z-10 ml-1 inline-flex items-center gap-2 rounded-full bg-zinc-950 px-4 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-zinc-800 active:scale-95"
-          >
-            <ShoppingBag className="size-4" aria-hidden="true" />
-            Loja
-          </Link>
+        <div className="hidden flex-1 items-center justify-center gap-8 md:flex">
+          {STORE_LINKS.map((link) => (
+            <Link key={link.label} to={link.to} className={linkClass}>
+              {link.label}
+            </Link>
+          ))}
+          <a href={contactHref} className={linkClass}>
+            Contato
+          </a>
         </div>
 
-        <div className="flex items-center gap-2 sm:gap-3">
-          {/* Botão da Sacola com ref para voo + indicador */}
+        <div className="flex flex-none items-center gap-4">
+          {/* Sacola com ref para a animação de voo */}
           <button
             ref={cartButtonRef}
             type="button"
             onClick={toggleDrawer}
-            className={`relative rounded-full p-2 text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-950 active:scale-90 ${
-              isBouncing ? 'animate-cart-bounce' : ''
-            }`}
+            className={`relative opacity-80 transition hover:opacity-100 active:scale-90 ${isBouncing ? 'animate-cart-bounce' : ''}`}
             aria-label="Ver sacola de compras"
           >
-            <ShoppingBag className="size-5" />
-            {totalItems() > 0 && (
-              <span className="absolute right-0 top-0 flex h-4 w-4 items-center justify-center rounded-full bg-zinc-950 text-[10px] font-bold text-white shadow-sm">
-                {totalItems()}
+            <ShoppingBag className="size-[18px]" strokeWidth={1.75} />
+            {count > 0 && (
+              <span
+                className={`absolute -right-2 -top-1.5 grid size-4 place-items-center rounded-full text-[10px] font-semibold ${
+                  dark ? 'bg-white text-black' : 'bg-zinc-950 text-white'
+                }`}
+              >
+                {count}
               </span>
             )}
           </button>
-          
+
           {user ? (
             <div ref={userMenuRef} className="relative">
               <button
+                type="button"
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
-                className="flex items-center gap-2 rounded-full border border-zinc-200 bg-white px-3.5 py-2 text-sm font-semibold text-zinc-950 transition hover:bg-zinc-50 active:scale-95 sm:px-4 sm:py-2.5"
+                className="opacity-80 transition hover:opacity-100 active:scale-90"
+                aria-label="Minha conta"
               >
-                <UserIcon className="size-4" />
-                <span className="hidden sm:inline">Minha Conta</span>
+                <UserIcon className="size-[18px]" strokeWidth={1.75} />
               </button>
 
               {userMenuOpen && (
-                <div className="absolute right-0 mt-2 w-60 max-w-[calc(100vw-2rem)] flex-col rounded-2xl border border-zinc-200/90 bg-white/95 p-2 shadow-2xl backdrop-blur-xl animate-fade-in z-50">
-                  <div className="border-b border-zinc-100 px-3 py-3 mb-1">
-                    <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">Conectado como</p>
-                    <p className="truncate text-xs font-semibold text-zinc-950 mt-0.5">{user.email}</p>
+                <div className="absolute right-0 z-50 mt-3 w-60 max-w-[calc(100vw-2rem)] rounded-2xl border border-zinc-200 bg-white p-2 text-zinc-900 shadow-2xl">
+                  <div className="mb-1 border-b border-zinc-100 px-3 py-3">
+                    <p className="text-xs text-zinc-500">Conectado como</p>
+                    <p className="mt-0.5 truncate text-sm font-semibold">{user.email}</p>
                   </div>
-
                   <Link
                     to="/pedidos"
                     onClick={() => setUserMenuOpen(false)}
-                    className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium text-zinc-700 transition hover:bg-zinc-100 hover:text-zinc-950"
+                    className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm text-zinc-700 transition hover:bg-zinc-100 hover:text-zinc-950"
                   >
                     <Package className="size-4 text-zinc-500" />
-                    Meus Pedidos
+                    Meus pedidos
                   </Link>
-
-                  <button 
-                    onClick={handleSignOut} 
-                    className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-50"
+                  <button
+                    type="button"
+                    onClick={handleSignOut}
+                    className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm text-red-600 transition hover:bg-red-50"
                   >
                     <LogOut className="size-4" />
                     Sair
@@ -237,19 +164,15 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
               )}
             </div>
           ) : (
-            <Link
-              to="/login"
-              className="rounded-full bg-zinc-950 px-4 py-2 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(24,24,27,0.18)] transition hover:-translate-y-0.5 hover:bg-zinc-800 active:scale-95 sm:px-5 sm:py-2.5"
-            >
+            <Link to="/login" className={`${linkClass} hidden sm:inline`}>
               Entrar
             </Link>
           )}
 
-          {/* Botao Hambúrguer Mobile */}
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="grid size-10 place-items-center rounded-full border border-zinc-200 bg-white text-zinc-700 transition hover:bg-zinc-100 active:scale-90 md:hidden"
+            className="opacity-80 transition hover:opacity-100 md:hidden"
             aria-label={mobileMenuOpen ? 'Fechar menu' : 'Abrir menu de navegação'}
           >
             {mobileMenuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
@@ -257,28 +180,36 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
         </div>
       </nav>
 
-      {/* Gaveta de Navegação Mobile */}
+      {/* Menu mobile */}
       {mobileMenuOpen && (
-        <div className="mx-auto mt-2 max-w-7xl overflow-hidden rounded-3xl border border-zinc-200/90 bg-white/95 p-5 shadow-2xl backdrop-blur-2xl animate-fade-in md:hidden">
-          <div className="flex flex-col gap-2">
-            {links.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
+        <div className="h-[calc(100dvh-3rem)] overflow-y-auto border-t border-black/5 px-8 pb-10 pt-6 md:hidden">
+          <div className="flex flex-col gap-1">
+            {STORE_LINKS.map((link) => (
+              <Link
+                key={link.label}
+                to={link.to}
                 onClick={() => setMobileMenuOpen(false)}
-                className="rounded-2xl px-4 py-3 text-base font-semibold text-zinc-800 transition hover:bg-zinc-100 active:bg-zinc-200"
+                className="py-2 text-3xl font-semibold tracking-tight text-zinc-900"
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
-            <Link
-              to="/shop"
+            <a
+              href={contactHref}
               onClick={() => setMobileMenuOpen(false)}
-              className="mt-2 flex items-center justify-center gap-2 rounded-2xl bg-zinc-950 py-3.5 text-base font-semibold text-white shadow-lg shadow-zinc-900/20 active:scale-98"
+              className="py-2 text-3xl font-semibold tracking-tight text-zinc-900"
             >
-              <ShoppingBag className="size-5" />
-              Ver a Loja
-            </Link>
+              Contato
+            </a>
+            {!user && (
+              <Link
+                to="/login"
+                onClick={() => setMobileMenuOpen(false)}
+                className="mt-6 text-lg font-medium text-[#0066cc]"
+              >
+                Entrar na sua conta
+              </Link>
+            )}
           </div>
         </div>
       )}
