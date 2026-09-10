@@ -62,11 +62,11 @@ function ProductCard({ product }: { product: FeaturedProduct }) {
   }, [activeImage, displaySrc])
 
   const handleAddToCart = () => {
-    if (imgRef.current) {
+    const success = addItemSilently(product, selectedColor, selectedStorage, activePrice, activeImage)
+    if (success && imgRef.current) {
       const rect = imgRef.current.getBoundingClientRect()
       triggerFly(activeImage, rect)
     }
-    addItemSilently(product, selectedColor, selectedStorage, activePrice, activeImage)
   }
 
   return (
@@ -204,7 +204,7 @@ export default function Shop() {
   const [searchParams] = useSearchParams()
   const categoryParam = searchParams.get('category')
   const { products } = useProducts()
-  const [query, setQuery] = useState('')
+  const [query, setQuery] = useState(() => searchParams.get('q') ?? '')
   const [selected, setSelected] = useState<(typeof CATEGORY_FILTERS)[number]>('Todos')
 
   useEffect(() => {
@@ -402,9 +402,12 @@ export default function Shop() {
         </section>
 
         <div className="mx-auto mt-16 flex max-w-7xl justify-center">
-          <a href="/" className="rounded-full border border-zinc-200 bg-white px-6 py-3 text-sm font-semibold text-zinc-700 shadow-sm transition hover:-translate-y-0.5 hover:text-zinc-950 hover:shadow-xl">
-            Voltar para o inicio
-          </a>
+          <button
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="rounded-full border border-zinc-200 bg-white px-6 py-3 text-sm font-semibold text-zinc-700 shadow-sm transition hover:-translate-y-0.5 hover:text-zinc-950 hover:shadow-xl active:scale-95"
+          >
+            Voltar ao topo do Shopping
+          </button>
         </div>
       </main>
     </div>

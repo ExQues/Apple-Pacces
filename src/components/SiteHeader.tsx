@@ -175,7 +175,7 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
           <Link
             to="/shop"
             aria-current={variant === 'shop' ? 'page' : undefined}
-            className="relative z-10 ml-1 inline-flex items-center gap-2 rounded-full bg-sky-600 px-4 py-2 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(2,132,199,0.28)] transition hover:-translate-y-0.5 hover:bg-sky-500 active:scale-95"
+            className="relative z-10 ml-1 inline-flex items-center gap-2 rounded-full bg-orange-600 px-4 py-2 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(234,88,12,0.28)] transition hover:-translate-y-0.5 hover:bg-orange-500 active:scale-95"
           >
             <ShoppingBag className="size-4" aria-hidden="true" />
             Shopping
@@ -195,7 +195,7 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
           >
             <ShoppingBag className="size-5" />
             {totalItems() > 0 && (
-              <span className="absolute right-0 top-0 flex h-4 w-4 items-center justify-center rounded-full bg-sky-600 text-[10px] font-bold text-white shadow-sm">
+              <span className="absolute right-0 top-0 flex h-4 w-4 items-center justify-center rounded-full bg-orange-600 text-[10px] font-bold text-white shadow-sm">
                 {totalItems()}
               </span>
             )}
@@ -275,7 +275,7 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
             <Link
               to="/shop"
               onClick={() => setMobileMenuOpen(false)}
-              className="mt-2 flex items-center justify-center gap-2 rounded-2xl bg-sky-600 py-3.5 text-base font-semibold text-white shadow-lg shadow-sky-600/20 active:scale-98"
+              className="mt-2 flex items-center justify-center gap-2 rounded-2xl bg-orange-600 py-3.5 text-base font-semibold text-white shadow-lg shadow-orange-600/20 active:scale-98"
             >
               <ShoppingBag className="size-5" />
               Abrir Shopping

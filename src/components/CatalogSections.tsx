@@ -22,11 +22,11 @@ function FeaturedCard({ product }: { product: FeaturedProduct }) {
   const { triggerFly } = useFlyingAnimationStore()
 
   const handleAddToCart = () => {
-    if (imgRef.current) {
+    const success = addItemSilently(product, product.colors[0])
+    if (success && imgRef.current) {
       const rect = imgRef.current.getBoundingClientRect()
       triggerFly(product.image, rect)
     }
-    addItemSilently(product, product.colors[0])
   }
 
   return (
@@ -108,7 +108,7 @@ export function CatalogSections() {
       <div className="mx-auto max-w-7xl">
         <div className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.25em] text-sky-600">Catálogo curado</p>
+            <p className="text-sm font-semibold uppercase tracking-[0.25em] text-orange-600">Catálogo curado</p>
             <h2 className="mt-4 max-w-2xl font-display text-4xl font-semibold tracking-[-0.045em] text-zinc-950 sm:text-5xl">
               Escolha por linha, finalize com orientação.
             </h2>
@@ -138,7 +138,7 @@ export function CatalogSections() {
                 {/* Glow Radial Decorativo Suave Titanium */}
                 <div
                   aria-hidden="true"
-                  className="pointer-events-none absolute -right-16 -top-16 size-72 rounded-full bg-[radial-gradient(circle,rgba(56,189,248,0.14),transparent_70%)] transition-transform duration-700 group-hover:scale-125"
+                  className="pointer-events-none absolute -right-16 -top-16 size-72 rounded-full bg-[radial-gradient(circle,rgba(234,108,36,0.14),transparent_70%)] transition-transform duration-700 group-hover:scale-125"
                 />
 
                 <div className="relative z-10 flex items-start justify-between gap-4">
@@ -146,7 +146,7 @@ export function CatalogSections() {
                     <span
                       className={`inline-block rounded-full px-3.5 py-1 text-xs font-semibold uppercase tracking-wider ${
                         isHero
-                          ? 'bg-sky-500/15 text-sky-800 border border-sky-200/60'
+                          ? 'bg-orange-500/15 text-orange-800 border border-orange-200/60'
                           : 'bg-zinc-200/70 text-zinc-700 border border-zinc-300/40'
                       }`}
                     >
@@ -180,7 +180,7 @@ export function CatalogSections() {
                     {category.description}
                   </p>
 
-                  <div className="mt-5 flex items-center gap-2 text-xs font-semibold text-zinc-950 transition group-hover:text-sky-600">
+                  <div className="mt-5 flex items-center gap-2 text-xs font-semibold text-zinc-950 transition group-hover:text-orange-600">
                     <span>Explorar {category.name}</span>
                     <ArrowRight className="size-4 transition-transform group-hover:translate-x-1.5" />
                   </div>
@@ -190,7 +190,19 @@ export function CatalogSections() {
           })}
         </div>
 
-        <div className="mt-16 grid gap-5 lg:grid-cols-3">
+        <div className="mt-20 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.25em] text-orange-600">Lançamento</p>
+            <h2 className="mt-3 font-display text-3xl font-semibold tracking-[-0.04em] text-zinc-950 sm:text-4xl">
+              Destaques da linha iPhone 17
+            </h2>
+          </div>
+          <Link to="/shop?category=iPhone" className="text-sm font-semibold text-zinc-950 hover:text-orange-600">
+            Ver todos os iPhones
+          </Link>
+        </div>
+
+        <div className="mt-8 grid gap-5 lg:grid-cols-3">
           {featuredProducts.map((product) => (
             <FeaturedCard key={product.name} product={product} />
           ))}

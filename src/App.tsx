@@ -9,13 +9,16 @@ import Orders from "@/pages/Orders";
 import { CartDrawer } from "@/components/CartDrawer";
 import { ProductModal } from "@/components/ProductModal";
 import { FlyingImage } from "@/components/FlyingImage";
+import { AuthGuardModal } from "@/components/AuthGuardModal";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useCartStore } from "@/store/useCartStore";
 
 import { ScrollToTop } from "@/components/ScrollToTop";
 
 export default function App() {
   const { initialize } = useAuthStore();
+  const { isAuthModalOpen, closeAuthModal } = useCartStore();
 
   useEffect(() => {
     initialize();
@@ -27,6 +30,7 @@ export default function App() {
       <CartDrawer />
       <ProductModal />
       <FlyingImage />
+      <AuthGuardModal isOpen={isAuthModalOpen} onClose={closeAuthModal} />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/shop" element={<Shop />} />

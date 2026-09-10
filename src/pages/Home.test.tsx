@@ -12,9 +12,9 @@ describe('Home', () => {
     )
 
     expect(
-      screen.getByRole('heading', { name: /linha apple para quem exige o melhor/i }),
+      screen.getByRole('heading', { name: /iphone 17 pro\.\s*chegou/i }),
     ).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /ver produtos/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /comprar iphone 17/i })).toHaveAttribute('href', '/shop?category=iPhone')
     expect(screen.getByRole('link', { name: /falar com consultor/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /shopping/i })).toHaveAttribute('href', '/shop')
 
@@ -24,8 +24,8 @@ describe('Home', () => {
     expect(screen.getAllByText(/ipad/i).length).toBeGreaterThan(0)
     expect(screen.getAllByText(/apple watch/i).length).toBeGreaterThan(0)
 
-    expect(screen.getByText(/iPhone 17 Pro/i)).toBeInTheDocument()
-    expect(screen.getByText(/MacBook Air/i)).toBeInTheDocument()
+    expect(screen.getAllByText(/iPhone 17 Pro/i).length).toBeGreaterThan(0)
+    expect(screen.getAllByText(/iPhone 17 Air/i).length).toBeGreaterThan(0)
     expect(screen.getByText(/Garantia e proced/i)).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: /escolha inteligente em 3 passos/i })).toBeInTheDocument()
     expect(screen.getByText(/compare perfil, orçamento e ciclo de troca/i)).toBeInTheDocument()

@@ -37,14 +37,16 @@ export function ProductModal() {
   const activeImage = activeColorObj?.image || product.image
 
   const handleAddToCart = () => {
-    addItem(product, activeColor, activeStorage, activePrice, activeImage)
-    setAdded(true)
-    setTimeout(() => {
-      setAdded(false)
-      setSelectedStorage('')
-      setSelectedColor('')
-      close()
-    }, 1200)
+    const success = addItem(product, activeColor, activeStorage, activePrice, activeImage)
+    if (success) {
+      setAdded(true)
+      setTimeout(() => {
+        setAdded(false)
+        setSelectedStorage('')
+        setSelectedColor('')
+        close()
+      }, 1200)
+    }
   }
 
   const handleClose = () => {
