@@ -38,7 +38,7 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
   useEffect(() => {
     const update = () => {
       const hero = document.getElementById('inicio')
-      setOverDark(variant === 'home' && !!hero && hero.getBoundingClientRect().bottom > 48)
+      setOverDark(variant === 'home' && !!hero && hero.getBoundingClientRect().bottom - 150 > 48)
     }
     update()
     window.addEventListener('scroll', update, { passive: true })

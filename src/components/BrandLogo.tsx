@@ -1,5 +1,6 @@
-// Marca Apple Pacces: módulo de três câmeras do iPhone Pro em um quadrado arredondado.
-// Usa currentColor, então herda a cor do texto (preto no claro, branco no escuro).
+// Marca Apple Pacces. O logotipo usado no site é só o nome; o símbolo (módulo de câmeras
+// do iPhone Pro) fica para favicon, ícone de perfil e usos em que o nome não cabe.
+// Tudo usa currentColor, então herda a cor do texto (preto no claro, branco no escuro).
 
 export function BrandSymbol({ className = 'h-6 w-6' }: { className?: string }) {
   return (
@@ -14,18 +15,16 @@ export function BrandSymbol({ className = 'h-6 w-6' }: { className?: string }) {
 
 type BrandLogoProps = {
   className?: string
-  symbolOnly?: boolean
+  withSymbol?: boolean
 }
 
-export function BrandLogo({ className = '', symbolOnly = false }: BrandLogoProps) {
+export function BrandLogo({ className = '', withSymbol = false }: BrandLogoProps) {
   return (
     <span className={`inline-flex items-center gap-2 ${className}`}>
-      <BrandSymbol className="size-[22px]" />
-      {!symbolOnly && (
-        <span className="font-display text-[15px] tracking-[-0.02em]">
-          <span className="font-normal opacity-70">Apple</span> <span className="font-semibold">Pacces</span>
-        </span>
-      )}
+      {withSymbol && <BrandSymbol className="size-[22px]" />}
+      <span className="font-display text-[17px] tracking-[-0.02em]">
+        <span className="font-normal opacity-70">Apple</span> <span className="font-semibold">Pacces</span>
+      </span>
     </span>
   )
 }

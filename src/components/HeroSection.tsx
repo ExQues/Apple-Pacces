@@ -50,7 +50,6 @@ export function HeroSection() {
     <section id="inicio" className="relative isolate overflow-hidden bg-black px-5 pb-16 pt-32 text-white lg:px-8 lg:pt-36">
       {/* Brilho Bordô atrás do aparelho */}
       <div className="absolute right-[-12%] top-0 -z-10 size-[46rem] rounded-full bg-[radial-gradient(circle,rgba(150,40,62,0.45),transparent_65%)] blur-2xl" />
-      <div className="absolute inset-x-0 bottom-0 -z-10 h-40 bg-gradient-to-b from-transparent to-black" />
 
       <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
         <div className="animate-rise">
@@ -208,6 +207,11 @@ export function HeroSection() {
           ))}
         </div>
       </div>
+      {/* Transição do lançamento (preto) para o restante da página (claro), passando pelo Bordô */}
+      <div
+        aria-hidden="true"
+        className="-mx-5 -mb-16 mt-8 h-72 bg-[linear-gradient(180deg,#000_0%,#1c0a0f_22%,#4a1c27_46%,#a57f88_72%,#f5f5f7_100%)] lg:-mx-8"
+      />
     </section>
   )
 }
