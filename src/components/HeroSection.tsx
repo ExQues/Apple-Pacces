@@ -5,7 +5,7 @@ import { allProducts } from '@/data/appleStore'
 const LAUNCH_LINEUP = ['iPhone 17 Pro Max', 'iPhone 17 Pro', 'iPhone 17 Air', 'iPhone 17', 'iPhone 17e'] as const
 
 const heroImage =
-  'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-17-pro-finish-select-202509-6-9inch-cosmicorange?wid=900&hei=900&fmt=png-alpha'
+  '/products/iphone-17-pro-finish-select-202509-6-9inch-cosmicorange.webp'
 
 const perks = [
   { icon: PackageCheck, label: 'Lacrados' },

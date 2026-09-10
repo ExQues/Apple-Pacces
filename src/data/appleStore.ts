@@ -34,54 +34,54 @@ export type TrustItem = {
   description: string
 }
 
-// URLs oficiais da CDN Apple testadas e com resposta HTTP 200 OK.
+// Fotos oficiais da Apple (CDN store.storeimages.cdn-apple.com), recortadas e hospedadas em public/products.
 const img = {
   // iPhone
-  iphone14_midnight: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-14-finish-select-202209-6-1inch-midnight?wid=600&hei=600&fmt=jpeg&qlt=85',
-  iphone15_black: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-15-finish-select-202309-6-1inch-black?wid=600&hei=600&fmt=jpeg&qlt=85',
-  iphone15_blue: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-15-finish-select-202309-6-1inch-blue?wid=600&hei=600&fmt=jpeg&qlt=85',
-  iphone15_pink: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-15-finish-select-202309-6-1inch-pink?wid=600&hei=600&fmt=jpeg&qlt=85',
-  iphone15_yellow: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-15-finish-select-202309-6-1inch-yellow?wid=600&hei=600&fmt=jpeg&qlt=85',
+  iphone14_midnight: '/products/iphone-14-finish-select-202209-6-1inch-midnight.webp',
+  iphone15_black: '/products/iphone-15-finish-select-202309-6-1inch-black.webp',
+  iphone15_blue: '/products/iphone-15-finish-select-202309-6-1inch-blue.webp',
+  iphone15_pink: '/products/iphone-15-finish-select-202309-6-1inch-pink.webp',
+  iphone15_yellow: '/products/iphone-15-finish-select-202309-6-1inch-yellow.webp',
 
-  iphone16_ultramarine: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-finish-select-202409-6-1inch-ultramarine?wid=600&hei=600&fmt=jpeg&qlt=85',
-  iphone16_teal: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-finish-select-202409-6-1inch-teal?wid=600&hei=600&fmt=jpeg&qlt=85',
-  iphone16_pink: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-finish-select-202409-6-1inch-pink?wid=600&hei=600&fmt=jpeg&qlt=85',
-  iphone16_white: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-finish-select-202409-6-1inch-white?wid=600&hei=600&fmt=jpeg&qlt=85',
-  iphone16_black: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-finish-select-202409-6-1inch-black?wid=600&hei=600&fmt=jpeg&qlt=85',
+  iphone16_ultramarine: '/products/iphone-16-finish-select-202409-6-1inch-ultramarine.webp',
+  iphone16_teal: '/products/iphone-16-finish-select-202409-6-1inch-teal.webp',
+  iphone16_pink: '/products/iphone-16-finish-select-202409-6-1inch-pink.webp',
+  iphone16_white: '/products/iphone-16-finish-select-202409-6-1inch-white.webp',
+  iphone16_black: '/products/iphone-16-finish-select-202409-6-1inch-black.webp',
 
-  iphone16pro_desert: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-3inch-deserttitanium?wid=600&hei=600&fmt=jpeg&qlt=85',
-  iphone16pro_natural: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-3inch-naturaltitanium?wid=600&hei=600&fmt=jpeg&qlt=85',
-  iphone16pro_black: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-3inch-blacktitanium?wid=600&hei=600&fmt=jpeg&qlt=85',
-  iphone16pro_white: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-3inch-whitetitanium?wid=600&hei=600&fmt=jpeg&qlt=85',
-  iphone16promax_desert: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-9inch-deserttitanium?wid=600&hei=600&fmt=jpeg&qlt=85',
+  iphone16pro_desert: '/products/iphone-16-pro-finish-select-202409-6-3inch-deserttitanium.webp',
+  iphone16pro_natural: '/products/iphone-16-pro-finish-select-202409-6-3inch-naturaltitanium.webp',
+  iphone16pro_black: '/products/iphone-16-pro-finish-select-202409-6-3inch-blacktitanium.webp',
+  iphone16pro_white: '/products/iphone-16-pro-finish-select-202409-6-3inch-whitetitanium.webp',
+  iphone16promax_desert: '/products/iphone-16-pro-finish-select-202409-6-9inch-deserttitanium.webp',
 
   // Apple Watch
-  watch_se: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/watch-card-40-se-202309?wid=600&hei=600&fmt=jpeg&qlt=85',
-  watch_series: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/watch-card-40-s9-202309?wid=600&hei=600&fmt=jpeg&qlt=85',
-  watch_ultra: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/watch-ultra2-digitalmat-gallery-1-202309?wid=600&hei=600&fmt=jpeg&qlt=85',
+  watch_se: '/products/watch-card-40-se-202309.webp',
+  watch_series: '/products/watch-card-40-s9-202309.webp',
+  watch_ultra: '/products/watch-ultra2-digitalmat-gallery-1-202309.webp',
 
   // iPad
-  ipad_mini: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/ipad-mini-finish-select-gallery-202410-space-gray-wifi?wid=600&hei=600&fmt=jpeg&qlt=85',
-  ipad_10: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/ipad-10th-gen-finish-select-202212-blue?wid=600&hei=600&fmt=jpeg&qlt=85',
-  ipad_air: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/ipad-air-storage-select-202405-11inch-blue?wid=600&hei=600&fmt=jpeg&qlt=85',
-  ipad_pro: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/ipad-pro-storage-select-202405-13inch-spaceblack?wid=600&hei=600&fmt=jpeg&qlt=85',
+  ipad_mini: '/products/ipad-mini-finish-select-gallery-202410-space-gray-wifi.webp',
+  ipad_10: '/products/ipad-10th-gen-finish-select-202212-blue.webp',
+  ipad_air: '/products/ipad-air-storage-select-202405-11inch-blue.webp',
+  ipad_pro: '/products/ipad-pro-storage-select-202405-13inch-spaceblack.webp',
 
   // Mac
-  mac_mini: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/mac-mini-hero-202410?wid=600&hei=600&fmt=jpeg&qlt=85',
-  macbook_air_spacegray: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/macbook-air-space-gray-select-201810?wid=600&hei=600&fmt=jpeg&qlt=85',
-  macbook_air_silver: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/macbook-air-silver-select-201810?wid=600&hei=600&fmt=jpeg&qlt=85',
-  macbook_pro: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/mbp16-spaceblack-select-202310?wid=600&hei=600&fmt=jpeg&qlt=85',
+  mac_mini: '/products/mac-mini-hero-202410.webp',
+  macbook_air_spacegray: '/products/macbook-air-space-gray-select-201810.webp',
+  macbook_air_silver: '/products/macbook-air-silver-select-201810.webp',
+  macbook_pro: '/products/mbp16-spaceblack-select-202310.webp',
 
   // AirPods & AirTag & Pencil
-  airpods4: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/airpods-4-select-202409?wid=600&hei=600&fmt=jpeg&qlt=85',
-  airpods4anc: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/airpods-4-anc-select-202409?wid=600&hei=600&fmt=jpeg&qlt=85',
-  airpodspro: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/MTJV3?wid=600&hei=600&fmt=jpeg&qlt=85',
-  airpodsmax: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/airpods-max-select-202409-starlight?wid=600&hei=600&fmt=jpeg&qlt=85',
-  airtag: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/airtag-single-select-202104?wid=600&hei=600&fmt=jpeg&qlt=85',
-  airtag4pack: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/airtag-4pack-select-202104?wid=600&hei=600&fmt=jpeg&qlt=85',
-  pencil_usbc: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/MQLU3?wid=600&hei=600&fmt=jpeg&qlt=85',
-  pencil_2: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/MU8F2?wid=600&hei=600&fmt=jpeg&qlt=85',
-  pencil_pro: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/MX2D3?wid=600&hei=600&fmt=jpeg&qlt=85',
+  airpods4: '/products/airpods-4-select-202409.webp',
+  airpods4anc: '/products/airpods-4-anc-select-202409.webp',
+  airpodspro: '/products/MTJV3.webp',
+  airpodsmax: '/products/airpods-max-select-202409-starlight.webp',
+  airtag: '/products/airtag-single-select-202104.webp',
+  airtag4pack: '/products/airtag-4pack-select-202104.webp',
+  pencil_usbc: '/products/MQLU3.webp',
+  pencil_2: '/products/MU8F2.webp',
+  pencil_pro: '/products/MX2D3.webp',
 } as const
 
 export const categories: ProductCategory[] = [
@@ -123,15 +123,15 @@ export const allProducts: FeaturedProduct[] = [
     description: 'Modelo consolidado com bom desempenho e otimas fotos.',
     specs: ['Face ID', 'Garantia Apple 1 ano'],
     colors: ['Meia-noite', 'Estelar', 'Roxo'],
-    image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-14-finish-select-202209-6-1inch-midnight?wid=600&hei=600&fmt=png-alpha',
+    image: '/products/iphone-14-finish-select-202209-6-1inch-midnight.webp',
     status: 'em-falta',
     storageOptions: [
       { storage: '128 GB', priceFrom: 'R$ 3.799' },
     ],
     colorOptions: [
-      { name: 'Meia-noite', image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-14-finish-select-202209-6-1inch-midnight?wid=600&hei=600&fmt=png-alpha', hex: '#1c232e' },
-      { name: 'Estelar', image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-14-finish-select-202209-6-1inch-starlight?wid=600&hei=600&fmt=png-alpha', hex: '#faf7f2' },
-      { name: 'Roxo', image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-14-finish-select-202209-6-1inch-purple?wid=600&hei=600&fmt=png-alpha', hex: '#e3d5e8' },
+      { name: 'Meia-noite', image: '/products/iphone-14-finish-select-202209-6-1inch-midnight.webp', hex: '#1c232e' },
+      { name: 'Estelar', image: '/products/iphone-14-finish-select-202209-6-1inch-starlight.webp', hex: '#faf7f2' },
+      { name: 'Roxo', image: '/products/iphone-14-finish-select-202209-6-1inch-purple.webp', hex: '#e3d5e8' },
     ],
   },
   {
@@ -162,13 +162,13 @@ export const allProducts: FeaturedProduct[] = [
     description: 'Porta de entrada da linha 16 com bateria longa e desempenho otimizado.',
     specs: ['128 GB', 'Apple Intelligence', 'Garantia Apple 1 ano'],
     colors: ['Preto', 'Branco'],
-    image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16e-finish-select-202502-black?wid=600&hei=600&fmt=png-alpha',
+    image: '/products/iphone-16e-finish-select-202502-black.webp',
     storageOptions: [
       { storage: '128 GB', priceFrom: 'R$ 3.799' },
     ],
     colorOptions: [
-      { name: 'Preto', image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16e-finish-select-202502-black?wid=600&hei=600&fmt=png-alpha', hex: '#222528' },
-      { name: 'Branco', image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16e-finish-select-202502-white?wid=600&hei=600&fmt=png-alpha', hex: '#f4f4f6' },
+      { name: 'Preto', image: '/products/iphone-16e-finish-select-202502-black.webp', hex: '#222528' },
+      { name: 'Branco', image: '/products/iphone-16e-finish-select-202502-white.webp', hex: '#f4f4f6' },
     ],
   },
   {
@@ -200,16 +200,16 @@ export const allProducts: FeaturedProduct[] = [
     description: 'Modelo equilibrado da nova geracao, com camera moderna e bateria forte.',
     specs: ['256 GB', 'Chip A19', 'Garantia Apple 1 ano'],
     colors: ['Lavanda', 'Salvia', 'Azul-nevoa', 'Preto', 'Branco'],
-    image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-17-finish-select-202509-lavender?wid=600&hei=600&fmt=png-alpha',
+    image: '/products/iphone-17-finish-select-202509-lavender.webp',
     storageOptions: [
       { storage: '256 GB', priceFrom: 'R$ 5.699' },
     ],
     colorOptions: [
-      { name: 'Lavanda', image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-17-finish-select-202509-lavender?wid=600&hei=600&fmt=png-alpha', hex: '#dccfe8' },
-      { name: 'Salvia', image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-17-finish-select-202509-sage?wid=600&hei=600&fmt=png-alpha', hex: '#b9c6a8' },
-      { name: 'Azul-nevoa', image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-17-finish-select-202509-mistblue?wid=600&hei=600&fmt=png-alpha', hex: '#a9bdd3' },
-      { name: 'Preto', image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-17-finish-select-202509-black?wid=600&hei=600&fmt=png-alpha', hex: '#2a2b2d' },
-      { name: 'Branco', image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-17-finish-select-202509-white?wid=600&hei=600&fmt=png-alpha', hex: '#f3f3f1' },
+      { name: 'Lavanda', image: '/products/iphone-17-finish-select-202509-lavender.webp', hex: '#dccfe8' },
+      { name: 'Salvia', image: '/products/iphone-17-finish-select-202509-sage.webp', hex: '#b9c6a8' },
+      { name: 'Azul-nevoa', image: '/products/iphone-17-finish-select-202509-mistblue.webp', hex: '#a9bdd3' },
+      { name: 'Preto', image: '/products/iphone-17-finish-select-202509-black.webp', hex: '#2a2b2d' },
+      { name: 'Branco', image: '/products/iphone-17-finish-select-202509-white.webp', hex: '#f3f3f1' },
     ],
   },
   {
@@ -220,14 +220,14 @@ export const allProducts: FeaturedProduct[] = [
     description: 'Perfil extremamente fino, acabamento leve de luxo e camera Fusion.',
     specs: ['Design ultrafino', 'Titanio leve', 'Garantia Apple 1 ano'],
     colors: ['Azul-ceu', 'Branco-nuvem'],
-    image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-air-finish-select-202509-skyblue?wid=600&hei=600&fmt=png-alpha',
+    image: '/products/iphone-air-finish-select-202509-skyblue.webp',
     storageOptions: [
       { storage: '256 GB', priceFrom: 'R$ 5.899' },
       { storage: '512 GB', priceFrom: 'R$ 7.199' },
     ],
     colorOptions: [
-      { name: 'Azul-ceu', image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-air-finish-select-202509-skyblue?wid=600&hei=600&fmt=png-alpha', hex: '#c9dbe9' },
-      { name: 'Branco-nuvem', image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-air-finish-select-202509-cloudwhite?wid=600&hei=600&fmt=png-alpha', hex: '#f2f1ec' },
+      { name: 'Azul-ceu', image: '/products/iphone-air-finish-select-202509-skyblue.webp', hex: '#c9dbe9' },
+      { name: 'Branco-nuvem', image: '/products/iphone-air-finish-select-202509-cloudwhite.webp', hex: '#f2f1ec' },
     ],
   },
   {
@@ -238,15 +238,15 @@ export const allProducts: FeaturedProduct[] = [
     description: 'Titanio Pro, telas com tecnologia ProMotion 120Hz e cameras triple de cinema.',
     specs: ['Chip A19 Pro', 'ProMotion 120Hz', 'Garantia Apple 1 ano'],
     colors: ['Laranja Cosmico', 'Azul Profundo', 'Prateado'],
-    image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-17-pro-finish-select-202509-6-3inch-cosmicorange?wid=600&hei=600&fmt=png-alpha',
+    image: '/products/iphone-17-pro-finish-select-202509-6-3inch-cosmicorange.webp',
     storageOptions: [
       { storage: '256 GB', priceFrom: 'R$ 7.299' },
       { storage: '512 GB', priceFrom: 'R$ 8.499' },
     ],
     colorOptions: [
-      { name: 'Laranja Cosmico', image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-17-pro-finish-select-202509-6-3inch-cosmicorange?wid=600&hei=600&fmt=png-alpha', hex: '#d8742f' },
-      { name: 'Azul Profundo', image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-17-pro-finish-select-202509-6-3inch-deepblue?wid=600&hei=600&fmt=png-alpha', hex: '#2f3d58' },
-      { name: 'Prateado', image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-17-pro-finish-select-202509-6-3inch-silver?wid=600&hei=600&fmt=png-alpha', hex: '#e3e4e6' },
+      { name: 'Laranja Cosmico', image: '/products/iphone-17-pro-finish-select-202509-6-3inch-cosmicorange.webp', hex: '#d8742f' },
+      { name: 'Azul Profundo', image: '/products/iphone-17-pro-finish-select-202509-6-3inch-deepblue.webp', hex: '#2f3d58' },
+      { name: 'Prateado', image: '/products/iphone-17-pro-finish-select-202509-6-3inch-silver.webp', hex: '#e3e4e6' },
     ],
   },
   {
@@ -257,16 +257,16 @@ export const allProducts: FeaturedProduct[] = [
     description: 'A maior tela Pro Super Retina XDR, autonomia insana e zoom periscopico.',
     specs: ['Tela Pro Max 6.9"', 'Bateria estendida', 'Garantia Apple 1 ano'],
     colors: ['Laranja Cosmico', 'Azul Profundo', 'Prateado'],
-    image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-17-pro-finish-select-202509-6-9inch-cosmicorange?wid=600&hei=600&fmt=png-alpha',
+    image: '/products/iphone-17-pro-finish-select-202509-6-9inch-cosmicorange.webp',
     storageOptions: [
       { storage: '256 GB', priceFrom: 'R$ 7.799' },
       { storage: '512 GB', priceFrom: 'R$ 9.299' },
       { storage: '1 TB', priceFrom: 'R$ 10.399' },
     ],
     colorOptions: [
-      { name: 'Laranja Cosmico', image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-17-pro-finish-select-202509-6-9inch-cosmicorange?wid=600&hei=600&fmt=png-alpha', hex: '#d8742f' },
-      { name: 'Azul Profundo', image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-17-pro-finish-select-202509-6-9inch-deepblue?wid=600&hei=600&fmt=png-alpha', hex: '#2f3d58' },
-      { name: 'Prateado', image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-17-pro-finish-select-202509-6-9inch-silver?wid=600&hei=600&fmt=png-alpha', hex: '#e3e4e6' },
+      { name: 'Laranja Cosmico', image: '/products/iphone-17-pro-finish-select-202509-6-9inch-cosmicorange.webp', hex: '#d8742f' },
+      { name: 'Azul Profundo', image: '/products/iphone-17-pro-finish-select-202509-6-9inch-deepblue.webp', hex: '#2f3d58' },
+      { name: 'Prateado', image: '/products/iphone-17-pro-finish-select-202509-6-9inch-silver.webp', hex: '#e3e4e6' },
     ],
   },
   {
@@ -277,12 +277,12 @@ export const allProducts: FeaturedProduct[] = [
     description: 'Versao acessivel da nova geracao com excelente custo-beneficio.',
     specs: ['256 GB', 'Apple Intelligence', 'Garantia Apple 1 ano'],
     colors: ['Branco'],
-    image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-17e-finish-select-202603-white?wid=600&hei=600&fmt=png-alpha',
+    image: '/products/iphone-17e-finish-select-202603-white.webp',
     storageOptions: [
       { storage: '256 GB', priceFrom: 'R$ 4.599' },
     ],
     colorOptions: [
-      { name: 'Branco', image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-17e-finish-select-202603-white?wid=600&hei=600&fmt=png-alpha', hex: '#f3f3f1' },
+      { name: 'Branco', image: '/products/iphone-17e-finish-select-202603-white.webp', hex: '#f3f3f1' },
     ],
   },
 
@@ -313,13 +313,13 @@ export const allProducts: FeaturedProduct[] = [
     description: 'Nova geracao do SE com desempenho aprimorado e novos sensores.',
     specs: ['GPS', 'Leitura Biometrica', 'Garantia Apple 1 ano'],
     colors: ['Meia-noite'],
-    image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/watch-card-40-se3-202509?wid=600&hei=600&fmt=png-alpha',
+    image: '/products/watch-card-40-se3-202509.webp',
     storageOptions: [
       { storage: '40 mm', priceFrom: 'R$ 2.199' },
       { storage: '44 mm', priceFrom: 'R$ 2.299' },
     ],
     colorOptions: [
-      { name: 'Meia-noite', image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/watch-card-40-se3-202509?wid=600&hei=600&fmt=png-alpha', hex: '#1c232e' },
+      { name: 'Meia-noite', image: '/products/watch-card-40-se3-202509.webp', hex: '#1c232e' },
     ],
   },
   {
@@ -330,13 +330,13 @@ export const allProducts: FeaturedProduct[] = [
     description: 'Design mais fino, tela Always-On OLED e recarga ultrafast.',
     specs: ['Always-On Retina', 'ECG + Oxigenio', 'Garantia Apple 1 ano'],
     colors: ['Jet Black'],
-    image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/watch-card-40-s11-202509?wid=600&hei=600&fmt=png-alpha',
+    image: '/products/watch-card-40-s11-202509.webp',
     storageOptions: [
       { storage: '42 mm', priceFrom: 'R$ 2.799' },
       { storage: '46 mm', priceFrom: 'R$ 2.999' },
     ],
     colorOptions: [
-      { name: 'Jet Black', image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/watch-card-40-s11-202509?wid=600&hei=600&fmt=png-alpha', hex: '#121214' },
+      { name: 'Jet Black', image: '/products/watch-card-40-s11-202509.webp', hex: '#121214' },
     ],
   },
   {
@@ -367,14 +367,14 @@ export const allProducts: FeaturedProduct[] = [
     description: 'Super leve e poderoso para leitura, anotacoes e mobilidade total.',
     specs: ['128 GB', '8.3" Liquid Retina', 'Compativel com Pencil Pro'],
     colors: ['Cinza Espacial', 'Roxo', 'Azul'],
-    image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/ipad-mini-finish-select-gallery-202410-space-gray-wifi?wid=600&hei=600&fmt=png-alpha',
+    image: '/products/ipad-mini-finish-select-gallery-202410-space-gray-wifi.webp',
     storageOptions: [
       { storage: '128 GB', priceFrom: 'R$ 4.499' },
     ],
     colorOptions: [
-      { name: 'Cinza Espacial', image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/ipad-mini-finish-select-gallery-202410-space-gray-wifi?wid=600&hei=600&fmt=png-alpha', hex: '#535558' },
-      { name: 'Roxo', image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/ipad-mini-finish-select-gallery-202410-purple-wifi?wid=600&hei=600&fmt=png-alpha', hex: '#b7b4d1' },
-      { name: 'Azul', image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/ipad-mini-finish-select-gallery-202410-blue-wifi?wid=600&hei=600&fmt=png-alpha', hex: '#95b3ca' },
+      { name: 'Cinza Espacial', image: '/products/ipad-mini-finish-select-gallery-202410-space-gray-wifi.webp', hex: '#535558' },
+      { name: 'Roxo', image: '/products/ipad-mini-finish-select-gallery-202410-purple-wifi.webp', hex: '#b7b4d1' },
+      { name: 'Azul', image: '/products/ipad-mini-finish-select-gallery-202410-blue-wifi.webp', hex: '#95b3ca' },
     ],
   },
   {
@@ -385,15 +385,15 @@ export const allProducts: FeaturedProduct[] = [
     description: 'Design de tela ponta a ponta, USB-C e cores vibrantes para estudo e lazer.',
     specs: ['128 GB', 'Tela 10.9"', 'Wi-Fi + USB-C'],
     colors: ['Azul', 'Amarelo', 'Rosa', 'Prateado'],
-    image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/ipad-finish-select-202503-blue-wifi?wid=600&hei=600&fmt=png-alpha',
+    image: '/products/ipad-finish-select-202503-blue-wifi.webp',
     storageOptions: [
       { storage: '128 GB', priceFrom: 'R$ 3.299' },
     ],
     colorOptions: [
-      { name: 'Azul', image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/ipad-finish-select-202503-blue-wifi?wid=600&hei=600&fmt=png-alpha', hex: '#63809e' },
-      { name: 'Amarelo', image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/ipad-finish-select-202503-yellow-wifi?wid=600&hei=600&fmt=png-alpha', hex: '#f5d665' },
-      { name: 'Rosa', image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/ipad-finish-select-202503-pink-wifi?wid=600&hei=600&fmt=png-alpha', hex: '#e3697e' },
-      { name: 'Prateado', image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/ipad-finish-select-202503-silver-wifi?wid=600&hei=600&fmt=png-alpha', hex: '#e3e4e6' },
+      { name: 'Azul', image: '/products/ipad-finish-select-202503-blue-wifi.webp', hex: '#63809e' },
+      { name: 'Amarelo', image: '/products/ipad-finish-select-202503-yellow-wifi.webp', hex: '#f5d665' },
+      { name: 'Rosa', image: '/products/ipad-finish-select-202503-pink-wifi.webp', hex: '#e3697e' },
+      { name: 'Prateado', image: '/products/ipad-finish-select-202503-silver-wifi.webp', hex: '#e3e4e6' },
     ],
   },
   {
@@ -424,13 +424,13 @@ export const allProducts: FeaturedProduct[] = [
     description: 'O OLED Ultra Retina XDR mais fino da historia com o chip M5.',
     specs: ['256 GB', 'Chip M5', 'Ultra Retina XDR 13"'],
     colors: ['Preto Espacial', 'Prateado'],
-    image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/ipad-pro-storage-select-202405-11inch-spaceblack?wid=600&hei=600&fmt=png-alpha',
+    image: '/products/ipad-pro-storage-select-202405-11inch-spaceblack.webp',
     storageOptions: [
       { storage: '256 GB', priceFrom: 'R$ 7.999' },
     ],
     colorOptions: [
-      { name: 'Preto Espacial', image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/ipad-pro-storage-select-202405-11inch-spaceblack?wid=600&hei=600&fmt=png-alpha', hex: '#2e2f31' },
-      { name: 'Prateado', image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/ipad-pro-storage-select-202405-11inch-silver?wid=600&hei=600&fmt=png-alpha', hex: '#e2e3e5' },
+      { name: 'Preto Espacial', image: '/products/ipad-pro-storage-select-202405-11inch-spaceblack.webp', hex: '#2e2f31' },
+      { name: 'Prateado', image: '/products/ipad-pro-storage-select-202405-11inch-silver.webp', hex: '#e2e3e5' },
     ],
   },
 
@@ -459,16 +459,16 @@ export const allProducts: FeaturedProduct[] = [
     description: 'O notebook mais amado do mundo, silencioso sem ventoinhas e bateria de ate 18h.',
     specs: ['Tela Liquid Retina 13.6"', 'Bateria ate 18h', 'MagSafe 3'],
     colors: ['Azul-ceu', 'Meia-noite', 'Prateado', 'Estelar'],
-    image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/mba13-skyblue-select-202503?wid=600&hei=600&fmt=png-alpha',
+    image: '/products/mba13-skyblue-select-202503.webp',
     storageOptions: [
       { storage: 'Neo 256GB', priceFrom: 'R$ 5.199' },
       { storage: 'M5 512GB', priceFrom: 'R$ 8.749' },
     ],
     colorOptions: [
-      { name: 'Azul-ceu', image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/mba13-skyblue-select-202503?wid=600&hei=600&fmt=png-alpha', hex: '#c6d6e3' },
-      { name: 'Meia-noite', image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/mba13-midnight-select-202503?wid=600&hei=600&fmt=png-alpha', hex: '#1c232e' },
-      { name: 'Prateado', image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/mba13-silver-select-202503?wid=600&hei=600&fmt=png-alpha', hex: '#e2e3e5' },
-      { name: 'Estelar', image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/mba13-starlight-select-202503?wid=600&hei=600&fmt=png-alpha', hex: '#f0e9df' },
+      { name: 'Azul-ceu', image: '/products/mba13-skyblue-select-202503.webp', hex: '#c6d6e3' },
+      { name: 'Meia-noite', image: '/products/mba13-midnight-select-202503.webp', hex: '#1c232e' },
+      { name: 'Prateado', image: '/products/mba13-silver-select-202503.webp', hex: '#e2e3e5' },
+      { name: 'Estelar', image: '/products/mba13-starlight-select-202503.webp', hex: '#f0e9df' },
     ],
   },
   {
@@ -479,13 +479,13 @@ export const allProducts: FeaturedProduct[] = [
     description: 'Desempenho monstruoso com chip M5, tela Liquid Retina XDR e HDMI/SDXC.',
     specs: ['512 GB SSD', 'Chip M5 Pro', 'Tela Liquid Retina XDR 120Hz'],
     colors: ['Preto Espacial', 'Prateado'],
-    image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/mbp14-spaceblack-select-202410?wid=600&hei=600&fmt=png-alpha',
+    image: '/products/mbp14-spaceblack-select-202410.webp',
     storageOptions: [
       { storage: '512 GB', priceFrom: 'R$ 11.999' },
     ],
     colorOptions: [
-      { name: 'Preto Espacial', image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/mbp14-spaceblack-select-202410?wid=600&hei=600&fmt=png-alpha', hex: '#262729' },
-      { name: 'Prateado', image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/mbp14-silver-select-202410?wid=600&hei=600&fmt=png-alpha', hex: '#e2e3e5' },
+      { name: 'Preto Espacial', image: '/products/mbp14-spaceblack-select-202410.webp', hex: '#262729' },
+      { name: 'Prateado', image: '/products/mbp14-silver-select-202410.webp', hex: '#e2e3e5' },
     ],
   },
 
@@ -498,13 +498,13 @@ export const allProducts: FeaturedProduct[] = [
     description: 'Ergonomia aprimorada, estojo USB-C compacto e audio espacial personalizavel.',
     specs: ['USB-C', 'Audio Espacial', 'Resistente a agua IP54'],
     colors: ['Branco'],
-    image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/airpods-4-hero-select-202409?wid=600&hei=600&fmt=png-alpha',
+    image: '/products/airpods-4-hero-select-202409.webp',
     storageOptions: [
       { storage: 'Sem ANC', priceFrom: 'R$ 1.349' },
       { storage: 'Com ANC', priceFrom: 'R$ 1.799' },
     ],
     colorOptions: [
-      { name: 'Branco', image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/airpods-4-hero-select-202409?wid=600&hei=600&fmt=png-alpha', hex: '#ffffff' },
+      { name: 'Branco', image: '/products/airpods-4-hero-select-202409.webp', hex: '#ffffff' },
     ],
   },
   {
@@ -515,13 +515,13 @@ export const allProducts: FeaturedProduct[] = [
     description: 'Cancelamento Ativo de Ruido 2x superior, modo Transparencia e estojo com alto-falante.',
     specs: ['USB-C', 'ANC Adaptativo', 'Busca de Precisao MagSafe'],
     colors: ['Branco'],
-    image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/airpods-pro-3-hero-select-202509?wid=600&hei=600&fmt=png-alpha',
+    image: '/products/airpods-pro-3-hero-select-202509.webp',
     storageOptions: [
       { storage: 'Pro 2', priceFrom: 'R$ 1.849' },
       { storage: 'Pro 3', priceFrom: 'R$ 2.099' },
     ],
     colorOptions: [
-      { name: 'Branco', image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/airpods-pro-3-hero-select-202509?wid=600&hei=600&fmt=png-alpha', hex: '#ffffff' },
+      { name: 'Branco', image: '/products/airpods-pro-3-hero-select-202509.webp', hex: '#ffffff' },
     ],
   },
   {
@@ -532,16 +532,16 @@ export const allProducts: FeaturedProduct[] = [
     description: 'Over-ear com drivers dinamicos Apple, cancelamento pro de ruido e conexao USB-C.',
     specs: ['USB-C', 'Titanio & Aluminio', 'Audio de Alta Fidelidade'],
     colors: ['Meia-noite', 'Estelar', 'Azul', 'Roxo', 'Laranja'],
-    image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/airpods-max-select-202409-midnight?wid=600&hei=600&fmt=png-alpha',
+    image: '/products/airpods-max-select-202409-midnight.webp',
     storageOptions: [
       { storage: 'USB-C Standard', priceFrom: 'R$ 3.799' },
     ],
     colorOptions: [
-      { name: 'Meia-noite', image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/airpods-max-select-202409-midnight?wid=600&hei=600&fmt=png-alpha', hex: '#2b2e33' },
-      { name: 'Estelar', image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/airpods-max-select-202409-starlight?wid=600&hei=600&fmt=png-alpha', hex: '#e3dfd8' },
-      { name: 'Azul', image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/airpods-max-select-202409-blue?wid=600&hei=600&fmt=png-alpha', hex: '#7e93ad' },
-      { name: 'Roxo', image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/airpods-max-select-202409-purple?wid=600&hei=600&fmt=png-alpha', hex: '#b9a8c9' },
-      { name: 'Laranja', image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/airpods-max-select-202409-orange?wid=600&hei=600&fmt=png-alpha', hex: '#e39a6a' },
+      { name: 'Meia-noite', image: '/products/airpods-max-select-202409-midnight.webp', hex: '#2b2e33' },
+      { name: 'Estelar', image: '/products/airpods-max-select-202409-starlight.webp', hex: '#e3dfd8' },
+      { name: 'Azul', image: '/products/airpods-max-select-202409-blue.webp', hex: '#7e93ad' },
+      { name: 'Roxo', image: '/products/airpods-max-select-202409-purple.webp', hex: '#b9a8c9' },
+      { name: 'Laranja', image: '/products/airpods-max-select-202409-orange.webp', hex: '#e39a6a' },
     ],
   },
   {
