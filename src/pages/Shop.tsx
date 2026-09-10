@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Search, ShoppingBag, X } from 'lucide-react'
+import { SiteFooter } from '@/components/SiteFooter'
 import { SiteHeader } from '@/components/SiteHeader'
 import { useCartStore } from '@/store/useCartStore'
 import { useProductModalStore } from '@/store/useProductModalStore'
@@ -310,6 +311,7 @@ export default function Shop() {
           )}
         </section>
       </main>
+      <SiteFooter />
     </div>
   )
 }

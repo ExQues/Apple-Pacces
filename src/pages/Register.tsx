@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { BrandLogo } from '@/components/BrandLogo'
 import { ArrowLeft, Eye, EyeOff, Mail, Lock, User, Phone } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 
@@ -71,42 +72,26 @@ export default function Register() {
   }
 
   return (
-    <div className="flex min-h-screen bg-[#f8f8f6]">
+    <div className="flex min-h-screen bg-[#f5f5f7]">
       {/* Painel esquerdo decorativo */}
       <div className="relative hidden w-[45%] overflow-hidden bg-zinc-950 lg:block">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(56,189,248,0.15),transparent_60%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(168,85,247,0.1),transparent_60%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(150,40,62,0.35),transparent_60%)]" />
         <div className="relative flex h-full flex-col justify-between p-12">
-          <Link to="/" className="flex items-center gap-3">
-            <span className="grid size-10 place-items-center rounded-full border border-white/20 bg-white/10 text-sm font-semibold text-white backdrop-blur">
-              AP
-            </span>
-            <span className="text-sm font-semibold tracking-[0.28em] text-white/80">PACCES</span>
+          <Link to="/" className="text-white transition-opacity hover:opacity-80" aria-label="Apple Pacces, página inicial">
+            <BrandLogo />
           </Link>
 
           <div className="max-w-sm">
             <h2 className="font-display text-4xl font-semibold leading-tight tracking-[-0.04em] text-white">
-              Junte-se à curadoria Apple Pacces.
+              Crie sua conta Apple Pacces.
             </h2>
             <p className="mt-5 text-base leading-7 text-zinc-400">
-              Crie sua conta e tenha acesso a recomendações personalizadas, condições exclusivas e atendimento prioritário.
+              Acompanhe seus pedidos, salve a sacola e finalize a compra em poucos passos.
             </p>
 
-            <div className="mt-10 grid grid-cols-3 gap-6 border-t border-white/10 pt-8">
-              {[
-                ['+900', 'clientes'],
-                ['24h', 'resposta'],
-                ['100%', 'curadoria'],
-              ].map(([val, label]) => (
-                <div key={label}>
-                  <p className="text-xl font-semibold text-white">{val}</p>
-                  <p className="mt-1 text-xs text-zinc-500">{label}</p>
-                </div>
-              ))}
-            </div>
           </div>
 
-          <p className="text-xs text-zinc-600">© 2026 Apple Pacces. Todos os direitos reservados.</p>
+          <p className="text-xs text-zinc-500">© {new Date().getFullYear()} Apple Pacces. Todos os direitos reservados.</p>
         </div>
       </div>
 

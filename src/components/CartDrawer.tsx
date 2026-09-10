@@ -105,7 +105,7 @@ export function CartDrawer() {
                 >
                   <div className="flex gap-0">
                     {/* Thumbnail em Gradiente Titanium */}
-                    <div className="flex w-[90px] flex-shrink-0 items-center justify-center bg-gradient-to-b from-slate-100/90 to-zinc-100/70 p-3 border-r border-zinc-200/60">
+                    <div className="flex w-[90px] flex-shrink-0 items-center justify-center bg-[#f5f5f7] p-3">
                       <img
                         src={item.image}
                         alt={item.name}

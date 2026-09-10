@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { BrandLogo } from '@/components/BrandLogo'
 import { ArrowLeft, Eye, EyeOff, Mail, Lock } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 
@@ -61,17 +62,13 @@ export default function Login() {
   }
 
   return (
-    <div className="flex min-h-screen bg-[#f8f8f6]">
+    <div className="flex min-h-screen bg-[#f5f5f7]">
       {/* Painel esquerdo decorativo */}
       <div className="relative hidden w-[45%] overflow-hidden bg-zinc-950 lg:block">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(56,189,248,0.15),transparent_60%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(168,85,247,0.1),transparent_60%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(150,40,62,0.35),transparent_60%)]" />
         <div className="relative flex h-full flex-col justify-between p-12">
-          <Link to="/" className="flex items-center gap-3">
-            <span className="grid size-10 place-items-center rounded-full border border-white/20 bg-white/10 text-sm font-semibold text-white backdrop-blur">
-              AP
-            </span>
-            <span className="text-sm font-semibold tracking-[0.28em] text-white/80">PACCES</span>
+          <Link to="/" className="text-white transition-opacity hover:opacity-80" aria-label="Apple Pacces, página inicial">
+            <BrandLogo />
           </Link>
 
           <div className="max-w-sm">
@@ -83,7 +80,7 @@ export default function Login() {
             </p>
           </div>
 
-          <p className="text-xs text-zinc-600">© 2026 Apple Pacces. Todos os direitos reservados.</p>
+          <p className="text-xs text-zinc-500">© {new Date().getFullYear()} Apple Pacces. Todos os direitos reservados.</p>
         </div>
       </div>
 
@@ -135,7 +132,7 @@ export default function Login() {
                 <button
                   type="button"
                   onClick={handleForgotPassword}
-                  className="text-xs font-semibold text-sky-600 transition hover:text-sky-800"
+                  className="text-xs font-semibold text-[#0066cc] transition hover:underline"
                 >
                   Esqueci a senha
                 </button>

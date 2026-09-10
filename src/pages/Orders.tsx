@@ -243,7 +243,7 @@ export default function Orders() {
                           href="https://wa.me/5500000000000"
                           target="_blank"
                           rel="noreferrer"
-                          className="inline-flex items-center gap-1.5 text-xs font-semibold text-sky-600 transition hover:text-sky-800"
+                          className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0066cc] transition hover:underline"
                         >
                           Falar com consultor
                           <ExternalLink className="size-3.5" />

@@ -6,6 +6,15 @@ import tsconfigPaths from "vite-tsconfig-paths";
 export default defineConfig({
   build: {
     sourcemap: 'hidden',
+    rollupOptions: {
+      output: {
+        // Bibliotecas em pacotes separados: carregam em paralelo e ficam em cache entre deploys
+        manualChunks: {
+          react: ['react', 'react-dom', 'react-router-dom'],
+          supabase: ['@supabase/supabase-js'],
+        },
+      },
+    },
   },
   test: {
     environment: 'jsdom',

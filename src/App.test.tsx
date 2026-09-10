@@ -11,7 +11,7 @@ describe('App', () => {
 
     expect(screen.getByRole('heading', { name: /^loja\.$/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^todos/i })).toBeInTheDocument()
-    expect(screen.getByText(/lacrados, com garantia apple de 1 ano/i)).toBeInTheDocument()
+    expect(screen.getByText(/todos os produtos lacrados, com garantia apple de 1 ano/i)).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'iPhone 17 Pro Max' })).toBeInTheDocument()
   })
 

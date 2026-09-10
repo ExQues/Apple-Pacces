@@ -80,7 +80,7 @@ export function ProductModal() {
           </button>
 
           {/* Imagem do Produto em Container Titanium Suave */}
-          <div className="flex h-64 items-center justify-center bg-gradient-to-b from-slate-100/90 via-zinc-100/80 to-slate-200/60 p-8 sm:h-80 border-b border-zinc-200/60">
+          <div className="flex h-64 items-center justify-center bg-[#f5f5f7] p-8 sm:h-80">
             <img
               src={activeImage}
               alt={product.name}
