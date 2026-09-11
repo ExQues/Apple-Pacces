@@ -1,3 +1,4 @@
+import { productImgProps } from '@/lib/images'
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Minus, Plus, ShoppingBag, X } from 'lucide-react'
@@ -90,7 +91,7 @@ export function CartDrawer() {
               {items.map((item) => (
                 <li key={item.cartItemId} className="flex gap-4 py-5">
                   <div className="grid size-20 flex-none place-items-center rounded-2xl bg-[#f5f5f7] p-2">
-                    <img src={item.image} alt={item.name} className="max-h-full max-w-full object-contain" />
+                    <img {...productImgProps(item.image, '80px')} alt={item.name} className="max-h-full max-w-full object-contain" />
                   </div>
 
                   <div className="flex min-w-0 flex-1 flex-col">

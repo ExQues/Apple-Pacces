@@ -10,6 +10,11 @@ import { useProducts } from '@/hooks/useProducts'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { productPath } from '@/lib/slug'
 import { byDisplayOrder } from '@/lib/catalogOrder'
+import { preloadProductImage, productImgProps } from '@/lib/images'
+import { SmoothImage } from '@/components/SmoothImage'
+
+// Tamanho em que a foto aparece no card (o navegador escolhe a versão leve ou a original)
+const CARD_IMAGE_SIZES = '(min-width: 1280px) 400px, (min-width: 768px) 45vw, 90vw'
 import { categoryCovers, type FeaturedProduct } from '@/data/appleStore'
 
 const CATEGORY_FILTERS = ['Todos', 'iPhone', 'Mac', 'iPad', 'Apple Watch', 'Acessórios'] as const
@@ -58,7 +63,7 @@ function ShelfStrip({
           const cover = products.find((p) => p.name === categoryCovers[category])
           return (
             <button key={category} type="button" onClick={() => onSelectCategory(category)} className={tileClass}>
-              <span className={imageBox}>{cover && <img src={cover.image} alt="" className={imageClass} />}</span>
+              <span className={imageBox}>{cover && <img {...productImgProps(cover.image, '112px')} alt="" className={imageClass} />}</span>
               <span className="text-xs font-medium text-zinc-700">{category === 'Apple Watch' ? 'Watch' : category}</span>
             </button>
           )
@@ -73,7 +78,7 @@ function ShelfStrip({
       {selected === 'iPhone' && (
         <Link to="/" className={tileClass}>
           <span className={imageBox}>
-            <img src="/products/iphone-18-pro-finish-select-202609-6-9inch-burgundy.webp" alt="" className={imageClass} />
+            <img {...productImgProps('/products/iphone-18-pro-finish-select-202609-6-9inch-burgundy.webp', '112px')} alt="" className={imageClass} />
           </span>
           <span className="text-xs font-medium text-zinc-700">
             iPhone 18 Pro
@@ -84,7 +89,7 @@ function ShelfStrip({
       {models.map((p) => (
         <Link key={p.name} to={productPath(p.name)} className={`${tileClass} ${p.status === 'em-falta' ? 'opacity-50' : ''}`}>
           <span className={imageBox}>
-            <img src={p.image} alt="" className={imageClass} />
+            <img {...productImgProps(p.image, '112px')} alt="" className={imageClass} />
           </span>
           <span className="text-xs font-medium leading-4 text-zinc-700">{p.name}</span>
         </Link>
@@ -114,36 +119,8 @@ function ProductCard({ product }: { product: FeaturedProduct }) {
   const activeColorObj = product.colorOptions?.find((c) => c.name === selectedColor)
   const activeImage = activeColorObj?.image || product.image
 
-  // Pré-carregamento em cache das imagens de todas as variações de cores do produto
-  useEffect(() => {
-    if (product.colorOptions && product.colorOptions.length > 0) {
-      product.colorOptions.forEach((opt) => {
-        const img = new Image()
-        img.src = opt.image
-      })
-    }
-  }, [product])
-
-  // Transição suave de troca de imagem sem tela branca / piscada
-  const [displaySrc, setDisplaySrc] = useState(activeImage)
-  const [isChanging, setIsChanging] = useState(false)
-  const [imageLoaded, setImageLoaded] = useState(false)
-
-  // Foto que já estava no cache pode terminar de carregar antes do onLoad ser ligado
-  useEffect(() => {
-    if (imgRef.current?.complete) setImageLoaded(true)
-  }, [displaySrc])
-
-  useEffect(() => {
-    if (activeImage !== displaySrc) {
-      setIsChanging(true)
-      const timeout = setTimeout(() => {
-        setDisplaySrc(activeImage)
-        setIsChanging(false)
-      }, 100)
-      return () => clearTimeout(timeout)
-    }
-  }, [activeImage, displaySrc])
+  // Baixa as outras cores só quando o cliente mostra interesse (mouse por cima ou toque)
+  const preloadColors = () => product.colorOptions?.forEach((c) => preloadProductImage(c.image, CARD_IMAGE_SIZES))
 
   const handleAddToCart = () => {
     const success = addItemSilently(product, selectedColor, selectedStorage, activePrice, activeImage)
@@ -158,30 +135,20 @@ function ProductCard({ product }: { product: FeaturedProduct }) {
   return (
     <article
       id={productAnchor(product.name)}
+      onPointerEnter={preloadColors}
       className="group flex scroll-mt-36 flex-col overflow-hidden rounded-3xl bg-white transition duration-300 hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)]"
     >
       <div className="relative flex h-72 items-center justify-center p-10">
-        <img
-          ref={imgRef}
-          src={displaySrc}
-          alt={`${product.name} na cor ${selectedColor}`}
-          loading="lazy"
-          decoding="async"
-          onLoad={() => setImageLoaded(true)}
-          onError={(e) => {
-            const target = e.currentTarget
-            target.onerror = null
-            setImageLoaded(true)
-            target.src =
-              'data:image/svg+xml;utf8,' +
-              encodeURIComponent(
-                `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect width="400" height="300" fill="%23ffffff"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="system-ui" font-size="20" fill="%239ca3af">${product.name}</text></svg>`,
-              )
-          }}
-          className={`h-full w-full object-contain transition-all duration-500 ease-out group-hover:scale-[1.03] ${
-            !imageLoaded || isChanging ? 'opacity-0' : isSoldOut ? 'opacity-60' : 'opacity-100'
-          }`}
-        />
+        <div className="h-full w-full transition-transform duration-500 group-hover:scale-[1.03]">
+          <SmoothImage
+            imgRef={imgRef}
+            src={activeImage}
+            alt={`${product.name} na cor ${selectedColor}`}
+            sizes={CARD_IMAGE_SIZES}
+            dimmed={isSoldOut}
+            className="h-full w-full object-contain"
+          />
+        </div>
         <Link to={productPath(product.name)} className="absolute inset-0 rounded-t-3xl" aria-label={`Ver detalhes do ${product.name}`} />
         {isSoldOut && (
           <span className="absolute left-5 top-5 rounded-full bg-zinc-100 px-3 py-1 text-xs font-semibold text-zinc-500">

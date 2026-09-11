@@ -1,3 +1,4 @@
+import { SmoothImage } from '@/components/SmoothImage'
 import { useEffect, useState } from 'react'
 import { Check, ShieldCheck, ShoppingBag, Truck, X } from 'lucide-react'
 import { useProductModalStore } from '@/store/useProductModalStore'
@@ -71,12 +72,12 @@ export function ProductModal() {
 
           {/* Foto */}
           <div className="flex items-center justify-center bg-[#f5f5f7] p-10 md:p-12">
-            <img
-              key={activeImage}
+            <SmoothImage
               src={activeImage}
               alt={`${product.name} na cor ${activeColor}`}
+              sizes="(min-width: 768px) 420px, 80vw"
+              loading="eager"
               className="h-60 w-auto object-contain sm:h-80"
-              style={{ animation: 'fadeIn 0.3s ease-out' }}
             />
           </div>
 

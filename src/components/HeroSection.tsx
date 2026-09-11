@@ -1,4 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { SmoothImage } from '@/components/SmoothImage'
+import { preloadProductImage, productImgProps } from '@/lib/images'
 import { ArrowUpRight, BadgeCheck, CalendarClock, CreditCard, PackageCheck } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Reveal } from '@/components/Reveal'
@@ -32,6 +34,8 @@ const PRO_MODELS = [
   },
 ]
 
+const SWITCHER_SIZES = '(min-width: 1024px) 480px, 80vw'
+
 const perks = [
   { icon: PackageCheck, label: 'Lacrados' },
   { icon: BadgeCheck, label: 'Garantia Apple 1 ano' },
@@ -40,6 +44,11 @@ const perks = [
 
 export function HeroSection() {
   const [color, setColor] = useState(PRO_COLORS[0])
+
+  // Deixa as quatro cores prontas para a troca ser instantânea
+  useEffect(() => {
+    PRO_COLORS.forEach((c) => preloadProductImage(c.image, SWITCHER_SIZES))
+  }, [])
 
   return (
     <section id="inicio" className="relative isolate overflow-hidden bg-black text-white">
@@ -96,7 +105,7 @@ export function HeroSection() {
 
         <div className="relative animate-rise [animation-delay:120ms]">
           <img
-            src={PRO_COLORS[0].image}
+            {...productImgProps(PRO_COLORS[0].image, '(min-width: 1024px) 512px, (min-width: 640px) 448px, 288px')}
             alt="iPhone 18 Pro Max na cor Bordô"
             loading="eager"
             decoding="async"
@@ -139,12 +148,11 @@ export function HeroSection() {
         <Reveal>
           <div className="grid items-center gap-10 rounded-[2rem] bg-zinc-900/60 p-8 sm:p-12 lg:grid-cols-2">
             <div className="flex h-72 items-center justify-center sm:h-96">
-              <img
-                key={color.name}
+              <SmoothImage
                 src={color.image}
                 alt={`iPhone 18 Pro Max na cor ${color.name}`}
-                loading="lazy"
-                className="max-h-full w-auto animate-page-in object-contain"
+                sizes={SWITCHER_SIZES}
+                className="max-h-full w-auto object-contain"
               />
             </div>
             <div>
@@ -182,7 +190,7 @@ export function HeroSection() {
               className="group flex flex-col gap-4 overflow-hidden rounded-3xl border border-white/10 bg-zinc-900/60 p-4 transition hover:border-white/25 hover:bg-zinc-900 sm:p-6 lg:flex-row lg:items-center lg:gap-6 lg:p-8"
             >
               <img
-                src={model.image}
+                {...productImgProps(model.image, '(min-width: 1024px) 180px, 150px')}
                 alt={model.name}
                 loading="lazy"
                 className="mx-auto h-36 w-auto flex-none object-contain transition duration-500 group-hover:scale-105 sm:h-44 lg:mx-0 lg:h-56"

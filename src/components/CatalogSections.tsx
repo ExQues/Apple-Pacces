@@ -1,3 +1,4 @@
+import { productImgProps } from '@/lib/images'
 import { ChevronRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { allProducts, categories, categoryCovers } from '@/data/appleStore'
@@ -36,7 +37,7 @@ export function CatalogSections() {
               >
                 <div className="flex h-36 w-full items-center justify-center">
                   <img
-                    src={cover.image}
+                    {...productImgProps(cover.image, '(min-width: 1024px) 220px, 45vw')}
                     alt={category.name}
                     loading="lazy"
                     className="h-full w-full object-contain transition duration-500 group-hover:scale-105"

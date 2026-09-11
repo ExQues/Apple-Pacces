@@ -1,4 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { SmoothImage } from '@/components/SmoothImage'
+import { preloadProductImage, productImgProps } from '@/lib/images'
 import { Link } from 'react-router-dom'
 import { Reveal } from '@/components/Reveal'
 import { allProducts } from '@/data/appleStore'
@@ -6,6 +8,8 @@ import { productPath } from '@/lib/slug'
 
 // Seções dos lançamentos de setembro de 2026, com dados oficiais da Apple Brasil.
 // Preços entram quando o fornecedor liberar.
+
+const SWITCHER_SIZES = '(min-width: 1024px) 480px, 80vw'
 
 const DUO_COLORS = [
   { name: 'Céu noturno', hex: '#2b3444', image: '/products/iphone-duo-finish-select-202609-nightsky.webp' },
@@ -30,6 +34,11 @@ const DUO_DETAILS = [
 
 export function DuoSection() {
   const [color, setColor] = useState(DUO_COLORS[0])
+
+  // Deixa as duas cores prontas para a troca ser instantânea
+  useEffect(() => {
+    DUO_COLORS.forEach((c) => preloadProductImage(c.image, SWITCHER_SIZES))
+  }, [])
 
   return (
     <section id="iphone-duo" className="bg-white px-5 pb-24 text-zinc-950 lg:px-8" aria-labelledby="duo-title">
@@ -67,12 +76,11 @@ export function DuoSection() {
         <Reveal>
           <div className="mt-20 grid items-center gap-10 rounded-[2rem] bg-[#f5f5f7] p-8 sm:p-12 lg:grid-cols-2">
             <div className="flex h-64 items-center justify-center sm:h-80">
-              <img
-                key={color.name}
+              <SmoothImage
                 src={color.image}
                 alt={`iPhone Duo na cor ${color.name}`}
-                loading="lazy"
-                className="max-h-full w-auto animate-page-in object-contain"
+                sizes={SWITCHER_SIZES}
+                className="max-h-full w-auto object-contain"
               />
             </div>
             <div>
@@ -202,7 +210,7 @@ export function ReadyToShipSection() {
             >
               <div className="flex h-40 items-center justify-center">
                 <img
-                  src={product.image}
+                  {...productImgProps(product.image, '(min-width: 1024px) 200px, 60vw')}
                   alt={product.name}
                   loading="lazy"
                   className="h-full w-auto object-contain transition duration-500 group-hover:scale-105"

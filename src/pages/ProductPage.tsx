@@ -7,6 +7,10 @@ import { useProducts } from '@/hooks/useProducts'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { productPath, productSlug } from '@/lib/slug'
 import { byDisplayOrder } from '@/lib/catalogOrder'
+import { preloadProductImage, productImgProps } from '@/lib/images'
+import { SmoothImage } from '@/components/SmoothImage'
+
+const MAIN_IMAGE_SIZES = '(min-width: 1024px) 640px, 90vw'
 import { useCartStore } from '@/store/useCartStore'
 import NotFound from '@/pages/NotFound'
 
@@ -29,6 +33,11 @@ function ProductDetails({ productName }: { productName: string }) {
   const [selectedStorage, setSelectedStorage] = useState(product.storageOptions?.[0]?.storage ?? '')
   const [selectedColor, setSelectedColor] = useState(product.colorOptions?.[0]?.name ?? product.colors[0] ?? '')
   const [added, setAdded] = useState(false)
+
+  // Deixa as outras cores prontas para a troca ser instantânea
+  useEffect(() => {
+    product.colorOptions?.forEach((c) => preloadProductImage(c.image, MAIN_IMAGE_SIZES))
+  }, [product])
 
   useEffect(() => {
     if (!added) return
@@ -95,11 +104,13 @@ function ProductDetails({ productName }: { productName: string }) {
             {/* Fotos */}
             <div className="lg:sticky lg:top-20">
               <div className="flex items-center justify-center rounded-3xl bg-white p-8 sm:p-12">
-                <img
-                  key={activeImage}
+                <SmoothImage
                   src={activeImage}
                   alt={`${product.name} na cor ${selectedColor}`}
-                  className={`h-72 w-auto object-contain sm:h-[28rem] ${isSoldOut ? 'opacity-60' : ''}`}
+                  sizes={MAIN_IMAGE_SIZES}
+                  loading="eager"
+                  dimmed={isSoldOut}
+                  className="h-72 w-auto object-contain sm:h-[28rem]"
                 />
               </div>
               {product.colorOptions && product.colorOptions.length > 1 && (
@@ -115,7 +126,7 @@ function ProductDetails({ productName }: { productName: string }) {
                         selectedColor === c.name ? 'ring-2 ring-zinc-950' : 'opacity-70 hover:opacity-100'
                       }`}
                     >
-                      <img src={c.image} alt="" className="max-h-full max-w-full object-contain" />
+                      <img {...productImgProps(c.image, '80px')} alt="" className="max-h-full max-w-full object-contain" />
                     </button>
                   ))}
                 </div>
@@ -231,7 +242,7 @@ function ProductDetails({ productName }: { productName: string }) {
                     to={productPath(p.name)}
                     className="group flex flex-col items-center rounded-3xl bg-white p-6 text-center transition hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)]"
                   >
-                    <img src={p.image} alt="" loading="lazy" className="h-32 w-auto object-contain transition duration-500 group-hover:scale-105 sm:h-40" />
+                    <img {...productImgProps(p.image, '220px')} alt="" loading="lazy" className="h-32 w-auto object-contain transition duration-500 group-hover:scale-105 sm:h-40" />
                     <p className="mt-5 font-semibold">{p.name}</p>
                     <p className="mt-1 text-sm text-zinc-500">a partir de {p.priceFrom}</p>
                   </Link>

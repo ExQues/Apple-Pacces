@@ -1,3 +1,4 @@
+import { productImgProps } from '@/lib/images'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Lock, Search, ShoppingBag } from 'lucide-react'
@@ -264,7 +265,7 @@ export default function Checkout() {
                   {items.map((item) => (
                     <li key={item.cartItemId} className="flex items-center gap-4 py-4 first:pt-0">
                       <div className="grid size-14 flex-none place-items-center rounded-xl bg-[#f5f5f7] p-1.5">
-                        <img src={item.image} alt="" className="max-h-full max-w-full object-contain" />
+                        <img {...productImgProps(item.image, '56px')} alt="" className="max-h-full max-w-full object-contain" />
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="text-sm font-medium text-zinc-950">{item.name}</p>
