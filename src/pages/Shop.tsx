@@ -8,6 +8,8 @@ import { useProductModalStore } from '@/store/useProductModalStore'
 import { useFlyingAnimationStore } from '@/store/useFlyingAnimationStore'
 import { useProducts } from '@/hooks/useProducts'
 import { usePageTitle } from '@/hooks/usePageTitle'
+import { productPath } from '@/lib/slug'
+import { byDisplayOrder } from '@/lib/catalogOrder'
 import { categoryCovers, type FeaturedProduct } from '@/data/appleStore'
 
 const CATEGORY_FILTERS = ['Todos', 'iPhone', 'Mac', 'iPad', 'Apple Watch', 'Acessórios'] as const
@@ -21,13 +23,6 @@ const CATEGORY_INTRO: Record<CategoryFilter, string> = {
   iPad: 'Do iPad 11 ao iPad Pro com chip M5, para estudar, trabalhar e desenhar.',
   'Apple Watch': 'Saúde, treino e notificações no pulso. Do SE ao Ultra.',
   Acessórios: 'AirPods, AirTag e Apple Pencil originais.',
-}
-
-// Lançamentos primeiro; produtos em falta sempre por último
-const HIGHLIGHT_ORDER = ['iPhone 17 Pro Max', 'iPhone 17 Pro', 'iPhone 17 Air', 'iPhone 17', 'iPhone 17e']
-const displayRank = (p: FeaturedProduct) => {
-  const highlight = HIGHLIGHT_ORDER.indexOf(p.name)
-  return (p.status === 'em-falta' ? 1000 : 0) + (highlight >= 0 ? highlight : 100)
 }
 
 const productAnchor = (name: string) => `produto-${name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`
@@ -72,7 +67,7 @@ function ShelfStrip({
     )
   }
 
-  const models = products.filter((p) => p.category === selected).sort((a, b) => displayRank(a) - displayRank(b))
+  const models = products.filter((p) => p.category === selected).sort(byDisplayOrder)
   return (
     <nav aria-label={`Modelos de ${selected}`} className="mt-6 flex gap-2 overflow-x-auto pb-2 [scrollbar-width:none]">
       {selected === 'iPhone' && (
@@ -87,17 +82,12 @@ function ShelfStrip({
         </Link>
       )}
       {models.map((p) => (
-        <button
-          key={p.name}
-          type="button"
-          onClick={() => document.getElementById(productAnchor(p.name))?.scrollIntoView?.({ behavior: 'smooth', block: 'start' })}
-          className={`${tileClass} ${p.status === 'em-falta' ? 'opacity-50' : ''}`}
-        >
+        <Link key={p.name} to={productPath(p.name)} className={`${tileClass} ${p.status === 'em-falta' ? 'opacity-50' : ''}`}>
           <span className={imageBox}>
             <img src={p.image} alt="" className={imageClass} />
           </span>
           <span className="text-xs font-medium leading-4 text-zinc-700">{p.name}</span>
-        </button>
+        </Link>
       ))}
     </nav>
   )
@@ -192,6 +182,7 @@ function ProductCard({ product }: { product: FeaturedProduct }) {
             !imageLoaded || isChanging ? 'opacity-0' : isSoldOut ? 'opacity-60' : 'opacity-100'
           }`}
         />
+        <Link to={productPath(product.name)} className="absolute inset-0 rounded-t-3xl" aria-label={`Ver detalhes do ${product.name}`} />
         {isSoldOut && (
           <span className="absolute left-5 top-5 rounded-full bg-zinc-100 px-3 py-1 text-xs font-semibold text-zinc-500">
             Em falta
@@ -221,7 +212,9 @@ function ProductCard({ product }: { product: FeaturedProduct }) {
           </div>
         )}
 
-        <h2 className="mt-4 text-xl font-semibold tracking-tight text-zinc-950">{product.name}</h2>
+        <h2 className="mt-4 text-xl font-semibold tracking-tight text-zinc-950">
+          <Link to={productPath(product.name)} className="hover:underline">{product.name}</Link>
+        </h2>
         <p className="mt-1.5 line-clamp-2 text-sm leading-6 text-zinc-500">{product.description}</p>
 
         {/* Seletor de capacidade */}
@@ -329,7 +322,7 @@ export default function Shop() {
           p.description.toLowerCase().includes(term)
         )
       })
-      .sort((a, b) => displayRank(a) - displayRank(b))
+      .sort(byDisplayOrder)
   }, [query, selected, products])
 
   const totalByCategory = useMemo(() => {

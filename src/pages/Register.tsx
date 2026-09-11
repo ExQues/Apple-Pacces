@@ -28,8 +28,8 @@ export default function Register() {
       return
     }
 
-    if (password.length < 6) {
-      setError('A senha deve ter pelo menos 6 caracteres.')
+    if (password.length < 8) {
+      setError('A senha deve ter pelo menos 8 caracteres.')
       setLoading(false)
       return
     }
@@ -192,11 +192,11 @@ export default function Register() {
                 <input
                   type={showPassword ? 'text' : 'password'}
                   required
-                  minLength={6}
+                  minLength={8}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full rounded-2xl border border-zinc-200 bg-white py-3.5 pl-12 pr-12 text-[15px] text-zinc-950 outline-none transition placeholder:text-zinc-400 focus:border-zinc-400 focus:ring-4 focus:ring-zinc-100"
-                  placeholder="Mínimo 6 caracteres"
+                  placeholder="Mínimo 8 caracteres"
                 />
                 <button
                   type="button"
@@ -206,7 +206,7 @@ export default function Register() {
                   {showPassword ? <EyeOff className="size-[18px]" /> : <Eye className="size-[18px]" />}
                 </button>
               </div>
-              <p className="mt-1.5 text-xs text-zinc-400">Mínimo de 6 caracteres</p>
+              <p className="mt-1.5 text-xs text-zinc-400">Mínimo de 8 caracteres</p>
             </div>
 
             {/* Submit */}

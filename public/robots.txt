@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /checkout
+Disallow: /pedidos
+Disallow: /login
+Disallow: /register
+
+Sitemap: https://aple-pacces.netlify.app/sitemap.xml

@@ -1,6 +1,7 @@
 import { ArrowUpRight, BadgeCheck, CalendarClock, CreditCard, PackageCheck } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { allProducts } from '@/data/appleStore'
+import { productPath } from '@/lib/slug'
 
 // Lançamento: preço entra quando o fornecedor liberar (preço do fornecedor + R$ 500)
 const IPHONE_18_COLORS = [
@@ -176,7 +177,7 @@ export function HeroSection() {
           {lineup.map((product) => (
             <Link
               key={product.name}
-              to={`/shop?category=iPhone&q=${encodeURIComponent(product.name)}`}
+              to={productPath(product.name)}
               className="group min-w-[62%] snap-start rounded-3xl border border-white/10 bg-zinc-900/60 p-5 transition hover:-translate-y-1 hover:border-white/25 hover:bg-zinc-900 sm:min-w-[40%] lg:min-w-0"
             >
               <div className="flex h-40 items-center justify-center">

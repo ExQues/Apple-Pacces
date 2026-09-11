@@ -40,9 +40,15 @@ export function ContactSection() {
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
+  // Campo invisível: pessoas não veem nem preenchem; robôs de spam preenchem
+  const [trap, setTrap] = useState('')
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
+    if (trap) {
+      setSubmitted(true)
+      return
+    }
     if (!name.trim() || !phone.trim()) {
       setErrorMessage('Preencha seu nome e WhatsApp.')
       return
@@ -107,6 +113,16 @@ export function ContactSection() {
             {errorMessage && (
               <div className="mb-4 rounded-xl bg-red-50 p-3 text-sm font-medium text-red-600">{errorMessage}</div>
             )}
+            <input
+              type="text"
+              name="empresa"
+              value={trap}
+              onChange={(e) => setTrap(e.target.value)}
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+              className="absolute -left-[9999px] h-0 w-0 opacity-0"
+            />
             <div className="grid gap-5 sm:grid-cols-2">
               <label className="text-sm font-medium text-zinc-700">
                 Nome

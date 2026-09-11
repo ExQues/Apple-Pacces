@@ -20,6 +20,7 @@ const Orders = lazy(() => import("@/pages/Orders"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
 const Privacidade = lazy(() => import("@/pages/Privacidade"));
 const Trocas = lazy(() => import("@/pages/Trocas"));
+const ProductPage = lazy(() => import("@/pages/ProductPage"));
 // Pré-visualização de telas para revisão de design; só existe no ambiente local
 const DevPreview = import.meta.env.DEV ? lazy(() => import("@/pages/DevPreview")) : null;
 
@@ -46,6 +47,7 @@ export default function App() {
       import("@/pages/Register");
       import("@/pages/Checkout");
       import("@/pages/Orders");
+      import("@/pages/ProductPage");
     };
     const idle = (window as Window & { requestIdleCallback?: (cb: () => void) => number }).requestIdleCallback;
     if (idle) idle(preload);
@@ -81,6 +83,7 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/produto/:slug" element={<ProductPage />} />
           <Route path="/privacidade" element={<Privacidade />} />
           <Route path="/trocas" element={<Trocas />} />
           {DevPreview && <Route path="/__preview" element={<DevPreview />} />}
