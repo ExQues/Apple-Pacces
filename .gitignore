@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+# Segredos e ferramentas locais (nunca enviar ao GitHub)
+.env
+.env.*
+!.env.example
+.netlify/
+.claude/

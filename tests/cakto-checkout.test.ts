@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import precos from './precos.json'
-import checkout from './cakto-checkout.cjs'
+import precos from '../netlify/functions/precos.json'
+import checkout from '../netlify/functions/cakto-checkout.cjs'
 
 const { handler, calcularPedido } = checkout as {
   handler: (event: { httpMethod: string; body?: string }) => Promise<{ statusCode: number; body: string }>
