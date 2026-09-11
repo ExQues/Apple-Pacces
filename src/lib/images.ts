@@ -7,15 +7,20 @@ export function productImgProps(src: string, sizes: string) {
   return { src: small, srcSet: `${small} 480w, ${src} 1000w`, sizes }
 }
 
-// Baixa a foto com antecedência (mesma versão que o navegador vai escolher na tela)
+// Baixa a foto com antecedência (mesma versão que o navegador vai escolher na tela).
+// Resolve quando o download termina: não depende de decode(), que alguns navegadores
+// pausam em abas em segundo plano.
 export function preloadProductImage(src: string, sizes: string): Promise<void> {
   const props = productImgProps(src, sizes)
   const img = new Image()
-  if (props.srcSet) {
-    img.sizes = sizes
-    img.srcset = props.srcSet
-  }
-  img.src = props.src
-  if (typeof img.decode !== 'function') return Promise.resolve()
-  return img.decode().catch(() => undefined)
+  return new Promise((resolve) => {
+    img.onload = () => resolve()
+    img.onerror = () => resolve()
+    if (props.srcSet) {
+      img.sizes = sizes
+      img.srcset = props.srcSet
+    }
+    img.src = props.src
+    if (img.complete) resolve()
+  })
 }
