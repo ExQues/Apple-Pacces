@@ -153,6 +153,7 @@ function ProductCard({ product }: { product: FeaturedProduct }) {
           <div>
             <p className="text-xs text-zinc-500">A partir de</p>
             <p className="text-xl font-semibold tracking-tight text-zinc-950">{activePrice}</p>
+            <p className="text-xs text-zinc-500">em até 18x no cartão</p>
           </div>
           {isSoldOut ? (
             <span className="rounded-full bg-zinc-100 px-4 py-2 text-xs font-semibold text-zinc-400">Esgotado</span>

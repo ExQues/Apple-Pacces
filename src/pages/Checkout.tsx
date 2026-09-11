@@ -1,27 +1,32 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { ArrowLeft, ShoppingBag, ArrowRight, User, MapPin, Search } from 'lucide-react'
+import { Lock, Search, ShoppingBag } from 'lucide-react'
+import { SiteFooter } from '@/components/SiteFooter'
+import { SiteHeader } from '@/components/SiteHeader'
 import { useCartStore } from '@/store/useCartStore'
 import { useAuthStore } from '@/store/useAuthStore'
 import { supabase } from '@/lib/supabase'
 import { createCaktoCheckoutSession } from '@/lib/cakto'
 
+const inputClass =
+  'mt-1.5 w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-sm text-zinc-950 outline-none transition placeholder:text-zinc-400 focus:border-zinc-950 focus:ring-4 focus:ring-zinc-950/5'
+const labelClass = 'block text-sm font-medium text-zinc-700'
+
 export default function Checkout() {
   const { items } = useCartStore()
   const { user } = useAuthStore()
   const navigate = useNavigate()
-  
+
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [paymentMethod] = useState<'pix' | 'credit_card' | 'delivery'>('pix')
 
-  // Dados Pessoais do Cliente
+  // Dados do cliente
   const [fullName, setFullName] = useState(user?.user_metadata?.name || '')
   const [email, setEmail] = useState(user?.email || '')
   const [cpf, setCpf] = useState('')
   const [phone, setPhone] = useState(user?.user_metadata?.whatsapp || '')
 
-  // Endereço de Entrega
+  // Endereço de entrega
   const [cep, setCep] = useState('')
   const [street, setStreet] = useState('')
   const [number, setNumber] = useState('')
@@ -33,22 +38,15 @@ export default function Checkout() {
 
   const parseItemPrice = (priceFrom: string) => {
     if (!priceFrom) return 0
-    let cleaned = priceFrom.trim()
-    if (cleaned.includes(',')) {
-      cleaned = cleaned.split(',')[0]
-    }
-    const priceString = cleaned.replace(/\D/g, '')
-    return priceString ? parseInt(priceString, 10) : 0
+    const cleaned = priceFrom.trim().split(',')[0]
+    const digits = cleaned.replace(/\D/g, '')
+    return digits ? parseInt(digits, 10) : 0
   }
 
-  const calculateTotal = () => {
-    return items.reduce((total, item) => {
-      const price = parseItemPrice(item.priceFrom)
-      return total + (price * item.quantity)
-    }, 0)
-  }
+  const total = items.reduce((sum, item) => sum + parseItemPrice(item.priceFrom) * item.quantity, 0)
+  const itemCount = items.reduce((sum, item) => sum + item.quantity, 0)
 
-  // Mascaras de formatacao
+  // Máscaras de formatação
   const formatCpf = (val: string) => {
     const d = val.replace(/\D/g, '').slice(0, 11)
     if (d.length <= 3) return d
@@ -64,11 +62,10 @@ export default function Checkout() {
     return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`
   }
 
-  // Busca Automatica de CEP via API ViaCEP
+  // Busca automática de CEP via ViaCEP
   const handleCepChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawDigits = e.target.value.replace(/\D/g, '').slice(0, 8)
-    const formatted = rawDigits.length > 5 ? `${rawDigits.slice(0, 5)}-${rawDigits.slice(5)}` : rawDigits
-    setCep(formatted)
+    setCep(rawDigits.length > 5 ? `${rawDigits.slice(0, 5)}-${rawDigits.slice(5)}` : rawDigits)
 
     if (rawDigits.length === 8) {
       setLoadingCep(true)
@@ -82,7 +79,7 @@ export default function Checkout() {
           setState(data.uf || '')
           setError(null)
         } else {
-          setError('CEP não encontrado. Por favor, preencha o endereço manualmente.')
+          setError('CEP não encontrado. Preencha o endereço manualmente.')
         }
       } catch (err) {
         console.warn('Erro ao consultar CEP:', err)
@@ -100,79 +97,52 @@ export default function Checkout() {
       return
     }
 
-    // Validacao dos campos obrigatorios do Primeiro Checkout (Oficial do site)
-    if (!fullName.trim() || !cpf.trim() || !phone.trim() || !cep.trim() || !street.trim() || !number.trim() || !neighborhood.trim() || !city.trim() || !state.trim()) {
-      setError('Por favor, preencha todos os campos obrigatórios de contato e endereço de entrega.')
+    if (![fullName, cpf, phone, cep, street, number, neighborhood, city, state].every((v) => v.trim())) {
+      setError('Preencha todos os campos obrigatórios de contato e endereço de entrega.')
       return
     }
 
     setLoading(true)
     setError(null)
-    const total = calculateTotal()
 
     try {
-      // 1. Gravar pedido completo no Supabase (incluindo endereco e dados do cliente)
-      const shippingAddress = {
-        fullName,
-        cpf,
-        phone,
-        cep,
-        street,
-        number,
-        complement,
-        neighborhood,
-        city,
-        state
-      }
+      // 1. Gravar o pedido no Supabase com os dados de entrega
+      const shippingAddress = { fullName, cpf, phone, cep, street, number, complement, neighborhood, city, state }
 
       const { data: order, error: orderError } = await supabase
         .from('orders')
-        .insert({
-          user_id: user.id,
-          total_price: total,
-          status: 'pending',
-          shipping_address: shippingAddress
-        })
+        .insert({ user_id: user.id, total_price: total, status: 'pending', shipping_address: shippingAddress })
         .select()
         .single()
 
       if (orderError) console.warn('Alerta ordens Supabase:', orderError)
 
-      // 2. Gravar os itens do pedido no Supabase
+      // 2. Gravar os itens do pedido (só os que existem na tabela de produtos)
       if (order) {
         try {
           const { data: productsData } = await supabase.from('products').select('id, name')
-          if (productsData && productsData.length > 0) {
-            const orderItemsToInsert = items.map((item) => {
+          const orderItemsToInsert = items
+            .map((item) => {
               const baseName = item.name.split(' (')[0].trim()
-              const dbProduct = productsData.find(
-                (p) => p.name === item.name || p.name === baseName,
-              )
-              return {
-                order_id: order.id,
-                product_id: dbProduct ? dbProduct.id : productsData[0]?.id,
-                quantity: item.quantity,
-                selected_color: item.selectedColor,
-              }
+              const dbProduct = productsData?.find((p) => p.name === item.name || p.name === baseName)
+              return dbProduct
+                ? { order_id: order.id, product_id: dbProduct.id, quantity: item.quantity, selected_color: item.selectedColor }
+                : null
             })
-            await supabase.from('order_items').insert(orderItemsToInsert)
-          }
-        } catch (e) {
-          console.warn('Alerta itens Supabase:', e)
+            .filter(Boolean)
+          if (orderItemsToInsert.length > 0) await supabase.from('order_items').insert(orderItemsToInsert)
+        } catch (err) {
+          console.warn('Alerta itens Supabase:', err)
         }
       }
 
-      // 3. Gerar Cobrança Dinâmica na API Cakto repassando dados pre-preenchidos
-      const cleanCpf = cpf.replace(/\D/g, '')
-      const cleanPhone = phone.replace(/\D/g, '')
-
-      // O servidor calcula o valor; aqui vai só o que foi escolhido
+      // 3. Gerar a cobrança na Cakto; o servidor calcula o valor, aqui vai só o que foi escolhido
       const caktoRes = await createCaktoCheckoutSession({
         customer: {
           name: fullName.trim(),
           email: email.trim(),
-          phone: cleanPhone,
-          docNumber: cleanCpf,
+          phone: phone.replace(/\D/g, ''),
+          docNumber: cpf.replace(/\D/g, ''),
         },
         items: items.map((i) => ({
           product:
@@ -187,296 +157,175 @@ export default function Checkout() {
       window.location.href = caktoRes.checkoutUrl
     } catch (err) {
       console.warn('Erro ao processar checkout:', err)
-      setError('Não conseguimos gerar o pagamento agora. Sua sacola continua salva: tente de novo em alguns minutos ou fale com a gente pelo WhatsApp.')
+      setError('Não conseguimos gerar o pagamento agora. Sua sacola continua salva: tente de novo em alguns minutos ou fale com a gente pelo atendimento.')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen bg-[#f8f8f6] px-5 pb-20 pt-12 animate-page-in sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-4xl">
-        <Link
-          to="/shop"
-          className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-zinc-400 transition hover:text-zinc-950"
-        >
-          <ArrowLeft className="size-4" />
-          Voltar para a loja
-        </Link>
+    <div className="min-h-screen bg-[#f5f5f7] text-zinc-950">
+      <SiteHeader variant="shop" />
 
-        <h1 className="font-display text-4xl font-semibold tracking-[-0.04em] text-zinc-950">
-          Finalizar Pedido
-        </h1>
-        <p className="mt-2 text-[15px] text-zinc-500">
-          Preencha suas informações de entrega e escolha a forma de pagamento.
-        </p>
-        
-        {items.length === 0 ? (
-          <div className="mt-12 flex flex-col items-center rounded-[2rem] border border-dashed border-zinc-200 bg-white/60 py-20 text-center">
-            <div className="grid size-20 place-items-center rounded-full bg-zinc-50">
-              <ShoppingBag className="size-8 text-zinc-300" />
+      <main className="px-5 pb-24 pt-28 sm:pt-32 lg:px-8">
+        <div className="mx-auto max-w-5xl">
+          <h1 className="font-display text-4xl font-semibold tracking-[-0.045em] sm:text-5xl">Finalizar compra.</h1>
+          <p className="mt-3 text-lg text-zinc-500">Confirme seus dados e o endereço. O pagamento é feito na página segura da Cakto.</p>
+
+          {items.length === 0 ? (
+            <div className="mt-10 flex flex-col items-center rounded-3xl bg-white px-6 py-20 text-center">
+              <ShoppingBag className="size-10 text-zinc-300" strokeWidth={1.5} />
+              <p className="mt-5 text-lg font-semibold">Sua sacola está vazia</p>
+              <p className="mt-1.5 text-sm text-zinc-500">Adicione produtos pela loja antes de continuar.</p>
+              <Link to="/shop" className="mt-6 rounded-full bg-zinc-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-zinc-800">
+                Ver a loja
+              </Link>
             </div>
-            <p className="mt-5 font-semibold text-zinc-950">Nenhum item no pedido</p>
-            <p className="mt-1.5 text-sm text-zinc-400">Adicione produtos pelo catálogo antes de continuar.</p>
-            <Link
-              to="/shop"
-              className="mt-6 rounded-full bg-zinc-950 px-6 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-zinc-800 active:scale-95"
-            >
-              Ver produtos
-            </Link>
-          </div>
-        ) : (
-          <form onSubmit={handleCheckout} className="mt-8 grid gap-8 lg:grid-cols-[1.3fr_0.7fr]">
-            <div className="space-y-6">
-              
-              {/* 1. SEÇÃO DE DADOS PESSOAIS */}
-              <div className="rounded-[2rem] border border-zinc-200/80 bg-white p-6 shadow-sm sm:p-8">
-                <div className="flex items-center gap-3 border-b border-zinc-100 pb-4">
-                  <div className="grid size-9 place-items-center rounded-xl bg-zinc-100 text-zinc-950">
-                    <User className="size-5" />
+          ) : (
+            <form onSubmit={handleCheckout} className="mt-10 grid gap-6 lg:grid-cols-[1.35fr_0.9fr] lg:items-start">
+              <div className="space-y-6">
+                {/* Dados */}
+                <section className="rounded-3xl bg-white p-6 sm:p-8" aria-labelledby="dados-title">
+                  <h2 id="dados-title" className="text-xl font-semibold tracking-tight">
+                    <span className="text-zinc-400">1.</span> Seus dados
+                  </h2>
+                  <div className="mt-6 grid gap-5 sm:grid-cols-2">
+                    <label className={`${labelClass} sm:col-span-2`}>
+                      Nome completo
+                      <input required value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Como está no documento" className={inputClass} autoComplete="name" />
+                    </label>
+                    <label className={labelClass}>
+                      CPF
+                      <input required inputMode="numeric" value={cpf} onChange={(e) => setCpf(formatCpf(e.target.value))} placeholder="000.000.000-00" className={inputClass} />
+                    </label>
+                    <label className={labelClass}>
+                      WhatsApp
+                      <input required inputMode="tel" value={phone} onChange={(e) => setPhone(formatPhone(e.target.value))} placeholder="(00) 00000-0000" className={inputClass} autoComplete="tel" />
+                    </label>
+                    <label className={`${labelClass} sm:col-span-2`}>
+                      E-mail
+                      <input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seu@email.com" className={inputClass} autoComplete="email" />
+                    </label>
                   </div>
-                  <div>
-                    <h3 className="text-base font-semibold text-zinc-950">1. Dados do Cliente</h3>
-                    <p className="text-xs text-zinc-400">Informações de identificação para o pedido</p>
-                  </div>
-                </div>
+                </section>
 
-                <div className="mt-6 grid gap-4 sm:grid-cols-2">
-                  <div className="sm:col-span-2">
-                    <label className="block text-xs font-semibold text-zinc-700">Nome Completo *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="Ex: João da Silva"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      className="mt-1.5 w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-4 py-3 text-sm font-medium text-zinc-950 placeholder-zinc-400 transition focus:border-zinc-950 focus:bg-white focus:outline-none"
-                    />
+                {/* Entrega */}
+                <section className="rounded-3xl bg-white p-6 sm:p-8" aria-labelledby="entrega-title">
+                  <h2 id="entrega-title" className="text-xl font-semibold tracking-tight">
+                    <span className="text-zinc-400">2.</span> Endereço de entrega
+                  </h2>
+                  <div className="mt-6 grid gap-5 sm:grid-cols-6">
+                    <label className={`${labelClass} sm:col-span-2`}>
+                      CEP
+                      <span className="relative block">
+                        <input required inputMode="numeric" value={cep} onChange={handleCepChange} placeholder="00000-000" className={`${inputClass} pr-10`} autoComplete="postal-code" />
+                        {loadingCep ? (
+                          <span className="apple-spinner absolute right-3 top-1/2 mt-[3px] size-4 -translate-y-1/2" aria-label="Buscando CEP" />
+                        ) : (
+                          <Search className="absolute right-3 top-1/2 mt-[3px] size-4 -translate-y-1/2 text-zinc-400" aria-hidden="true" />
+                        )}
+                      </span>
+                    </label>
+                    <label className={`${labelClass} sm:col-span-4`}>
+                      Rua
+                      <input required value={street} onChange={(e) => setStreet(e.target.value)} placeholder="Preenchida pelo CEP" className={inputClass} autoComplete="address-line1" />
+                    </label>
+                    <label className={`${labelClass} sm:col-span-2`}>
+                      Número
+                      <input required value={number} onChange={(e) => setNumber(e.target.value)} className={inputClass} />
+                    </label>
+                    <label className={`${labelClass} sm:col-span-4`}>
+                      Complemento <span className="font-normal text-zinc-400">(opcional)</span>
+                      <input value={complement} onChange={(e) => setComplement(e.target.value)} placeholder="Apartamento, bloco" className={inputClass} autoComplete="address-line2" />
+                    </label>
+                    <label className={`${labelClass} sm:col-span-2`}>
+                      Bairro
+                      <input required value={neighborhood} onChange={(e) => setNeighborhood(e.target.value)} className={inputClass} />
+                    </label>
+                    <label className={`${labelClass} sm:col-span-3`}>
+                      Cidade
+                      <input required value={city} onChange={(e) => setCity(e.target.value)} className={inputClass} autoComplete="address-level2" />
+                    </label>
+                    <label className={`${labelClass} sm:col-span-1`}>
+                      UF
+                      <input required maxLength={2} value={state} onChange={(e) => setState(e.target.value.toUpperCase())} placeholder="SP" className={`${inputClass} uppercase`} autoComplete="address-level1" />
+                    </label>
                   </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-zinc-700">CPF *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="000.000.000-00"
-                      value={cpf}
-                      onChange={(e) => setCpf(formatCpf(e.target.value))}
-                      className="mt-1.5 w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-4 py-3 text-sm font-medium text-zinc-950 placeholder-zinc-400 transition focus:border-zinc-950 focus:bg-white focus:outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-zinc-700">WhatsApp / Celular *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="(00) 00000-0000"
-                      value={phone}
-                      onChange={(e) => setPhone(formatPhone(e.target.value))}
-                      className="mt-1.5 w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-4 py-3 text-sm font-medium text-zinc-950 placeholder-zinc-400 transition focus:border-zinc-950 focus:bg-white focus:outline-none"
-                    />
-                  </div>
-
-                  <div className="sm:col-span-2">
-                    <label className="block text-xs font-semibold text-zinc-700">E-mail *</label>
-                    <input
-                      type="email"
-                      required
-                      placeholder="seuemail@exemplo.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="mt-1.5 w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-4 py-3 text-sm font-medium text-zinc-950 placeholder-zinc-400 transition focus:border-zinc-950 focus:bg-white focus:outline-none"
-                    />
-                  </div>
-                </div>
+                </section>
               </div>
 
-              {/* 2. SEÇÃO DE ENDEREÇO DE ENTREGA */}
-              <div className="rounded-[2rem] border border-zinc-200/80 bg-white p-6 shadow-sm sm:p-8">
-                <div className="flex items-center gap-3 border-b border-zinc-100 pb-4">
-                  <div className="grid size-9 place-items-center rounded-xl bg-zinc-100 text-zinc-950">
-                    <MapPin className="size-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-base font-semibold text-zinc-950">2. Endereço de Entrega</h3>
-                    <p className="text-xs text-zinc-400">Informe onde você deseja receber seu aparelho</p>
-                  </div>
-                </div>
+              {/* Resumo */}
+              <aside className="rounded-3xl bg-white p-6 sm:p-8 lg:sticky lg:top-20" aria-labelledby="resumo-title">
+                <h2 id="resumo-title" className="text-xl font-semibold tracking-tight">Resumo</h2>
 
-                <div className="mt-6 grid gap-4 sm:grid-cols-3">
-                  <div>
-                    <label className="block text-xs font-semibold text-zinc-700">CEP *</label>
-                    <div className="relative mt-1.5">
-                      <input
-                        type="text"
-                        required
-                        placeholder="00000-000"
-                        value={cep}
-                        onChange={handleCepChange}
-                        className="w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-4 py-3 pr-10 text-sm font-medium text-zinc-950 placeholder-zinc-400 transition focus:border-zinc-950 focus:bg-white focus:outline-none"
-                      />
-                      {loadingCep ? (
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                          <div className="apple-spinner apple-spinner--dark size-4" />
-                        </div>
-                      ) : (
-                        <Search className="absolute right-3 top-1/2 size-4 -translate-y-1/2 text-zinc-400" />
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="sm:col-span-2">
-                    <label className="block text-xs font-semibold text-zinc-700">Rua / Logradouro *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="Ex: Av. Paulista"
-                      value={street}
-                      onChange={(e) => setStreet(e.target.value)}
-                      className="mt-1.5 w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-4 py-3 text-sm font-medium text-zinc-950 placeholder-zinc-400 transition focus:border-zinc-950 focus:bg-white focus:outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-zinc-700">Número *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="Ex: 1000"
-                      value={number}
-                      onChange={(e) => setNumber(e.target.value)}
-                      className="mt-1.5 w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-4 py-3 text-sm font-medium text-zinc-950 placeholder-zinc-400 transition focus:border-zinc-950 focus:bg-white focus:outline-none"
-                    />
-                  </div>
-
-                  <div className="sm:col-span-2">
-                    <label className="block text-xs font-semibold text-zinc-700">Complemento (Opcional)</label>
-                    <input
-                      type="text"
-                      placeholder="Ex: Apto 42, Bloco B"
-                      value={complement}
-                      onChange={(e) => setComplement(e.target.value)}
-                      className="mt-1.5 w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-4 py-3 text-sm font-medium text-zinc-950 placeholder-zinc-400 transition focus:border-zinc-950 focus:bg-white focus:outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-zinc-700">Bairro *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="Bairro"
-                      value={neighborhood}
-                      onChange={(e) => setNeighborhood(e.target.value)}
-                      className="mt-1.5 w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-4 py-3 text-sm font-medium text-zinc-950 placeholder-zinc-400 transition focus:border-zinc-950 focus:bg-white focus:outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-zinc-700">Cidade *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="Cidade"
-                      value={city}
-                      onChange={(e) => setCity(e.target.value)}
-                      className="mt-1.5 w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-4 py-3 text-sm font-medium text-zinc-950 placeholder-zinc-400 transition focus:border-zinc-950 focus:bg-white focus:outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-zinc-700">Estado (UF) *</label>
-                    <input
-                      type="text"
-                      required
-                      maxLength={2}
-                      placeholder="SP"
-                      value={state}
-                      onChange={(e) => setState(e.target.value.toUpperCase())}
-                      className="mt-1.5 w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-4 py-3 text-sm font-medium text-zinc-950 placeholder-zinc-400 transition focus:border-zinc-950 focus:bg-white focus:outline-none uppercase"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* RESUMO DO PEDIDO */}
-            <div className="space-y-4">
-              <div className="sticky top-6 rounded-[2rem] border border-zinc-200/80 bg-white p-6 shadow-sm sm:p-8">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400">Resumo do Pedido</p>
-
-                {/* Lista compacta de itens */}
-                <ul className="mt-4 divide-y divide-zinc-100 border-b border-zinc-100 pb-4">
-                  {items.map(item => (
-                    <li key={item.cartItemId} className="flex items-center gap-3 py-3 first:pt-0 last:pb-0">
-                      <div className="flex size-12 flex-shrink-0 items-center justify-center rounded-lg bg-zinc-50 p-1 border border-zinc-100">
-                        <img src={item.image} alt={item.name} className="h-full w-full object-contain" />
+                <ul className="mt-5 divide-y divide-zinc-100">
+                  {items.map((item) => (
+                    <li key={item.cartItemId} className="flex items-center gap-4 py-4 first:pt-0">
+                      <div className="grid size-14 flex-none place-items-center rounded-xl bg-[#f5f5f7] p-1.5">
+                        <img src={item.image} alt="" className="max-h-full max-w-full object-contain" />
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="truncate text-xs font-semibold text-zinc-950">{item.name}</p>
-                        <p className="text-[11px] text-zinc-400">{item.selectedColor} · Qtd: {item.quantity}</p>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-zinc-950">{item.name}</p>
+                        <p className="text-xs text-zinc-500">
+                          {item.selectedColor}
+                          {item.quantity > 1 ? ` · ${item.quantity} unidades` : ''}
+                        </p>
                       </div>
-                      <p className="text-xs font-semibold text-zinc-950">{item.priceFrom}</p>
+                      <p className="text-sm font-medium text-zinc-950">{item.priceFrom}</p>
                     </li>
                   ))}
                 </ul>
 
-                <div className="mt-4 space-y-2.5 text-xs">
-                  <div className="flex justify-between text-zinc-500">
-                    <span>Subtotal ({items.length} {items.length === 1 ? 'item' : 'itens'})</span>
-                    <span className="font-medium text-zinc-950">R$ {calculateTotal().toLocaleString('pt-BR')}</span>
+                <dl className="mt-2 space-y-2.5 border-t border-zinc-100 pt-4 text-sm">
+                  <div className="flex justify-between">
+                    <dt className="text-zinc-500">Subtotal ({itemCount} {itemCount === 1 ? 'item' : 'itens'})</dt>
+                    <dd>R$ {total.toLocaleString('pt-BR')}</dd>
                   </div>
-                  <div className="flex justify-between text-zinc-500">
-                    <span>Pagamento</span>
-                    <span className="font-semibold text-zinc-950 uppercase">
-                      {paymentMethod === 'pix' ? 'Pix (Cakto)' : paymentMethod === 'credit_card' ? 'Cartão 12x' : 'Presencial'}
-                    </span>
+                  <div className="flex justify-between">
+                    <dt className="text-zinc-500">Entrega</dt>
+                    <dd>Combinada após o pedido</dd>
                   </div>
-                  <div className="flex justify-between text-zinc-500">
-                    <span>Frete de Envio</span>
-                    <span className="font-semibold text-emerald-600">A combinar</span>
+                  <div className="flex justify-between">
+                    <dt className="text-zinc-500">Pagamento</dt>
+                    <dd>Pix ou cartão em até 18x</dd>
                   </div>
-                </div>
+                </dl>
 
-                <div className="mt-5 flex items-center justify-between border-t border-zinc-100 pt-4">
-                  <span className="text-sm font-medium text-zinc-700">Total do dia</span>
-                  <span className="text-2xl font-bold tracking-tight text-zinc-950">
-                    R$ {calculateTotal().toLocaleString('pt-BR')}
-                  </span>
+                <div className="mt-5 flex items-baseline justify-between border-t border-zinc-100 pt-5">
+                  <span className="text-base font-semibold">Total</span>
+                  <span className="text-2xl font-semibold tracking-tight">R$ {total.toLocaleString('pt-BR')}</span>
                 </div>
 
                 {error && (
-                  <div className="mt-4 rounded-2xl border border-red-100 bg-red-50/80 p-4 text-xs font-medium leading-relaxed text-red-600">
+                  <p role="alert" className="mt-5 rounded-2xl bg-red-50 p-4 text-sm leading-6 text-red-700">
                     {error}
-                  </div>
+                  </p>
                 )}
 
                 <button
                   type="submit"
-                  disabled={loading || items.length === 0}
-                  className="mt-6 group flex w-full items-center justify-center gap-2.5 rounded-full bg-zinc-950 py-4 text-sm font-semibold text-white shadow-[0_10px_30px_rgba(24,24,27,0.22)] transition-all hover:-translate-y-0.5 hover:bg-zinc-800 hover:shadow-[0_14px_40px_rgba(24,24,27,0.30)] active:scale-95 disabled:translate-y-0 disabled:opacity-60"
+                  disabled={loading}
+                  className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-zinc-950 py-4 text-sm font-semibold text-white transition hover:bg-zinc-800 active:scale-[0.98] disabled:opacity-60"
                 >
-                  {loading ? (
-                    <div className="apple-spinner apple-spinner--light" />
-                  ) : (
-                    <>
-                      Confirmar e Ir para Pagamento
-                      <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
-                    </>
-                  )}
+                  {loading ? <span className="apple-spinner apple-spinner--light" aria-label="Gerando pagamento" /> : 'Ir para o pagamento'}
                 </button>
 
-                <p className="mt-4 text-center text-[11px] text-zinc-400">
-                  🔒 Seus dados de entrega estão protegidos por criptografia de ponta a ponta.
+                <p className="mt-4 flex items-start gap-2 text-xs leading-5 text-zinc-500">
+                  <Lock className="mt-0.5 size-3.5 flex-none" aria-hidden="true" />
+                  Pagamento processado pela Cakto. Os dados do cartão são digitados direto lá e não passam pelo nosso site.
                 </p>
-              </div>
-            </div>
-          </form>
-        )}
-      </div>
+                <p className="mt-3 text-xs leading-5 text-zinc-500">
+                  Ao continuar, você concorda com a{' '}
+                  <Link to="/privacidade" className="text-[#0066cc] hover:underline">Política de privacidade</Link> e as{' '}
+                  <Link to="/trocas" className="text-[#0066cc] hover:underline">Trocas e devoluções</Link>.
+                </p>
+              </aside>
+            </form>
+          )}
+        </div>
+      </main>
+
+      <SiteFooter />
     </div>
   )
 }
-
-

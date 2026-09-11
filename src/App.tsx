@@ -20,6 +20,8 @@ const Orders = lazy(() => import("@/pages/Orders"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
 const Privacidade = lazy(() => import("@/pages/Privacidade"));
 const Trocas = lazy(() => import("@/pages/Trocas"));
+// Pré-visualização de telas para revisão de design; só existe no ambiente local
+const DevPreview = import.meta.env.DEV ? lazy(() => import("@/pages/DevPreview")) : null;
 
 export default function App() {
   const { initialize } = useAuthStore();
@@ -60,6 +62,7 @@ export default function App() {
           />
           <Route path="/privacidade" element={<Privacidade />} />
           <Route path="/trocas" element={<Trocas />} />
+          {DevPreview && <Route path="/__preview" element={<DevPreview />} />}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>

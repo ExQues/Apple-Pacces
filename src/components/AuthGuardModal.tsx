@@ -1,5 +1,6 @@
-import { Lock, X, ArrowRight, UserPlus } from 'lucide-react'
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { X } from 'lucide-react'
 
 interface AuthGuardModalProps {
   isOpen: boolean
@@ -9,96 +10,72 @@ interface AuthGuardModalProps {
 export function AuthGuardModal({ isOpen, onClose }: AuthGuardModalProps) {
   const navigate = useNavigate()
 
+  useEffect(() => {
+    if (!isOpen) return
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [isOpen, onClose])
+
   if (!isOpen) return null
 
-  const handleLogin = () => {
+  const goTo = (path: string) => {
     onClose()
-    navigate('/login')
-  }
-
-  const handleRegister = () => {
-    onClose()
-    navigate('/register')
+    navigate(path)
   }
 
   return (
     <>
-      {/* Overlay com Blur */}
-      <div
-        className="fixed inset-0 z-[80] bg-zinc-950/40 backdrop-blur-md transition-opacity animate-fade-in"
-        onClick={onClose}
-      />
+      <div className="fixed inset-0 z-[80] bg-black/40 backdrop-blur-sm" onClick={onClose} aria-hidden="true" />
 
-      {/* Modal */}
-      <div className="fixed inset-0 z-[81] flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-[81] flex items-end justify-center sm:items-center sm:p-4" onClick={onClose}>
         <div
-          className="relative w-full max-w-md overflow-hidden rounded-[2.5rem] border border-zinc-200/80 bg-white p-7 shadow-[0_32px_100px_rgba(0,0,0,0.22)] sm:p-9"
-          style={{ animation: 'modalIn 0.35s cubic-bezier(0.16, 1, 0.3, 1)' }}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="auth-guard-title"
+          onClick={(e) => e.stopPropagation()}
+          className="relative w-full max-w-md rounded-t-3xl bg-white p-8 text-center shadow-2xl sm:rounded-3xl sm:p-10"
+          style={{ animation: 'authIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)' }}
         >
-          {/* Botão Fechar */}
           <button
+            type="button"
             onClick={onClose}
-            className="absolute right-5 top-5 grid size-9 place-items-center rounded-full bg-zinc-100/80 text-zinc-400 transition hover:bg-zinc-200 hover:text-zinc-950 active:scale-90"
+            className="absolute right-4 top-4 grid size-9 place-items-center rounded-full bg-black/5 text-zinc-600 transition hover:bg-black/10 hover:text-zinc-950"
             aria-label="Fechar"
           >
             <X className="size-4" />
           </button>
 
-          {/* Ícone com Glow e estilo Apple */}
-          <div className="mx-auto flex size-16 items-center justify-center rounded-2xl bg-zinc-950 shadow-xl shadow-zinc-950/20">
-            <Lock className="size-7 text-white" />
-          </div>
+          <h2 id="auth-guard-title" className="font-display text-2xl font-semibold tracking-[-0.03em] text-zinc-950 sm:text-3xl">
+            Entre para usar a sacola
+          </h2>
+          <p className="mt-3 text-sm leading-6 text-zinc-500">
+            Com uma conta, sua sacola fica salva no celular e no computador, e você acompanha seus pedidos.
+          </p>
 
-          {/* Conteúdo */}
-          <div className="mt-6 text-center">
-            <h3 className="font-display text-2xl font-semibold tracking-[-0.03em] text-zinc-950 sm:text-3xl">
-              Entre para colocar na sacola
-            </h3>
-            <p className="mt-3 text-sm leading-6 text-zinc-500">
-              Sua sacola fica associada à sua conta e é sincronizada instantaneamente em qualquer dispositivo (PC ou celular).
-            </p>
-          </div>
-
-          {/* Botões de Ação */}
           <div className="mt-8 space-y-3">
             <button
-              onClick={handleLogin}
-              className="group flex w-full items-center justify-center gap-2 rounded-full bg-zinc-950 py-4 text-sm font-semibold text-white shadow-[0_10px_30px_rgba(24,24,27,0.20)] transition-all hover:-translate-y-0.5 hover:bg-zinc-800 hover:shadow-xl active:scale-98"
+              type="button"
+              onClick={() => goTo('/login')}
+              className="w-full rounded-full bg-zinc-950 py-4 text-sm font-semibold text-white transition hover:bg-zinc-800 active:scale-[0.98]"
             >
-              Entrar na Conta
-              <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
+              Entrar
             </button>
-
             <button
-              onClick={handleRegister}
-              className="flex w-full items-center justify-center gap-2 rounded-full border border-zinc-200 bg-white py-3.5 text-sm font-semibold text-zinc-700 transition hover:bg-zinc-50 hover:text-zinc-950 active:scale-98"
+              type="button"
+              onClick={() => goTo('/register')}
+              className="w-full rounded-full border border-zinc-300 py-3.5 text-sm font-semibold text-zinc-950 transition hover:border-zinc-950"
             >
-              <UserPlus className="size-4 text-zinc-400" />
-              Criar uma Conta
+              Criar conta
             </button>
-
-            <button
-              onClick={onClose}
-              className="w-full pt-1 text-center text-xs font-medium text-zinc-400 transition hover:text-zinc-600"
-            >
-              Continuar apenas navegando
+            <button type="button" onClick={onClose} className="w-full pt-1 text-sm font-medium text-[#0066cc] hover:underline">
+              Continuar navegando
             </button>
           </div>
         </div>
       </div>
 
-      <style>{`
-        @keyframes modalIn {
-          from {
-            opacity: 0;
-            transform: scale(0.92) translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1) translateY(0);
-          }
-        }
-      `}</style>
+      <style>{`@keyframes authIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }`}</style>
     </>
   )
 }

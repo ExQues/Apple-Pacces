@@ -1,7 +1,7 @@
-import { ShoppingBag, X, Plus, Minus, Trash2, ArrowRight, Sparkles } from 'lucide-react'
-import { useCartStore } from '@/store/useCartStore'
-import { useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { Minus, Plus, ShoppingBag, X } from 'lucide-react'
+import { useCartStore } from '@/store/useCartStore'
 
 function parsePrice(priceFrom: string): number {
   const digits = priceFrom.replace(/\D/g, '')
@@ -11,146 +11,124 @@ function parsePrice(priceFrom: string): number {
 export function CartDrawer() {
   const { items, isDrawerOpen, closeDrawer, updateQuantity, removeItem, totalItems } = useCartStore()
   const navigate = useNavigate()
+  const count = totalItems()
 
+  // Trava o scroll e fecha com Esc
   useEffect(() => {
-    if (isDrawerOpen) {
-      document.body.style.overflow = 'hidden'
-    } else {
+    if (!isDrawerOpen) return
+    document.body.style.overflow = 'hidden'
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && closeDrawer()
+    window.addEventListener('keydown', onKey)
+    return () => {
       document.body.style.overflow = ''
+      window.removeEventListener('keydown', onKey)
     }
-    return () => { document.body.style.overflow = '' }
-  }, [isDrawerOpen])
+  }, [isDrawerOpen, closeDrawer])
 
-  const handleCheckout = () => {
+  const goTo = (path: string) => {
     closeDrawer()
-    navigate('/checkout')
+    navigate(path)
   }
 
   const subtotal = items.reduce((acc, item) => acc + parsePrice(item.priceFrom) * item.quantity, 0)
 
   return (
     <>
-      {/* Overlay */}
       <div
-        className={`fixed inset-0 z-[70] bg-zinc-950/25 backdrop-blur-[6px] transition-opacity duration-300 ${
+        className={`fixed inset-0 z-[70] bg-black/30 backdrop-blur-sm transition-opacity duration-300 ${
           isDrawerOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
         }`}
         onClick={closeDrawer}
+        aria-hidden="true"
       />
 
-      {/* Drawer */}
       <aside
-        className={`fixed right-0 top-0 z-[71] flex h-full w-full max-w-[440px] flex-col border-l border-zinc-100 bg-[#fafafa] shadow-[rgba(0,0,0,0.08)_-12px_0_50px] transition-transform duration-[450ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+        role="dialog"
+        aria-modal="true"
+        aria-label="Sacola"
+        className={`fixed right-0 top-0 z-[71] flex h-full w-full max-w-[420px] flex-col bg-white shadow-2xl transition-transform duration-[450ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
           isDrawerOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
-        {/* ── Header ── */}
-        <div className="relative flex items-center justify-between px-7 pb-5 pt-7">
-          <div className="flex items-center gap-3.5">
-            <div className="grid size-11 place-items-center rounded-2xl bg-zinc-950 shadow-lg shadow-zinc-950/15">
-              <ShoppingBag className="size-[18px] text-white" />
-            </div>
-            <div>
-              <h2 className="text-[15px] font-semibold tracking-tight text-zinc-950">Sua Sacola</h2>
-              <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-zinc-400">
-                {totalItems() === 0
-                  ? 'Vazia'
-                  : totalItems() === 1
-                    ? '1 item'
-                    : `${totalItems()} itens`}
-              </p>
-            </div>
+        {/* Cabeçalho */}
+        <div className="flex items-center justify-between border-b border-zinc-100 px-6 py-5">
+          <div>
+            <h2 className="text-xl font-semibold tracking-tight text-zinc-950">Sacola</h2>
+            <p className="text-sm text-zinc-500">
+              {count === 0 ? 'Nenhum item' : count === 1 ? '1 item' : `${count} itens`}
+            </p>
           </div>
           <button
+            type="button"
             onClick={closeDrawer}
-            className="grid size-9 place-items-center rounded-full border border-zinc-200 bg-white text-zinc-400 shadow-sm transition hover:border-zinc-300 hover:text-zinc-950"
+            className="grid size-9 place-items-center rounded-full bg-black/5 text-zinc-600 transition hover:bg-black/10 hover:text-zinc-950"
+            aria-label="Fechar sacola"
           >
             <X className="size-4" />
           </button>
-          {/* Divider line */}
-          <div className="absolute bottom-0 left-7 right-7 h-px bg-gradient-to-r from-transparent via-zinc-200 to-transparent" />
         </div>
 
-        {/* ── Items ── */}
-        <div className="flex-1 overflow-y-auto px-5 py-5">
+        {/* Itens */}
+        <div className="flex-1 overflow-y-auto px-6">
           {items.length === 0 ? (
-            <div className="flex h-full flex-col items-center justify-center pb-20">
-              <div className="relative grid size-24 place-items-center rounded-full bg-white shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
-                <ShoppingBag className="size-9 text-zinc-200" />
-                <div className="absolute -right-1 -top-1 grid size-8 place-items-center rounded-full bg-zinc-950 shadow-lg">
-                  <Sparkles className="size-3.5 text-white" />
-                </div>
-              </div>
-              <p className="mt-6 text-sm font-semibold text-zinc-950">Sua sacola esta vazia</p>
-              <p className="mt-1.5 max-w-[220px] text-center text-[13px] leading-5 text-zinc-400">
-                Explore o catálogo e encontre o aparelho ideal para você.
+            <div className="flex h-full flex-col items-center justify-center pb-16 text-center">
+              <ShoppingBag className="size-10 text-zinc-300" strokeWidth={1.5} />
+              <p className="mt-5 text-base font-semibold text-zinc-950">Sua sacola está vazia</p>
+              <p className="mt-1.5 max-w-[240px] text-sm leading-6 text-zinc-500">
+                Explore a loja e encontre o aparelho ideal para você.
               </p>
               <button
-                onClick={() => {
-                  closeDrawer()
-                  navigate('/shop')
-                }}
-                className="mt-6 rounded-full border border-zinc-200 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-700 shadow-sm transition hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-md"
+                type="button"
+                onClick={() => goTo('/shop')}
+                className="mt-6 rounded-full bg-zinc-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-zinc-800"
               >
-                Ver produtos
+                Ver a loja
               </button>
             </div>
           ) : (
-            <ul className="space-y-3">
-              {items.map((item, index) => (
-                <li
-                  key={item.cartItemId}
-                  className="overflow-hidden rounded-[1.25rem] border border-zinc-200/80 bg-white shadow-[0_2px_12px_rgba(0,0,0,0.04)] transition-all hover:shadow-[0_4px_20px_rgba(0,0,0,0.07)]"
-                  style={{ animationDelay: `${index * 60}ms` }}
-                >
-                  <div className="flex gap-0">
-                    {/* Thumbnail em Gradiente Titanium */}
-                    <div className="flex w-[90px] flex-shrink-0 items-center justify-center bg-[#f5f5f7] p-3">
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="h-16 w-16 object-contain drop-shadow-xs"
-                      />
+            <ul className="divide-y divide-zinc-100">
+              {items.map((item) => (
+                <li key={item.cartItemId} className="flex gap-4 py-5">
+                  <div className="grid size-20 flex-none place-items-center rounded-2xl bg-[#f5f5f7] p-2">
+                    <img src={item.image} alt={item.name} className="max-h-full max-w-full object-contain" />
+                  </div>
+
+                  <div className="flex min-w-0 flex-1 flex-col">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <h3 className="text-sm font-semibold text-zinc-950">{item.name}</h3>
+                        <p className="mt-0.5 text-xs text-zinc-500">{item.selectedColor}</p>
+                      </div>
+                      <p className="flex-none text-sm font-semibold text-zinc-950">{item.priceFrom}</p>
                     </div>
 
-                    {/* Content */}
-                    <div className="flex flex-1 flex-col justify-between px-4 py-3.5">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0">
-                          <h3 className="truncate text-[13px] font-semibold leading-tight text-zinc-950">{item.name}</h3>
-                          <p className="mt-0.5 text-[11px] font-medium text-zinc-400">{item.selectedColor}</p>
-                        </div>
+                    <div className="mt-auto flex items-center justify-between pt-3">
+                      <div className="inline-flex items-center rounded-full border border-zinc-200">
                         <button
-                          onClick={() => removeItem(item.cartItemId)}
-                          className="flex-shrink-0 rounded-lg p-1 text-zinc-300 transition hover:bg-red-50 hover:text-red-500 active:scale-90"
-                          aria-label={`Remover ${item.name}`}
+                          type="button"
+                          onClick={() => updateQuantity(item.cartItemId, Math.max(1, item.quantity - 1))}
+                          className="grid size-8 place-items-center text-zinc-500 transition hover:text-zinc-950"
+                          aria-label={`Diminuir quantidade de ${item.name}`}
                         >
-                          <Trash2 className="size-3.5" />
+                          <Minus className="size-3.5" />
+                        </button>
+                        <span className="min-w-6 text-center text-sm font-medium text-zinc-950">{item.quantity}</span>
+                        <button
+                          type="button"
+                          onClick={() => updateQuantity(item.cartItemId, item.quantity + 1)}
+                          className="grid size-8 place-items-center text-zinc-500 transition hover:text-zinc-950"
+                          aria-label={`Aumentar quantidade de ${item.name}`}
+                        >
+                          <Plus className="size-3.5" />
                         </button>
                       </div>
-
-                      <div className="mt-2 flex items-center justify-between">
-                        <p className="text-sm font-semibold text-zinc-950">{item.priceFrom}</p>
-
-                        {/* Stepper */}
-                        <div className="inline-flex items-center rounded-full border border-zinc-200 bg-zinc-50/80">
-                          <button
-                            onClick={() => updateQuantity(item.cartItemId, Math.max(1, item.quantity - 1))}
-                            className="grid size-7 place-items-center rounded-full text-zinc-400 transition hover:text-zinc-950 active:scale-90"
-                          >
-                            <Minus className="size-3" />
-                          </button>
-                          <span className="min-w-[24px] text-center text-xs font-semibold text-zinc-950">
-                            {item.quantity}
-                          </span>
-                          <button
-                            onClick={() => updateQuantity(item.cartItemId, item.quantity + 1)}
-                            className="grid size-7 place-items-center rounded-full text-zinc-400 transition hover:text-zinc-950 active:scale-90"
-                          >
-                            <Plus className="size-3" />
-                          </button>
-                        </div>
-                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removeItem(item.cartItemId)}
+                        className="text-xs font-medium text-[#0066cc] hover:underline"
+                      >
+                        Remover
+                      </button>
                     </div>
                   </div>
                 </li>
@@ -159,29 +137,31 @@ export function CartDrawer() {
           )}
         </div>
 
-        {/* ── Footer ── */}
+        {/* Rodapé */}
         {items.length > 0 && (
-          <div className="border-t border-zinc-100 bg-white px-7 pb-7 pt-5">
-            {/* Subtotal */}
-            <div className="mb-5 flex items-center justify-between">
-              <span className="text-sm text-zinc-500">Subtotal estimado</span>
-              <span className="text-lg font-semibold tracking-tight text-zinc-950">
+          <div className="border-t border-zinc-100 px-6 pb-6 pt-5">
+            <div className="flex items-baseline justify-between">
+              <span className="text-sm text-zinc-500">Subtotal</span>
+              <span className="text-xl font-semibold tracking-tight text-zinc-950">
                 R$ {subtotal.toLocaleString('pt-BR')}
               </span>
             </div>
+            <p className="mt-1 text-right text-xs text-zinc-500">Pix ou em até 18x no cartão · frete combinado após o pedido</p>
 
-            {/* CTA */}
             <button
-              onClick={handleCheckout}
-              className="group flex w-full items-center justify-center gap-2.5 rounded-full bg-zinc-950 px-7 py-4 text-sm font-semibold text-white shadow-[0_10px_30px_rgba(24,24,27,0.22)] transition-all hover:-translate-y-0.5 hover:bg-zinc-800 hover:shadow-[0_14px_40px_rgba(24,24,27,0.30)] active:scale-95"
+              type="button"
+              onClick={() => goTo('/checkout')}
+              className="mt-5 w-full rounded-full bg-zinc-950 py-4 text-sm font-semibold text-white transition hover:bg-zinc-800 active:scale-[0.98]"
             >
-              Finalizar Compra
-              <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
+              Finalizar compra
             </button>
-
-            <p className="mt-3 text-center text-[11px] text-zinc-400">
-              Frete e condições calculados no checkout
-            </p>
+            <button
+              type="button"
+              onClick={closeDrawer}
+              className="mt-3 w-full text-center text-sm font-medium text-[#0066cc] hover:underline"
+            >
+              Continuar comprando
+            </button>
           </div>
         )}
       </aside>
