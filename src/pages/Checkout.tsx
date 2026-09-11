@@ -7,6 +7,7 @@ import { useCartStore } from '@/store/useCartStore'
 import { useAuthStore } from '@/store/useAuthStore'
 import { supabase } from '@/lib/supabase'
 import { createCaktoCheckoutSession } from '@/lib/cakto'
+import { usePageTitle } from '@/hooks/usePageTitle'
 
 const inputClass =
   'mt-1.5 w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-sm text-zinc-950 outline-none transition placeholder:text-zinc-400 focus:border-zinc-950 focus:ring-4 focus:ring-zinc-950/5'
@@ -16,6 +17,7 @@ export default function Checkout() {
   const { items } = useCartStore()
   const { user } = useAuthStore()
   const navigate = useNavigate()
+  usePageTitle('Finalizar compra')
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)

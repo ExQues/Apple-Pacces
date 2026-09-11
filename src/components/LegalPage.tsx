@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { SiteFooter } from '@/components/SiteFooter'
 import { SiteHeader } from '@/components/SiteHeader'
+import { usePageTitle } from '@/hooks/usePageTitle'
 
 type LegalPageProps = {
   title: string
@@ -10,6 +11,7 @@ type LegalPageProps = {
 }
 
 export function LegalPage({ title, updatedAt, intro, sections }: LegalPageProps) {
+  usePageTitle(title)
   return (
     <div className="min-h-screen bg-[#f5f5f7] text-zinc-950">
       <SiteHeader variant="shop" />

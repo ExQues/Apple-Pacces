@@ -127,13 +127,13 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
             ref={cartButtonRef}
             type="button"
             onClick={toggleDrawer}
-            className={`relative opacity-80 transition hover:opacity-100 active:scale-90 ${isBouncing ? 'animate-cart-bounce' : ''}`}
+            className={`relative -m-2 p-2 opacity-80 transition hover:opacity-100 active:scale-90 ${isBouncing ? 'animate-cart-bounce' : ''}`}
             aria-label="Ver sacola de compras"
           >
             <ShoppingBag className="size-[18px]" strokeWidth={1.75} />
             {count > 0 && (
               <span
-                className={`absolute -right-2 -top-1.5 grid size-4 place-items-center rounded-full text-[10px] font-semibold ${
+                className={`absolute right-0 top-0.5 grid size-4 place-items-center rounded-full text-[10px] font-semibold ${
                   dark ? 'bg-white text-black' : 'bg-zinc-950 text-white'
                 }`}
               >
@@ -147,7 +147,7 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
               <button
                 type="button"
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
-                className="opacity-80 transition hover:opacity-100 active:scale-90"
+                className="-m-2 p-2 opacity-80 transition hover:opacity-100 active:scale-90"
                 aria-label="Minha conta"
               >
                 <UserIcon className="size-[18px]" strokeWidth={1.75} />
@@ -187,7 +187,7 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="opacity-80 transition hover:opacity-100 md:hidden"
+            className="-m-2 p-2 opacity-80 transition hover:opacity-100 md:hidden"
             aria-label={mobileMenuOpen ? 'Fechar menu' : 'Abrir menu de navegação'}
           >
             {mobileMenuOpen ? <X className="size-5" /> : <Menu className="size-5" />}

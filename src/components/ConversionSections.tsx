@@ -60,13 +60,11 @@ export function ContactSection() {
         },
       ])
 
-      if (error) {
-        console.error('Erro ao enviar lead:', error)
-      }
+      if (error) throw error
       setSubmitted(true)
     } catch (err) {
-      console.error('Erro de conexão:', err)
-      setSubmitted(true)
+      console.error('Erro ao enviar contato:', err)
+      setErrorMessage('Não conseguimos enviar agora. Confira sua conexão e tente de novo em instantes.')
     } finally {
       setLoading(false)
     }

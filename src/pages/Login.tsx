@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { BrandLogo } from '@/components/BrandLogo'
 import { ArrowLeft, Eye, EyeOff, Mail, Lock } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
+import { usePageTitle } from '@/hooks/usePageTitle'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -10,7 +11,9 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [notice, setNotice] = useState<string | null>(null)
   const navigate = useNavigate()
+  usePageTitle('Entrar')
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -30,9 +33,12 @@ export default function Login() {
 
     if (error) {
       if (error.message.includes('Invalid login')) {
-        setError('Email ou senha incorretos.')
+        setError('E-mail ou senha incorretos.')
+      } else if (error.message.toLowerCase().includes('email not confirmed')) {
+        setError('Confirme seu e-mail pelo link que enviamos antes de entrar.')
       } else {
-        setError(error.message)
+        console.warn('Erro no login:', error)
+        setError('Não conseguimos entrar agora. Tente de novo em instantes.')
       }
       setLoading(false)
     } else {
@@ -42,7 +48,7 @@ export default function Login() {
 
   const handleForgotPassword = async () => {
     if (!email) {
-      setError('Digite seu email acima para recuperar a senha.')
+      setError('Digite seu e-mail acima para recuperar a senha.')
       return
     }
     setLoading(true)
@@ -53,10 +59,10 @@ export default function Login() {
     })
 
     if (error) {
-      setError(error.message)
+      console.warn('Erro ao enviar recuperação de senha:', error)
+      setError('Não conseguimos enviar o link agora. Tente de novo em instantes.')
     } else {
-      setError(null)
-      alert('Se o email existir, enviamos um link de recuperação. Verifique sua caixa de entrada.')
+      setNotice('Se houver uma conta com este e-mail, enviamos um link para criar uma nova senha. Confira sua caixa de entrada.')
     }
     setLoading(false)
   }
@@ -103,6 +109,11 @@ export default function Login() {
           </p>
 
           <form onSubmit={handleLogin} className="mt-9 space-y-5">
+            {notice && (
+              <div role="status" className="rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3.5 text-sm font-medium text-emerald-800">
+                {notice}
+              </div>
+            )}
             {error && (
               <div className="rounded-2xl border border-red-100 bg-red-50/80 px-4 py-3.5 text-sm font-medium text-red-600">
                 {error}

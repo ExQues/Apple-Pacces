@@ -5,6 +5,7 @@ import { SiteFooter } from '@/components/SiteFooter'
 import { SiteHeader } from '@/components/SiteHeader'
 import { useAuthStore } from '@/store/useAuthStore'
 import { supabase } from '@/lib/supabase'
+import { usePageTitle } from '@/hooks/usePageTitle'
 
 interface OrderItem {
   id: string
@@ -30,6 +31,7 @@ const STATUS: Record<string, { label: string; className: string }> = {
 
 export default function Orders() {
   const { user } = useAuthStore()
+  usePageTitle('Meus pedidos')
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)

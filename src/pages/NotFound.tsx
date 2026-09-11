@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom'
 import { SiteFooter } from '@/components/SiteFooter'
 import { SiteHeader } from '@/components/SiteHeader'
+import { usePageTitle } from '@/hooks/usePageTitle'
 
 export default function NotFound() {
+  usePageTitle('Página não encontrada')
   return (
     <div className="min-h-screen bg-[#f5f5f7] text-zinc-950">
       <SiteHeader variant="shop" />

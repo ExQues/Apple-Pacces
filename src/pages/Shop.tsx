@@ -7,6 +7,7 @@ import { useCartStore } from '@/store/useCartStore'
 import { useProductModalStore } from '@/store/useProductModalStore'
 import { useFlyingAnimationStore } from '@/store/useFlyingAnimationStore'
 import { useProducts } from '@/hooks/useProducts'
+import { usePageTitle } from '@/hooks/usePageTitle'
 import type { FeaturedProduct } from '@/data/appleStore'
 
 const CATEGORY_FILTERS = ['Todos', 'iPhone', 'Mac', 'iPad', 'Apple Watch', 'Acessórios'] as const
@@ -203,6 +204,8 @@ export default function Shop() {
   const selected: CategoryFilter = (CATEGORY_FILTERS as readonly string[]).includes(categoryParam ?? '')
     ? (categoryParam as CategoryFilter)
     : 'Todos'
+
+  usePageTitle(selected === 'Todos' ? 'Loja' : selected)
 
   // Busca que veio por link (ex.: vitrine da home) acompanha o endereço
   useEffect(() => {

@@ -105,17 +105,17 @@ export function HeroSection() {
             loading="eager"
             decoding="async"
             {...{ fetchpriority: 'high' }}
-            className="mx-auto w-full max-w-md drop-shadow-[0_40px_90px_rgba(150,40,62,0.45)] lg:max-w-lg"
+            className="mx-auto w-full max-w-[18rem] drop-shadow-[0_40px_90px_rgba(150,40,62,0.45)] sm:max-w-md lg:max-w-lg"
           />
         </div>
       </div>
 
       {/* Destaques técnicos */}
-      <dl className="mx-auto mt-16 grid max-w-7xl gap-px overflow-hidden rounded-3xl border border-white/10 bg-white/10 sm:grid-cols-3">
+      <dl className="mx-auto mt-12 grid max-w-7xl grid-cols-3 gap-px overflow-hidden rounded-3xl border border-white/10 bg-white/10 sm:mt-16">
         {specs.map((spec) => (
-          <div key={spec.value} className="bg-black p-6 sm:p-8">
-            <dt className="font-display text-4xl font-semibold tracking-tight">{spec.value}</dt>
-            <dd className="mt-2 text-sm text-zinc-400">{spec.label}</dd>
+          <div key={spec.value} className="bg-black p-4 sm:p-8">
+            <dt className="font-display text-2xl font-semibold tracking-tight sm:text-4xl">{spec.value}</dt>
+            <dd className="mt-1 text-xs leading-5 text-zinc-400 sm:mt-2 sm:text-sm">{spec.label}</dd>
           </div>
         ))}
       </dl>
@@ -123,22 +123,22 @@ export function HeroSection() {
       {/* Os dois modelos do lançamento */}
       <div className="mx-auto mt-16 max-w-7xl">
         <h2 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">Escolha o seu iPhone 18 Pro</h2>
-        <div className="mt-6 grid gap-5 md:grid-cols-2">
+        <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-5">
           {IPHONE_18_MODELS.map((model) => (
             <article
               key={model.name}
-              className="group flex items-center gap-6 overflow-hidden rounded-[2rem] border border-white/10 bg-zinc-900/60 p-6 transition hover:border-white/25 hover:bg-zinc-900 sm:p-8"
+              className="group flex flex-col gap-4 overflow-hidden rounded-3xl border border-white/10 bg-zinc-900/60 p-4 transition hover:border-white/25 hover:bg-zinc-900 sm:p-6 lg:flex-row lg:items-center lg:gap-6 lg:p-8"
             >
               <img
                 src={model.image}
                 alt={model.name}
                 loading="lazy"
-                className="h-44 w-auto flex-none object-contain transition duration-500 group-hover:scale-105 sm:h-56"
+                className="mx-auto h-36 w-auto flex-none object-contain transition duration-500 group-hover:scale-105 sm:h-44 lg:mx-0 lg:h-56"
               />
               <div className="min-w-0">
-                <h3 className="text-2xl font-semibold tracking-tight">{model.name}</h3>
-                <p className="mt-1 text-sm text-zinc-400">
-                  {model.screen} · {model.highlight}
+                <h3 className="text-lg font-semibold leading-tight tracking-tight sm:text-2xl">{model.name}</h3>
+                <p className="mt-1 text-xs text-zinc-400 sm:text-sm">
+                  {model.screen}<span className="hidden sm:inline"> · {model.highlight}</span>
                 </p>
                 <div className="mt-4 flex gap-1.5">
                   {IPHONE_18_COLORS.map((c) => (
@@ -150,10 +150,10 @@ export function HeroSection() {
                     />
                   ))}
                 </div>
-                <p className="mt-4 text-sm font-semibold text-rose-200">Pré-venda · consulte o valor</p>
+                <p className="mt-3 text-xs font-semibold text-rose-200 sm:mt-4 sm:text-sm">Pré-venda · consulte o valor</p>
                 <a
                   href="#contato"
-                  className="mt-4 inline-flex rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-black transition hover:bg-zinc-200"
+                  className="mt-4 inline-flex w-full justify-center rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-black transition hover:bg-zinc-200 sm:w-auto"
                 >
                   Reservar
                 </a>

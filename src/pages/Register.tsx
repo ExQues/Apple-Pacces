@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { BrandLogo } from '@/components/BrandLogo'
 import { ArrowLeft, Eye, EyeOff, Mail, Lock, User, Phone } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
+import { usePageTitle } from '@/hooks/usePageTitle'
 
 export default function Register() {
   const [name, setName] = useState('')
@@ -12,7 +13,9 @@ export default function Register() {
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [notice, setNotice] = useState<string | null>(null)
   const navigate = useNavigate()
+  usePageTitle('Criar conta')
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -46,11 +49,12 @@ export default function Register() {
     if (signUpError) {
       const msg = signUpError.message.toLowerCase()
       if (msg.includes('already registered') || msg.includes('already exists')) {
-        setError('Este e-mail já foi criado nas tentativas anteriores! Clique em "Fazer login" abaixo para entrar com sua senha.')
+        setError('Já existe uma conta com este e-mail. Toque em "Fazer login" abaixo para entrar.')
       } else if (msg.includes('rate limit') || msg.includes('limit exceeded')) {
-        setError('Limite temporário de envio de e-mail atingido no Supabase por tentativas seguidas. Aguarde 2 minutos ou tente fazer login caso sua conta já tenha sido criada.')
+        setError('Muitas tentativas seguidas. Aguarde 2 minutos e tente de novo.')
       } else {
-        setError(signUpError.message)
+        console.warn('Erro no cadastro:', signUpError)
+        setError('Não conseguimos criar sua conta agora. Confira os dados e tente de novo.')
       }
       setLoading(false)
       return
@@ -66,6 +70,13 @@ export default function Register() {
       } catch (err) {
         console.warn('Nota RLS profiles Supabase:', err)
       }
+    }
+
+    // Se a conta precisar de confirmação por e-mail, ainda não há sessão ativa
+    if (!data.session) {
+      setNotice(`Enviamos um link de confirmação para ${email}. Abra o e-mail e toque no link para ativar sua conta.`)
+      setLoading(false)
+      return
     }
 
     navigate('/shop')
@@ -114,6 +125,11 @@ export default function Register() {
           </p>
 
           <form onSubmit={handleRegister} className="mt-9 space-y-4">
+            {notice && (
+              <div role="status" className="rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3.5 text-sm font-medium text-emerald-800">
+                {notice}
+              </div>
+            )}
             {error && (
               <div className="rounded-2xl border border-red-100 bg-red-50/80 px-4 py-3.5 text-sm font-medium text-red-600">
                 {error}
