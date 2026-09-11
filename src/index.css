@@ -130,3 +130,21 @@ button:focus-visible {
   outline-offset: 3px;
   border-radius: 6px;
 }
+
+/* Imagens de lançamento: aproximam suavemente conforme entram na tela (navegadores compatíveis) */
+@supports (animation-timeline: view()) {
+  .launch-zoom {
+    animation: launchZoom linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 45%;
+  }
+}
+
+@keyframes launchZoom {
+  from { transform: scale(1.16); }
+  to { transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .launch-zoom { animation: none !important; }
+}

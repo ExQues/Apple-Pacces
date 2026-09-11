@@ -1,6 +1,7 @@
 import { CatalogSections } from '@/components/CatalogSections'
 import { ContactSection, TrustStrip } from '@/components/ConversionSections'
 import { HeroSection } from '@/components/HeroSection'
+import { AlsoLaunchedSection, DuoSection, ReadyToShipSection } from '@/components/LaunchShowcase'
 import { SiteFooter } from '@/components/SiteFooter'
 import { SiteHeader } from '@/components/SiteHeader'
 
@@ -10,6 +11,9 @@ export default function Home() {
       <SiteHeader />
       <main>
         <HeroSection />
+        <DuoSection />
+        <AlsoLaunchedSection />
+        <ReadyToShipSection />
         <CatalogSections />
         <TrustStrip />
         <ContactSection />
