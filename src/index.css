@@ -118,3 +118,15 @@ body {
   animation: pageFadeIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+/* Contorno de foco só para quem navega pelo teclado; some ao clicar com o mouse */
+a:focus:not(:focus-visible),
+button:focus:not(:focus-visible) {
+  outline: none;
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid #0066cc;
+  outline-offset: 3px;
+  border-radius: 6px;
+}

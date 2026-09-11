@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState, useEffect } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { Search, ShoppingBag, X } from 'lucide-react'
 import { SiteFooter } from '@/components/SiteFooter'
 import { SiteHeader } from '@/components/SiteHeader'
@@ -8,10 +8,20 @@ import { useProductModalStore } from '@/store/useProductModalStore'
 import { useFlyingAnimationStore } from '@/store/useFlyingAnimationStore'
 import { useProducts } from '@/hooks/useProducts'
 import { usePageTitle } from '@/hooks/usePageTitle'
-import type { FeaturedProduct } from '@/data/appleStore'
+import { categoryCovers, type FeaturedProduct } from '@/data/appleStore'
 
 const CATEGORY_FILTERS = ['Todos', 'iPhone', 'Mac', 'iPad', 'Apple Watch', 'Acessórios'] as const
 type CategoryFilter = (typeof CATEGORY_FILTERS)[number]
+
+// Frase de abertura de cada página da loja
+const CATEGORY_INTRO: Record<CategoryFilter, string> = {
+  Todos: 'Todos os produtos lacrados, com garantia Apple de 1 ano e até 18x no cartão.',
+  iPhone: 'Linha iPhone 17 à pronta entrega e iPhone 18 Pro em pré-venda.',
+  Mac: 'MacBook Air, MacBook Pro e Mac mini com chip Apple.',
+  iPad: 'Do iPad 11 ao iPad Pro com chip M5, para estudar, trabalhar e desenhar.',
+  'Apple Watch': 'Saúde, treino e notificações no pulso. Do SE ao Ultra.',
+  Acessórios: 'AirPods, AirTag e Apple Pencil originais.',
+}
 
 // Lançamentos primeiro; produtos em falta sempre por último
 const HIGHLIGHT_ORDER = ['iPhone 17 Pro Max', 'iPhone 17 Pro', 'iPhone 17 Air', 'iPhone 17', 'iPhone 17e']
@@ -20,8 +30,77 @@ const displayRank = (p: FeaturedProduct) => {
   return (p.status === 'em-falta' ? 1000 : 0) + (highlight >= 0 ? highlight : 100)
 }
 
-function slugify(value: string) {
-  return value.toLowerCase().replace(/\s+/g, '-')
+const productAnchor = (name: string) => `produto-${name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`
+
+const scrollToTop = () => {
+  try {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  } catch {
+    // Ambiente de teste (jsdom) não implementa scroll
+  }
+}
+
+// Faixa de miniaturas: na loja geral mostra as categorias; dentro de uma categoria, os modelos
+function ShelfStrip({
+  selected,
+  products,
+  onSelectCategory,
+}: {
+  selected: CategoryFilter
+  products: FeaturedProduct[]
+  onSelectCategory: (category: CategoryFilter) => void
+}) {
+  const tileClass =
+    'group flex w-24 flex-none flex-col items-center gap-2 rounded-2xl px-1 py-3 text-center transition hover:bg-white sm:w-28'
+  const imageBox = 'flex h-16 w-full items-center justify-center'
+  const imageClass = 'max-h-full max-w-full object-contain transition duration-300 group-hover:scale-105'
+
+  if (selected === 'Todos') {
+    const order: CategoryFilter[] = ['iPhone', 'Mac', 'iPad', 'Apple Watch', 'Acessórios']
+    return (
+      <nav aria-label="Categorias" className="mt-6 hidden gap-2 overflow-x-auto pb-2 [scrollbar-width:none] md:flex">
+        {order.map((category) => {
+          const cover = products.find((p) => p.name === categoryCovers[category])
+          return (
+            <button key={category} type="button" onClick={() => onSelectCategory(category)} className={tileClass}>
+              <span className={imageBox}>{cover && <img src={cover.image} alt="" className={imageClass} />}</span>
+              <span className="text-xs font-medium text-zinc-700">{category === 'Apple Watch' ? 'Watch' : category}</span>
+            </button>
+          )
+        })}
+      </nav>
+    )
+  }
+
+  const models = products.filter((p) => p.category === selected).sort((a, b) => displayRank(a) - displayRank(b))
+  return (
+    <nav aria-label={`Modelos de ${selected}`} className="mt-6 flex gap-2 overflow-x-auto pb-2 [scrollbar-width:none]">
+      {selected === 'iPhone' && (
+        <Link to="/" className={tileClass}>
+          <span className={imageBox}>
+            <img src="/products/iphone-18-pro-finish-select-202609-6-9inch-burgundy.webp" alt="" className={imageClass} />
+          </span>
+          <span className="text-xs font-medium text-zinc-700">
+            iPhone 18 Pro
+            <span className="mt-0.5 block text-[11px] font-semibold text-[#b4455a]">Novo</span>
+          </span>
+        </Link>
+      )}
+      {models.map((p) => (
+        <button
+          key={p.name}
+          type="button"
+          onClick={() => document.getElementById(productAnchor(p.name))?.scrollIntoView?.({ behavior: 'smooth', block: 'start' })}
+          className={`${tileClass} ${p.status === 'em-falta' ? 'opacity-50' : ''}`}
+        >
+          <span className={imageBox}>
+            <img src={p.image} alt="" className={imageClass} />
+          </span>
+          <span className="text-xs font-medium leading-4 text-zinc-700">{p.name}</span>
+        </button>
+      ))}
+    </nav>
+  )
 }
 
 function ProductCard({ product }: { product: FeaturedProduct }) {
@@ -60,6 +139,11 @@ function ProductCard({ product }: { product: FeaturedProduct }) {
   const [isChanging, setIsChanging] = useState(false)
   const [imageLoaded, setImageLoaded] = useState(false)
 
+  // Foto que já estava no cache pode terminar de carregar antes do onLoad ser ligado
+  useEffect(() => {
+    if (imgRef.current?.complete) setImageLoaded(true)
+  }, [displaySrc])
+
   useEffect(() => {
     if (activeImage !== displaySrc) {
       setIsChanging(true)
@@ -83,8 +167,8 @@ function ProductCard({ product }: { product: FeaturedProduct }) {
 
   return (
     <article
-      id={slugify(product.category)}
-      className="group flex flex-col overflow-hidden rounded-3xl bg-white transition duration-300 hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)]"
+      id={productAnchor(product.name)}
+      className="group flex scroll-mt-36 flex-col overflow-hidden rounded-3xl bg-white transition duration-300 hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)]"
     >
       <div className="relative flex h-72 items-center justify-center p-10">
         <img
@@ -212,6 +296,16 @@ export default function Shop() {
     setQuery(searchParams.get('q') ?? '')
   }, [searchParams])
 
+  // Ao trocar de categoria com a página rolada, volta ao topo para mostrar a nova seleção
+  const isFirstRender = useRef(true)
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      return
+    }
+    scrollToTop()
+  }, [selected])
+
   const selectCategory = (category: CategoryFilter) => {
     const next = new URLSearchParams()
     if (category !== 'Todos') next.set('category', category)
@@ -247,18 +341,17 @@ export default function Shop() {
   return (
     <div className="min-h-screen bg-[#f5f5f7] text-zinc-950">
       <SiteHeader variant="shop" />
-      <main className="animate-page-in px-5 pb-24 pt-28 sm:pt-32 lg:px-8 lg:pt-36">
-        <section className="mx-auto max-w-7xl">
-          <h1 className="font-display text-5xl font-semibold tracking-[-0.05em] sm:text-6xl">
+      <main className="animate-page-in px-5 pb-24 pt-24 sm:pt-28 lg:px-8">
+        <section key={selected} className="animate-page-in mx-auto max-w-7xl">
+          <h1 className="font-display text-4xl font-semibold tracking-[-0.045em] sm:text-5xl">
             {selected === 'Todos' ? 'Loja.' : `${selected}.`}
           </h1>
-          <p className="mt-3 max-w-2xl text-xl leading-8 text-zinc-500 sm:text-2xl sm:leading-9">
-            Todos os produtos lacrados, com garantia Apple de 1 ano e até 18x no cartão.
-          </p>
+          <p className="mt-2 max-w-2xl text-lg leading-7 text-zinc-500 sm:text-xl">{CATEGORY_INTRO[selected]}</p>
+          <ShelfStrip selected={selected} products={products} onSelectCategory={selectCategory} />
         </section>
 
         {/* Filtros (no celular, onde o menu fica recolhido) e busca */}
-        <div className="sticky top-12 z-30 mx-auto mt-10 max-w-7xl bg-[#f5f5f7]/85 py-3 backdrop-blur-xl">
+        <div className="sticky top-12 z-30 mx-auto mt-4 max-w-7xl bg-[#f5f5f7]/85 py-3 backdrop-blur-xl">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] md:hidden">
               {CATEGORY_FILTERS.map((cat) => {
@@ -316,7 +409,7 @@ export default function Shop() {
           )}
         </div>
 
-        <section className="mx-auto mt-6 max-w-7xl" aria-label="Produtos Apple">
+        <section className="mx-auto mt-4 max-w-7xl" aria-label="Produtos Apple">
           {filtered.length === 0 ? (
             <div className="rounded-3xl bg-white p-12 text-center">
               <p className="text-lg font-semibold text-zinc-950">Nenhum produto encontrado.</p>
@@ -333,7 +426,7 @@ export default function Shop() {
               </button>
             </div>
           ) : (
-            <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            <div key={selected} className="animate-page-in grid gap-5 md:grid-cols-2 xl:grid-cols-3">
               {filtered.map((product) => (
                 <ProductCard key={product.name} product={product} />
               ))}

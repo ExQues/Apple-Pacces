@@ -605,3 +605,12 @@ export const trustItems: TrustItem[] = [
     description: 'Processo organizado para receber seu dispositivo com total tranquilidade.',
   },
 ]
+
+// Produto usado como foto de capa de cada categoria (home e loja)
+export const categoryCovers: Record<string, string> = {
+  iPhone: 'iPhone 17 Pro Max',
+  Mac: 'MacBook Air 13"',
+  iPad: 'iPad Pro M5',
+  'Apple Watch': 'Apple Watch Series 11',
+  Acessórios: 'AirPods Max',
+}

@@ -1,15 +1,6 @@
 import { ChevronRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { allProducts, categories } from '@/data/appleStore'
-
-// Produto usado como foto de capa de cada categoria
-const CATEGORY_COVER: Record<string, string> = {
-  iPhone: 'iPhone 17 Pro Max',
-  Mac: 'MacBook Air 13"',
-  iPad: 'iPad Pro M5',
-  'Apple Watch': 'Apple Watch Series 11',
-  Acessórios: 'AirPods Max',
-}
+import { allProducts, categories, categoryCovers } from '@/data/appleStore'
 
 function parsePrice(value: string) {
   return Number(value.replace(/\D/g, ''))
@@ -34,7 +25,7 @@ export function CatalogSections() {
 
         <div className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
           {categories.map((category) => {
-            const cover = allProducts.find((p) => p.name === CATEGORY_COVER[category.name]) ?? allProducts[0]
+            const cover = allProducts.find((p) => p.name === categoryCovers[category.name]) ?? allProducts[0]
             const price = lowestPrice(category.name)
 
             return (
