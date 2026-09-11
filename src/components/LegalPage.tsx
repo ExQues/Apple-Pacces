@@ -13,7 +13,7 @@ export function LegalPage({ title, updatedAt, intro, sections }: LegalPageProps)
   return (
     <div className="min-h-screen bg-[#f5f5f7] text-zinc-950">
       <SiteHeader variant="shop" />
-      <main className="px-5 pb-24 pt-28 sm:pt-32 lg:px-8">
+      <main className="animate-page-in px-5 pb-24 pt-28 sm:pt-32 lg:px-8">
         <article className="mx-auto max-w-3xl">
           <p className="text-sm text-zinc-500">Atualizado em {updatedAt}</p>
           <h1 className="mt-2 font-display text-4xl font-semibold tracking-[-0.045em] sm:text-5xl">{title}</h1>

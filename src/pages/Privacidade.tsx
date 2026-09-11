@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { LegalPage } from '@/components/LegalPage'
 
 export default function Privacidade() {
@@ -12,7 +13,7 @@ export default function Privacidade() {
           body: (
             <p>
               A Apple Pacces é uma revenda independente de produtos Apple, sem vínculo com a Apple Inc. Para qualquer assunto
-              sobre seus dados, fale com a gente pelo formulário <a href="/#contato" className="text-[#0066cc] hover:underline">Fale com um especialista</a>.
+              sobre seus dados, fale com a gente pelo formulário <Link to="/#contato" className="text-[#0066cc] hover:underline">Fale com um especialista</Link>.
             </p>
           ),
         },

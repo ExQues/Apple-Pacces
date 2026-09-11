@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { ShoppingBag, User as UserIcon, LogOut, Menu, X, Package } from 'lucide-react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { BrandLogo } from '@/components/BrandLogo'
 import { useAuthStore } from '@/store/useAuthStore'
 import { useCartStore } from '@/store/useCartStore'
@@ -10,27 +10,34 @@ type SiteHeaderProps = {
   variant?: 'home' | 'shop'
 }
 
+// Os links de categoria levam à loja já filtrada; a loja lê o filtro do endereço,
+// então menu e loja mostram sempre a mesma seleção.
 const STORE_LINKS = [
-  { label: 'Loja', to: '/shop' },
-  { label: 'iPhone', to: '/shop?category=iPhone' },
-  { label: 'Mac', to: '/shop?category=Mac' },
-  { label: 'iPad', to: '/shop?category=iPad' },
-  { label: 'Watch', to: `/shop?category=${encodeURIComponent('Apple Watch')}` },
-  { label: 'Acessórios', to: `/shop?category=${encodeURIComponent('Acessórios')}` },
-]
+  { label: 'Loja', category: null },
+  { label: 'iPhone', category: 'iPhone' },
+  { label: 'Mac', category: 'Mac' },
+  { label: 'iPad', category: 'iPad' },
+  { label: 'Watch', category: 'Apple Watch' },
+  { label: 'Acessórios', category: 'Acessórios' },
+] as const
+
+const storeHref = (category: string | null) => (category ? `/shop?category=${encodeURIComponent(category)}` : '/shop')
 
 export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
-  const contactHref = variant === 'home' ? '#contato' : '/#contato'
-
   const { user, signOut } = useAuthStore()
   const { toggleDrawer, totalItems } = useCartStore()
   const { setCartIconRef, isBouncing } = useFlyingAnimationStore()
   const navigate = useNavigate()
+  const location = useLocation()
   const cartButtonRef = useRef<HTMLButtonElement | null>(null)
   const userMenuRef = useRef<HTMLDivElement | null>(null)
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
+
+  // Categoria aberta na loja, para marcar o link ativo
+  const activeCategory =
+    location.pathname === '/shop' ? new URLSearchParams(location.search).get('category') : undefined
 
   // Barra escura enquanto estiver sobre o hero escuro da home; clara no resto
   const [overDark, setOverDark] = useState(variant === 'home')
@@ -85,7 +92,7 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
   const barClass = dark
     ? 'border-white/10 bg-black/70 text-white'
     : 'border-black/5 bg-[#f5f5f7]/80 text-zinc-900'
-  const linkClass = 'text-[13px] opacity-80 transition-opacity hover:opacity-100'
+  const linkClass = 'text-[13px] transition-opacity hover:opacity-100'
   const count = totalItems()
 
   return (
@@ -96,14 +103,22 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
         </Link>
 
         <div className="hidden flex-1 items-center justify-center gap-8 md:flex">
-          {STORE_LINKS.map((link) => (
-            <Link key={link.label} to={link.to} className={linkClass}>
-              {link.label}
-            </Link>
-          ))}
-          <a href={contactHref} className={linkClass}>
+          {STORE_LINKS.map((link) => {
+            const isActive = activeCategory !== undefined && (activeCategory ?? null) === link.category
+            return (
+              <Link
+                key={link.label}
+                to={storeHref(link.category)}
+                aria-current={isActive ? 'page' : undefined}
+                className={`${linkClass} ${isActive ? 'font-semibold opacity-100' : 'opacity-80'}`}
+              >
+                {link.label}
+              </Link>
+            )
+          })}
+          <Link to="/#contato" className={`${linkClass} opacity-80`}>
             Contato
-          </a>
+          </Link>
         </div>
 
         <div className="flex flex-none items-center gap-4">
@@ -164,7 +179,7 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
               )}
             </div>
           ) : (
-            <Link to="/login" className={`${linkClass} hidden sm:inline`}>
+            <Link to="/login" className={`${linkClass} hidden opacity-80 sm:inline`}>
               Entrar
             </Link>
           )}
@@ -187,20 +202,20 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
             {STORE_LINKS.map((link) => (
               <Link
                 key={link.label}
-                to={link.to}
+                to={storeHref(link.category)}
                 onClick={() => setMobileMenuOpen(false)}
                 className="py-2 text-3xl font-semibold tracking-tight text-zinc-900"
               >
                 {link.label}
               </Link>
             ))}
-            <a
-              href={contactHref}
+            <Link
+              to="/#contato"
               onClick={() => setMobileMenuOpen(false)}
               className="py-2 text-3xl font-semibold tracking-tight text-zinc-900"
             >
               Contato
-            </a>
+            </Link>
             {!user && (
               <Link
                 to="/login"

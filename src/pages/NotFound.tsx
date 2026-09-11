@@ -6,7 +6,7 @@ export default function NotFound() {
   return (
     <div className="min-h-screen bg-[#f5f5f7] text-zinc-950">
       <SiteHeader variant="shop" />
-      <main className="grid min-h-[75vh] place-items-center px-5 pt-24 text-center">
+      <main className="animate-page-in grid min-h-[75vh] place-items-center px-5 pt-24 text-center">
         <div>
           <p className="text-sm font-semibold text-zinc-500">Erro 404</p>
           <h1 className="mt-3 font-display text-5xl font-semibold tracking-[-0.05em] sm:text-6xl">Página não encontrada.</h1>

@@ -51,15 +51,9 @@ export function SiteFooter() {
               <ul className="mt-3 space-y-2">
                 {column.links.map((link) => (
                   <li key={link.label}>
-                    {link.to.includes('#') ? (
-                      <a href={link.to} className="text-sm transition hover:text-zinc-900 hover:underline">
-                        {link.label}
-                      </a>
-                    ) : (
-                      <Link to={link.to} className="text-sm transition hover:text-zinc-900 hover:underline">
-                        {link.label}
-                      </Link>
-                    )}
+                    <Link to={link.to} className="text-sm transition hover:text-zinc-900 hover:underline">
+                      {link.label}
+                    </Link>
                   </li>
                 ))}
               </ul>

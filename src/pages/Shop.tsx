@@ -10,6 +10,14 @@ import { useProducts } from '@/hooks/useProducts'
 import type { FeaturedProduct } from '@/data/appleStore'
 
 const CATEGORY_FILTERS = ['Todos', 'iPhone', 'Mac', 'iPad', 'Apple Watch', 'Acessórios'] as const
+type CategoryFilter = (typeof CATEGORY_FILTERS)[number]
+
+// Lançamentos primeiro; produtos em falta sempre por último
+const HIGHLIGHT_ORDER = ['iPhone 17 Pro Max', 'iPhone 17 Pro', 'iPhone 17 Air', 'iPhone 17', 'iPhone 17e']
+const displayRank = (p: FeaturedProduct) => {
+  const highlight = HIGHLIGHT_ORDER.indexOf(p.name)
+  return (p.status === 'em-falta' ? 1000 : 0) + (highlight >= 0 ? highlight : 100)
+}
 
 function slugify(value: string) {
   return value.toLowerCase().replace(/\s+/g, '-')
@@ -49,6 +57,7 @@ function ProductCard({ product }: { product: FeaturedProduct }) {
   // Transição suave de troca de imagem sem tela branca / piscada
   const [displaySrc, setDisplaySrc] = useState(activeImage)
   const [isChanging, setIsChanging] = useState(false)
+  const [imageLoaded, setImageLoaded] = useState(false)
 
   useEffect(() => {
     if (activeImage !== displaySrc) {
@@ -83,18 +92,20 @@ function ProductCard({ product }: { product: FeaturedProduct }) {
           alt={`${product.name} na cor ${selectedColor}`}
           loading="lazy"
           decoding="async"
+          onLoad={() => setImageLoaded(true)}
           onError={(e) => {
             const target = e.currentTarget
             target.onerror = null
+            setImageLoaded(true)
             target.src =
               'data:image/svg+xml;utf8,' +
               encodeURIComponent(
                 `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect width="400" height="300" fill="%23ffffff"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="system-ui" font-size="20" fill="%239ca3af">${product.name}</text></svg>`,
               )
           }}
-          className={`h-full w-full object-contain transition-all duration-300 ease-out group-hover:scale-[1.03] ${
-            isChanging ? 'opacity-40' : 'opacity-100'
-          } ${isSoldOut ? 'opacity-60' : ''}`}
+          className={`h-full w-full object-contain transition-all duration-500 ease-out group-hover:scale-[1.03] ${
+            !imageLoaded || isChanging ? 'opacity-0' : isSoldOut ? 'opacity-60' : 'opacity-100'
+          }`}
         />
         {isSoldOut && (
           <span className="absolute left-5 top-5 rounded-full bg-zinc-100 px-3 py-1 text-xs font-semibold text-zinc-500">
@@ -183,36 +194,45 @@ function ProductCard({ product }: { product: FeaturedProduct }) {
 }
 
 export default function Shop() {
-  const [searchParams] = useSearchParams()
-  const categoryParam = searchParams.get('category')
+  const [searchParams, setSearchParams] = useSearchParams()
   const { products } = useProducts()
   const [query, setQuery] = useState(() => searchParams.get('q') ?? '')
-  const [selected, setSelected] = useState<(typeof CATEGORY_FILTERS)[number]>('Todos')
 
+  // A categoria mora no endereço (?category=): menu, filtros e botão voltar ficam sempre em sincronia
+  const categoryParam = searchParams.get('category')
+  const selected: CategoryFilter = (CATEGORY_FILTERS as readonly string[]).includes(categoryParam ?? '')
+    ? (categoryParam as CategoryFilter)
+    : 'Todos'
+
+  // Busca que veio por link (ex.: vitrine da home) acompanha o endereço
   useEffect(() => {
-    if (categoryParam && (CATEGORY_FILTERS as readonly string[]).includes(categoryParam)) {
-      setSelected(categoryParam as (typeof CATEGORY_FILTERS)[number])
-    } else {
-      setSelected('Todos')
-    }
-  }, [categoryParam])
+    setQuery(searchParams.get('q') ?? '')
+  }, [searchParams])
+
+  const selectCategory = (category: CategoryFilter) => {
+    const next = new URLSearchParams()
+    if (category !== 'Todos') next.set('category', category)
+    setSearchParams(next)
+  }
 
   const isSearching = query.trim().length > 0
 
   const filtered = useMemo(() => {
     const term = query.trim().toLowerCase()
-    return products.filter((p) => {
-      // Ao digitar uma busca, ignora a restrição de categoria individual para buscar em todo o catálogo
-      const inCategory = term ? true : selected === 'Todos' || p.category === selected
-      if (!inCategory) return false
-      if (!term) return true
-      return (
-        p.name.toLowerCase().includes(term) ||
-        p.line.toLowerCase().includes(term) ||
-        p.category.toLowerCase().includes(term) ||
-        p.description.toLowerCase().includes(term)
-      )
-    })
+    return products
+      .filter((p) => {
+        // Ao digitar uma busca, ignora a categoria para buscar em todo o catálogo
+        const inCategory = term ? true : selected === 'Todos' || p.category === selected
+        if (!inCategory) return false
+        if (!term) return true
+        return (
+          p.name.toLowerCase().includes(term) ||
+          p.line.toLowerCase().includes(term) ||
+          p.category.toLowerCase().includes(term) ||
+          p.description.toLowerCase().includes(term)
+        )
+      })
+      .sort((a, b) => displayRank(a) - displayRank(b))
   }, [query, selected, products])
 
   const totalByCategory = useMemo(() => {
@@ -224,18 +244,20 @@ export default function Shop() {
   return (
     <div className="min-h-screen bg-[#f5f5f7] text-zinc-950">
       <SiteHeader variant="shop" />
-      <main className="px-5 pb-24 pt-28 sm:pt-32 lg:px-8 lg:pt-36">
+      <main className="animate-page-in px-5 pb-24 pt-28 sm:pt-32 lg:px-8 lg:pt-36">
         <section className="mx-auto max-w-7xl">
-          <h1 className="font-display text-5xl font-semibold tracking-[-0.05em] sm:text-6xl">Loja.</h1>
+          <h1 className="font-display text-5xl font-semibold tracking-[-0.05em] sm:text-6xl">
+            {selected === 'Todos' ? 'Loja.' : `${selected}.`}
+          </h1>
           <p className="mt-3 max-w-2xl text-xl leading-8 text-zinc-500 sm:text-2xl sm:leading-9">
             Todos os produtos lacrados, com garantia Apple de 1 ano e até 18x no cartão.
           </p>
         </section>
 
-        {/* Filtros e busca */}
+        {/* Filtros (no celular, onde o menu fica recolhido) e busca */}
         <div className="sticky top-12 z-30 mx-auto mt-10 max-w-7xl bg-[#f5f5f7]/85 py-3 backdrop-blur-xl">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] md:hidden">
               {CATEGORY_FILTERS.map((cat) => {
                 const isActive = selected === cat
                 const count = cat === 'Todos' ? products.length : totalByCategory.get(cat) ?? 0
@@ -243,7 +265,7 @@ export default function Shop() {
                   <button
                     key={cat}
                     type="button"
-                    onClick={() => setSelected(cat)}
+                    onClick={() => selectCategory(cat)}
                     aria-pressed={isActive}
                     className={`inline-flex flex-none items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition active:scale-95 ${
                       isActive ? 'bg-zinc-950 text-white' : 'bg-white text-zinc-600 hover:text-zinc-950'
@@ -256,7 +278,11 @@ export default function Shop() {
               })}
             </div>
 
-            <label className="flex items-center gap-2 rounded-full bg-white px-4 py-2.5 ring-1 ring-zinc-200 transition focus-within:ring-zinc-400 lg:w-80">
+            <p className="hidden text-sm text-zinc-500 md:block">
+              {filtered.length} {filtered.length === 1 ? 'produto' : 'produtos'}
+            </p>
+
+            <label className="flex items-center gap-2 rounded-full bg-white px-4 py-2.5 ring-1 ring-zinc-200 transition focus-within:ring-zinc-400 md:w-80">
               <Search className="size-4 flex-none text-zinc-400" aria-hidden="true" />
               <input
                 type="text"
@@ -296,7 +322,7 @@ export default function Shop() {
                 type="button"
                 onClick={() => {
                   setQuery('')
-                  setSelected('Todos')
+                  selectCategory('Todos')
                 }}
                 className="mt-6 inline-flex rounded-full bg-zinc-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-zinc-800"
               >

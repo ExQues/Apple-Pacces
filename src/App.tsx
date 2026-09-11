@@ -23,6 +23,14 @@ const Trocas = lazy(() => import("@/pages/Trocas"));
 // Pré-visualização de telas para revisão de design; só existe no ambiente local
 const DevPreview = import.meta.env.DEV ? lazy(() => import("@/pages/DevPreview")) : null;
 
+function PageLoading() {
+  return (
+    <div className="grid min-h-screen place-items-center bg-[#f5f5f7]">
+      <span className="apple-spinner apple-spinner--lg" aria-label="Carregando" />
+    </div>
+  );
+}
+
 export default function App() {
   const { initialize } = useAuthStore();
   const { isAuthModalOpen, closeAuthModal } = useCartStore();
@@ -31,6 +39,19 @@ export default function App() {
     initialize();
   }, [initialize]);
 
+  // Baixa as páginas secundárias quando o navegador estiver livre, para abrirem sem espera
+  useEffect(() => {
+    const preload = () => {
+      import("@/pages/Login");
+      import("@/pages/Register");
+      import("@/pages/Checkout");
+      import("@/pages/Orders");
+    };
+    const idle = (window as Window & { requestIdleCallback?: (cb: () => void) => number }).requestIdleCallback;
+    if (idle) idle(preload);
+    else setTimeout(preload, 2000);
+  }, []);
+
   return (
     <Router>
       <ScrollToTop />
@@ -38,7 +59,7 @@ export default function App() {
       <ProductModal />
       <FlyingImage />
       <AuthGuardModal isOpen={isAuthModalOpen} onClose={closeAuthModal} />
-      <Suspense fallback={<div className="min-h-screen bg-[#f5f5f7]" />}>
+      <Suspense fallback={<PageLoading />}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/shop" element={<Shop />} />

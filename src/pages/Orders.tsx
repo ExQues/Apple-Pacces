@@ -65,7 +65,7 @@ export default function Orders() {
     <div className="min-h-screen bg-[#f5f5f7] text-zinc-950">
       <SiteHeader variant="shop" />
 
-      <main className="px-5 pb-24 pt-28 sm:pt-32 lg:px-8">
+      <main className="animate-page-in px-5 pb-24 pt-28 sm:pt-32 lg:px-8">
         <div className="mx-auto max-w-4xl">
           <h1 className="font-display text-4xl font-semibold tracking-[-0.045em] sm:text-5xl">Meus pedidos.</h1>
           <p className="mt-3 text-lg text-zinc-500">Acompanhe o status das suas compras.</p>
@@ -88,9 +88,9 @@ export default function Orders() {
                 <Link to="/shop" className="rounded-full bg-zinc-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-zinc-800">
                   Ver a loja
                 </Link>
-                <a href="/#contato" className="rounded-full px-6 py-3 text-sm font-semibold text-[#0066cc] hover:underline">
+                <Link to="/#contato" className="rounded-full px-6 py-3 text-sm font-semibold text-[#0066cc] hover:underline">
                   Falar com a gente
-                </a>
+                </Link>
               </div>
             </div>
           ) : (
@@ -140,9 +140,9 @@ export default function Orders() {
 
                     <p className="mt-2 text-sm text-zinc-500">
                       Dúvidas sobre este pedido?{' '}
-                      <a href="/#contato" className="font-medium text-[#0066cc] hover:underline">
+                      <Link to="/#contato" className="font-medium text-[#0066cc] hover:underline">
                         Fale com a gente
-                      </a>
+                      </Link>
                     </p>
                   </article>
                 )

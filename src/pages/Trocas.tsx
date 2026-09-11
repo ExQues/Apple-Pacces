@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { LegalPage } from '@/components/LegalPage'
 
 export default function Trocas() {
@@ -44,7 +45,7 @@ export default function Trocas() {
           title: 'Como pedir',
           body: (
             <p>
-              Fale com a gente pelo <a href="/#contato" className="text-[#0066cc] hover:underline">atendimento</a> informando o
+              Fale com a gente pelo <Link to="/#contato" className="text-[#0066cc] hover:underline">atendimento</Link> informando o
               número do pedido, que aparece em Meus pedidos. Enviamos as instruções de devolução e a coleta ou postagem sem custo.
             </p>
           ),

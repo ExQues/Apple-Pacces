@@ -167,7 +167,7 @@ export default function Checkout() {
     <div className="min-h-screen bg-[#f5f5f7] text-zinc-950">
       <SiteHeader variant="shop" />
 
-      <main className="px-5 pb-24 pt-28 sm:pt-32 lg:px-8">
+      <main className="animate-page-in px-5 pb-24 pt-28 sm:pt-32 lg:px-8">
         <div className="mx-auto max-w-5xl">
           <h1 className="font-display text-4xl font-semibold tracking-[-0.045em] sm:text-5xl">Finalizar compra.</h1>
           <p className="mt-3 text-lg text-zinc-500">Confirme seus dados e o endereço. O pagamento é feito na página segura da Cakto.</p>
